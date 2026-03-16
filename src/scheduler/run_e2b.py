@@ -33,10 +33,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 def _collect_sandbox_files() -> list[dict]:
     """Collect only the files needed inside the sandbox.
 
-    The sandbox only needs:
-    - scheduler/sandbox/ (the agent + api_client)
-    - scheduler/config.py (for reading env vars — though sandbox onboarding
-      reads env directly, config.py is still imported transitively)
+    The sandbox needs:
+    - scheduler/sandbox/ (entry point + api_client)
+    - scheduler/onboarding/agent.py (shared agent logic)
     - pyproject.toml (for pip install)
     """
     files = []
@@ -47,6 +46,17 @@ def _collect_sandbox_files() -> list[dict]:
             "path": f"/home/user/scheduler/src/{rel_path}",
             "data": py_file.read_text(),
         })
+
+    # Shared onboarding agent (no backends — sandbox uses ControlPlaneClient directly)
+    onboarding_dir = PROJECT_ROOT / "src" / "scheduler" / "onboarding"
+    files.append({
+        "path": "/home/user/scheduler/src/scheduler/onboarding/__init__.py",
+        "data": "",
+    })
+    files.append({
+        "path": "/home/user/scheduler/src/scheduler/onboarding/agent.py",
+        "data": (onboarding_dir / "agent.py").read_text(),
+    })
 
     # Include the top-level package init
     init_file = PROJECT_ROOT / "src" / "scheduler" / "__init__.py"
