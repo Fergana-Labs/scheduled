@@ -1,9 +1,9 @@
 """Onboarding agent — backfills the stash calendar from Gmail history.
 
-This is an AGENT (not a simple LLM completion). It uses the Claude Agent SDK
-with custom tools (via an SDK MCP server) to agentically search through Gmail,
-read email threads, check for existing calendar events, and add missing
-commitments to the stash calendar.
+Uses the Claude Agent SDK with custom tools (via an SDK MCP server) 
+to agentically search through Gmail, read email threads, check for 
+existing calendar events, and add missing commitments to the stash 
+calendar.
 
 An agent is used here (rather than a single completion) because onboarding
 requires iterative exploration — the agent needs to search Gmail with different
