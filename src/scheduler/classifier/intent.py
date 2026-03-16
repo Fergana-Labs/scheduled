@@ -1,4 +1,8 @@
-"""LLM-based classifier for scheduling intent in emails.
+"""LLM completion classifier for scheduling intent in emails.
+
+This is a simple LLM completion (not an agent) — it takes an email and returns
+a structured classification. No tools, no agentic loop, just a single API call
+with structured output.
 
 Determines whether an incoming email is asking the user to schedule something,
 and if so, extracts relevant details (proposed times, urgency, etc.).
@@ -47,10 +51,11 @@ def classify_email(subject: str, body: str, sender: str) -> ClassificationResult
     Returns:
         ClassificationResult with the intent and extracted details.
     """
-    # TODO: Implement
+    # TODO: Implement as a single LLM completion (not an agent)
     # 1. Build a prompt that asks Claude to classify the email
-    # 2. Parse the structured response
-    # 3. Return a ClassificationResult
+    # 2. Use a single anthropic.messages.create() call
+    # 3. Parse the structured response (consider using tool_use for structured output)
+    # 4. Return a ClassificationResult
     raise NotImplementedError
 
 
@@ -67,7 +72,8 @@ def classify_message_for_event(message: str, sender: str) -> dict | None:
         Dict with event details (summary, datetime, duration) if a new event
         was detected, None otherwise.
     """
-    # TODO: Implement
+    # TODO: Implement as a single LLM completion (not an agent)
     # This is the hook classifier — it determines if a new message
     # represents a scheduling commitment that should go on the stash calendar
+    # Single anthropic.messages.create() call with structured output
     raise NotImplementedError

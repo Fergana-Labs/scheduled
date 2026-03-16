@@ -28,5 +28,14 @@ src/scheduler/
 
 - **Stash calendar approach**: A real Google Calendar is the single source of truth for all commitments. This lets users see it too.
 - **v0 scope**: Google Calendar only. Text messages (v1) and Beeper/Slack (v2) come later.
-- Uses Claude (via Anthropic API) for email classification and draft composition.
 - Google OAuth uses same scopes/approach as Fyxer for creating drafts.
+
+### LLM completion vs agent
+
+Two agents, one LLM completion:
+
+| Component | Type | Why |
+|---|---|---|
+| `classifier/intent.py` | **LLM completion** | Simple classification — single API call with structured output, no tools needed |
+| `drafts/composer.py` | **Agent** | Needs to read threads, check availability across date ranges, iterate on draft quality |
+| `onboarding.py` | **Agent** | Needs to iteratively search Gmail with different queries, read threads, cross-reference calendar, decide when done |
