@@ -7,3 +7,4 @@ build/
 .pytest_cache/
 token.json
 credentials.json
+.DS_store
