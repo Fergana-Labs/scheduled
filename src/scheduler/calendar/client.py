@@ -1,7 +1,7 @@
 """Google Calendar API client for the stash calendar."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 from googleapiclient.discovery import build
 
@@ -28,7 +28,8 @@ def _parse_event_datetime(event_data: dict, field: str) -> datetime:
     if dt_str:
         return datetime.fromisoformat(dt_str)
     # All-day event — just a date string like "2026-03-17"
-    return datetime.fromisoformat(event_data[field]["date"])
+    # Must attach UTC tzinfo so sorting can compare with timed (aware) events
+    return datetime.fromisoformat(event_data[field]["date"]).replace(tzinfo=timezone.utc)
 
 
 def _event_from_api(event_data: dict) -> Event:
