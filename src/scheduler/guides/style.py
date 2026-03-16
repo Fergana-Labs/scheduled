@@ -6,8 +6,10 @@ scheduling-related emails, then writes a style guide for future agents.
 Uses the Claude Agent SDK with custom tools (via an SDK MCP server).
 """
 
+from __future__ import annotations
+
 import json
-import os
+from typing import TYPE_CHECKING
 
 from claude_agent_sdk import (
     AssistantMessage,
@@ -19,25 +21,11 @@ from claude_agent_sdk import (
     tool,
 )
 
-from scheduler.config import config
-from scheduler.gmail.client import GmailClient
+if TYPE_CHECKING:
+    from scheduler.guides.backends import GuideBackend
 
 
-def _serialize_email(email):
-    """Serialize an Email object to a dict for the agent."""
-    return {
-        "id": email.id,
-        "thread_id": email.thread_id,
-        "sender": email.sender,
-        "recipient": email.recipient,
-        "subject": email.subject,
-        "body": email.body,
-        "date": email.date.isoformat(),
-        "snippet": email.snippet,
-    }
-
-
-def _build_tools(gmail: GmailClient):
+def _build_tools(backend: GuideBackend):
     """Build the Agent SDK tools for the style agent."""
 
     @tool(
@@ -46,12 +34,11 @@ def _build_tools(gmail: GmailClient):
         {"query": str, "max_results": int},
     )
     async def search_emails(args):
-        emails = gmail.search(
+        result = backend.search_emails(
             query=args["query"],
             max_results=args.get("max_results", 50),
         )
-        result = json.dumps({"emails": [_serialize_email(e) for e in emails]})
-        return {"content": [{"type": "text", "text": result}]}
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     @tool(
         "read_thread",
@@ -59,9 +46,8 @@ def _build_tools(gmail: GmailClient):
         {"thread_id": str},
     )
     async def read_thread(args):
-        thread_messages = gmail.get_thread(args["thread_id"])
-        result = json.dumps({"messages": [_serialize_email(e) for e in thread_messages]})
-        return {"content": [{"type": "text", "text": result}]}
+        result = backend.read_thread(args["thread_id"])
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     @tool(
         "write_guide",
@@ -70,11 +56,8 @@ def _build_tools(gmail: GmailClient):
         {"content": str},
     )
     async def write_guide(args):
-        os.makedirs(config.guides_dir, exist_ok=True)
-        path = os.path.join(config.guides_dir, "email_style.md")
-        with open(path, "w") as f:
-            f.write(args["content"])
-        return {"content": [{"type": "text", "text": json.dumps({"status": "written", "path": path})}]}
+        result = backend.write_guide("email_style", args["content"])
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     return [search_emails, read_thread, write_guide]
 
@@ -117,9 +100,9 @@ composing draft replies on behalf of this user.
 """
 
 
-async def run_style_agent(gmail: GmailClient) -> None:
+async def run_style_agent(backend: GuideBackend) -> None:
     """Run the email style guide-writer agent."""
-    tools = _build_tools(gmail)
+    tools = _build_tools(backend)
     server = create_sdk_mcp_server("style-tools", tools=tools)
 
     prompt = (

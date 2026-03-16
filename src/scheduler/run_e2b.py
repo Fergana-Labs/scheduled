@@ -36,6 +36,8 @@ def _collect_sandbox_files() -> list[dict]:
     The sandbox needs:
     - scheduler/sandbox/ (entry point + api_client)
     - scheduler/onboarding/agent.py (shared agent logic)
+    - scheduler/guides/ (preferences + style agents + backends)
+    - scheduler/config.py (used by guide agents for lookback_days)
     - pyproject.toml (for pip install)
     """
     files = []
@@ -56,6 +58,22 @@ def _collect_sandbox_files() -> list[dict]:
     files.append({
         "path": "/home/user/scheduler/src/scheduler/onboarding/agent.py",
         "data": (onboarding_dir / "agent.py").read_text(),
+    })
+
+    # Guide agents (preferences + style + backends)
+    guides_dir = PROJECT_ROOT / "src" / "scheduler" / "guides"
+    for py_file in guides_dir.glob("*.py"):
+        rel_path = py_file.relative_to(PROJECT_ROOT / "src")
+        files.append({
+            "path": f"/home/user/scheduler/src/{rel_path}",
+            "data": py_file.read_text(),
+        })
+
+    # Config module (used by guide agents for lookback_days, etc.)
+    config_file = PROJECT_ROOT / "src" / "scheduler" / "config.py"
+    files.append({
+        "path": "/home/user/scheduler/src/scheduler/config.py",
+        "data": config_file.read_text(),
     })
 
     # Include the top-level package init
@@ -87,8 +105,10 @@ name = "scheduler"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
+    "anyio>=4.0.0",
     "claude-agent-sdk>=0.1.0",
     "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [tool.setuptools.packages.find]

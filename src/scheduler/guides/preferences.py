@@ -6,9 +6,11 @@ and how the user schedules things, then writes a guide for future agents.
 Uses the Claude Agent SDK with custom tools (via an SDK MCP server).
 """
 
+from __future__ import annotations
+
 import json
-import os
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 from claude_agent_sdk import (
     AssistantMessage,
@@ -20,37 +22,13 @@ from claude_agent_sdk import (
     tool,
 )
 
-from scheduler.calendar.client import CalendarClient
 from scheduler.config import config
-from scheduler.gmail.client import GmailClient
+
+if TYPE_CHECKING:
+    from scheduler.guides.backends import GuideBackend
 
 
-def _serialize_email(email):
-    """Serialize an Email object to a dict for the agent."""
-    return {
-        "id": email.id,
-        "thread_id": email.thread_id,
-        "sender": email.sender,
-        "recipient": email.recipient,
-        "subject": email.subject,
-        "body": email.body,
-        "date": email.date.isoformat(),
-        "snippet": email.snippet,
-    }
-
-
-def _serialize_event(event):
-    """Serialize an Event object to a dict for the agent."""
-    return {
-        "id": event.id,
-        "summary": event.summary,
-        "start": event.start.isoformat(),
-        "end": event.end.isoformat(),
-        "description": event.description,
-    }
-
-
-def _build_tools(gmail: GmailClient, calendar: CalendarClient):
+def _build_tools(backend: GuideBackend):
     """Build the Agent SDK tools for the preferences agent."""
 
     @tool(
@@ -59,12 +37,11 @@ def _build_tools(gmail: GmailClient, calendar: CalendarClient):
         {"query": str, "max_results": int},
     )
     async def search_emails(args):
-        emails = gmail.search(
+        result = backend.search_emails(
             query=args["query"],
             max_results=args.get("max_results", 50),
         )
-        result = json.dumps({"emails": [_serialize_email(e) for e in emails]})
-        return {"content": [{"type": "text", "text": result}]}
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     @tool(
         "read_thread",
@@ -72,9 +49,8 @@ def _build_tools(gmail: GmailClient, calendar: CalendarClient):
         {"thread_id": str},
     )
     async def read_thread(args):
-        thread_messages = gmail.get_thread(args["thread_id"])
-        result = json.dumps({"messages": [_serialize_email(e) for e in thread_messages]})
-        return {"content": [{"type": "text", "text": result}]}
+        result = backend.read_thread(args["thread_id"])
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     @tool(
         "get_calendar_events",
@@ -82,12 +58,11 @@ def _build_tools(gmail: GmailClient, calendar: CalendarClient):
         {"start_date": str, "end_date": str},
     )
     async def get_calendar_events(args):
-        events = calendar.get_all_events(
-            time_min=datetime.fromisoformat(args["start_date"]),
-            time_max=datetime.fromisoformat(args["end_date"]),
+        result = backend.get_calendar_events(
+            start_date=args["start_date"],
+            end_date=args["end_date"],
         )
-        result = json.dumps({"events": [_serialize_event(e) for e in events]})
-        return {"content": [{"type": "text", "text": result}]}
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     @tool(
         "write_guide",
@@ -96,11 +71,8 @@ def _build_tools(gmail: GmailClient, calendar: CalendarClient):
         {"content": str},
     )
     async def write_guide(args):
-        os.makedirs(config.guides_dir, exist_ok=True)
-        path = os.path.join(config.guides_dir, "scheduling_preferences.md")
-        with open(path, "w") as f:
-            f.write(args["content"])
-        return {"content": [{"type": "text", "text": json.dumps({"status": "written", "path": path})}]}
+        result = backend.write_guide("scheduling_preferences", args["content"])
+        return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     return [search_emails, read_thread, get_calendar_events, write_guide]
 
@@ -135,7 +107,7 @@ pattern vs. weak signal). Do not fabricate patterns.
 """
 
 
-async def run_preferences_agent(gmail: GmailClient, calendar: CalendarClient) -> None:
+async def run_preferences_agent(backend: GuideBackend) -> None:
     """Run the scheduling preferences guide-writer agent."""
     today = datetime.now()
     window_start = today - timedelta(days=config.onboarding_lookback_days)
@@ -146,7 +118,7 @@ async def run_preferences_agent(gmail: GmailClient, calendar: CalendarClient) ->
         window_start=window_start.strftime("%Y-%m-%d"),
     )
 
-    tools = _build_tools(gmail, calendar)
+    tools = _build_tools(backend)
     server = create_sdk_mcp_server("preferences-tools", tools=tools)
 
     prompt = (

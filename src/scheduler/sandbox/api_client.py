@@ -48,3 +48,6 @@ class ControlPlaneClient:
             "/calendar/add",
             {"summary": summary, "start": start, "end": end, "description": description},
         )
+
+    def write_guide(self, name: str, content: str) -> dict:
+        return self._post("/guides/write", {"name": name, "content": content})

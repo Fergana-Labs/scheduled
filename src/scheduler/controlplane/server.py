@@ -150,6 +150,11 @@ class AddEventRequest(BaseModel):
     description: str = ""
 
 
+class WriteGuideRequest(BaseModel):
+    name: str
+    content: str
+
+
 # --- Gmail routes ---
 
 
@@ -216,3 +221,17 @@ def calendar_add(req: AddEventRequest, session: dict = Depends(get_session)):
     )
     event_id = calendar.add_event(event)
     return {"event_id": event_id, "status": "created"}
+
+
+# --- Guide routes ---
+
+
+@app.post("/api/v1/guides/write")
+def guides_write(req: WriteGuideRequest, session: dict = Depends(get_session)):
+    import os
+
+    os.makedirs(config.guides_dir, exist_ok=True)
+    path = os.path.join(config.guides_dir, f"{req.name}.md")
+    with open(path, "w") as f:
+        f.write(req.content)
+    return {"status": "written", "path": path}
