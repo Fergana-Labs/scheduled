@@ -13,3 +13,4 @@ web/.next/
 uv.lock
 node_modules/
 web/node_modules/
+web/tsconfig.tsbuildinfo
