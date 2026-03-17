@@ -191,18 +191,21 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
     return response
 
 
-@app.get("/auth/me")
-def auth_me(request: Request):
-    """Return the current user's info from the session cookie."""
+def get_web_session(request: Request) -> dict:
+    """Validate the session cookie from the web app."""
     session_cookie = request.cookies.get("session")
     if not session_cookie:
         raise HTTPException(status_code=401, detail="Not authenticated")
-
     payload = _verify_session(session_cookie)
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid session")
+    return payload
 
-    return {"user_id": payload["user_id"], "email": payload["email"]}
+
+@app.get("/auth/me")
+def auth_me(session: dict = Depends(get_web_session)):
+    """Return the current user's info from the session cookie."""
+    return {"user_id": session["user_id"], "email": session["email"]}
 
 
 # --- Session store ---
@@ -456,7 +459,61 @@ def guides_read(req: ReadGuideRequest, session: dict = Depends(get_session)):
     return {"name": guide.name, "content": guide.content, "updated_at": guide.updated_at.isoformat()}
 
 
+# --- Onboarding ---
+
+
+def _run_onboarding_guides(user_id: str) -> None:
+    """Background task: run both guide-writer agents for a user."""
+    import anyio
+    from scheduler.guides.backends import LocalGuideBackend
+    from scheduler.guides.preferences import run_preferences_agent
+    from scheduler.guides.style import run_style_agent
+
+    creds = load_credentials(user_id)
+    gmail = GmailClient(creds)
+    calendar = CalendarClient(creds, config.stash_calendar_name)
+    calendar.get_or_create_stash_calendar()
+
+    backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
+
+    async def _run():
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(run_preferences_agent, backend)
+            tg.start_soon(run_style_agent, backend)
+
+    anyio.run(_run)
+
+
+@app.post("/api/v1/onboarding/run")
+def onboarding_run(request: Request, background_tasks: BackgroundTasks):
+    """Kick off the style + preferences guide agents for this user."""
+    session = get_web_session(request)
+    user_id = session["user_id"]
+    logger.info("onboarding: starting guide agents for user=%s", user_id)
+    background_tasks.add_task(_run_onboarding_guides, user_id)
+    return {"status": "started"}
+
+
 # --- Gmail webhook ---
+
+# Per-user sets of recently processed message IDs to avoid duplicate drafts.
+# Bounded to last 200 IDs per user to avoid unbounded growth.
+_processed_messages: dict[str, set[str]] = {}
+_PROCESSED_MAX = 200
+
+
+def _mark_processed(user_id: str, message_id: str) -> bool:
+    """Mark a message as processed. Returns True if it was already processed."""
+    seen = _processed_messages.setdefault(user_id, set())
+    if message_id in seen:
+        return True
+    seen.add(message_id)
+    if len(seen) > _PROCESSED_MAX:
+        # Evict oldest entries (sets are unordered, but this is good enough)
+        to_remove = len(seen) - _PROCESSED_MAX
+        for _ in range(to_remove):
+            seen.pop()
+    return False
 
 
 def _process_new_messages(user_id: str, email_address: str, history_id: str) -> None:
@@ -502,6 +559,10 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
     calendar = CalendarClient(creds, config.stash_calendar_name)
 
     for message_id in new_message_ids:
+        if _mark_processed(user_id, message_id):
+            logger.info("gmail_webhook: message %s already processed, skipping", message_id)
+            continue
+
         try:
             email = gmail.get_email(message_id)
 
