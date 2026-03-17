@@ -1,4 +1,9 @@
-When making changes, always verify they work end-to-end. If you are about to ask the user to check something for you, think about whether you can do it yourself.
+If you are about to ask the user to do something for you, think about whether you can do it yourself.
+
+### 0. Autonomy Rules
+
+- **Never ask the user to check logs.** Check them yourself — via Render MCP, ngrok inspector (`localhost:4040`), or by running the server with captured output.
+- **Never ask permission to kill/restart local processes.** If you need to restart uvicorn, ngrok, or any dev server to make progress, just do it.
 
 ### 1. Check Render Deployment
 
@@ -8,9 +13,15 @@ The control plane runs on Render as `scheduler-control-plane` (service ID: `srv-
 
 ### 2. Check Neon Database
 
-The database is Neon project `blue-pine-43043371` (database: `neondb`).
+Neon project: `blue-pine-43043371`. It has multiple branches — **always pass the correct branch ID**:
 
-- Use `mcp__neon__run_sql` to run migrations and verify table state
+- **Dev branch**: `br-cold-mouse-am8uwd1y` (endpoint: `ep-solitary-dawn`) — this is what `.env` DATABASE_URL points to
+- **Prod branch**: `br-shy-violet-am1llf2x` (endpoint: `ep-wild-voice`)
+
+When using `mcp__neon__run_sql`, always include `branchId`:
+```
+mcp__neon__run_sql(projectId="blue-pine-43043371", branchId="br-cold-mouse-am8uwd1y", sql="...")
+```
 
 ### 3. Refresh Gmail Watcher
 
