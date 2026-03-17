@@ -212,6 +212,10 @@ class GmailClient:
                     message_id_header = header["value"]
                     break
 
+        # Strip leading/trailing whitespace — LLM tool calls often include
+        # stray indentation which shows up as an indent in the Gmail draft.
+        body = body.strip()
+
         # Build MIME message
         mime_msg = MIMEText(body, content_type)
         mime_msg["To"] = to
@@ -263,6 +267,10 @@ class GmailClient:
                 if header["name"].lower() == "message-id":
                     message_id_header = header["value"]
                     break
+
+        # Strip leading/trailing whitespace — LLM tool calls often include
+        # stray indentation which shows up as an indent in the sent email.
+        body = body.strip()
 
         # Build MIME message
         mime_msg = MIMEText(body, content_type)
