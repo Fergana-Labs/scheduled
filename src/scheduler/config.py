@@ -36,10 +36,22 @@ class Config:
         default_factory=lambda: os.environ.get("CONTROL_PLANE_HOST", "0.0.0.0")
     )
     control_plane_port: int = field(
-        default_factory=lambda: int(os.environ.get("CONTROL_PLANE_PORT", "8000"))
+        default_factory=lambda: int(os.environ.get("CONTROL_PLANE_PORT", "8080"))
     )
     gmail_pubsub_topic: str = field(
         default_factory=lambda: os.environ.get("GMAIL_PUBSUB_TOPIC", "")
+    )
+    web_app_url: str = field(
+        default_factory=lambda: os.environ.get("WEB_APP_URL", "http://localhost:3000")
+    )
+    google_web_redirect_uri: str = field(
+        default_factory=lambda: os.environ.get(
+            "GOOGLE_WEB_REDIRECT_URI",
+            "http://localhost:8080",
+        )
+    )
+    session_secret: str = field(
+        default_factory=lambda: os.environ.get("SESSION_SECRET", "change-me-in-production")
     )
     guides_dir: str = field(
         default_factory=lambda: os.environ.get(

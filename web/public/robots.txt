@@ -1,0 +1,31 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# AI Search Engines - Explicitly allow for Generative Engine Optimization
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Omgilibot
+Allow: /
+
+# Disallow API routes
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://scheduler.ferganalabs.com/sitemap.xml

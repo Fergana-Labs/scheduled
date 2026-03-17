@@ -11,16 +11,21 @@ and passed into the sandbox as an env var.
 """
 
 import base64
+import hashlib
+import hmac
 import json
 import logging
 import secrets
 import time
+import urllib.parse
 from datetime import datetime
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
-from scheduler.auth.google_auth import load_credentials
+from scheduler.auth.google_auth import SCOPES, load_credentials
 from scheduler.calendar.client import CalendarClient, Event
 from scheduler.config import config
 from scheduler.gmail.client import GmailClient
@@ -28,6 +33,176 @@ from scheduler.gmail.client import GmailClient
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Scheduler Control Plane")
+
+# Allow the web frontend to call the control plane
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[config.web_app_url],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# --- Web auth helpers ---
+
+
+def _sign_session(user_id: str, email: str) -> str:
+    """Create an HMAC-signed session token encoding user_id and email."""
+    payload = json.dumps({"user_id": user_id, "email": email})
+    sig = hmac.new(config.session_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
+    return base64.urlsafe_b64encode(f"{payload}|{sig}".encode()).decode()
+
+
+def _verify_session(token: str) -> dict | None:
+    """Verify and decode an HMAC-signed session token."""
+    try:
+        decoded = base64.urlsafe_b64decode(token).decode()
+        payload, sig = decoded.rsplit("|", 1)
+        expected = hmac.new(config.session_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected):
+            return None
+        return json.loads(payload)
+    except Exception:
+        return None
+
+# --- Web OAuth routes ---
+
+# Temporary store for OAuth state tokens (state -> timestamp)
+_oauth_states: dict[str, float] = {}
+
+
+@app.get("/auth/google")
+def auth_google_redirect():
+    """Redirect the user to Google's OAuth consent screen."""
+    state = secrets.token_urlsafe(32)
+    _oauth_states[state] = time.time()
+
+    params = {
+        "client_id": config.google_client_id,
+        "redirect_uri": config.google_web_redirect_uri,
+        "response_type": "code",
+        "scope": " ".join(SCOPES),
+        "access_type": "offline",
+        "prompt": "consent",
+        "state": state,
+    }
+    url = f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
+    return RedirectResponse(url)
+
+
+@app.get("/")
+def root_callback(code: str | None = None, state: str | None = None, error: str | None = None):
+    """Handle the OAuth callback at the root path (Google redirects to http://localhost:8080).
+
+    If no OAuth query params are present, returns a simple health check.
+    """
+    if not code and not state and not error:
+        return {"status": "ok", "service": "scheduler-control-plane"}
+    return auth_google_callback(code=code, state=state, error=error)
+
+
+def auth_google_callback(code: str | None = None, state: str | None = None, error: str | None = None):
+    """Handle the OAuth callback from Google.
+
+    Exchanges the authorization code for tokens, upserts the user in the
+    database, and redirects to the web app with a signed session cookie.
+    """
+    if error:
+        return RedirectResponse(f"{config.web_app_url}?error={error}")
+
+    if not code or not state:
+        return RedirectResponse(f"{config.web_app_url}?error=missing_params")
+
+    # Validate state
+    issued_at = _oauth_states.pop(state, None)
+    if not issued_at or (time.time() - issued_at > 600):
+        return RedirectResponse(f"{config.web_app_url}?error=invalid_state")
+
+    # Exchange authorization code for tokens
+    import httpx
+
+    token_response = httpx.post(
+        "https://oauth2.googleapis.com/token",
+        data={
+            "code": code,
+            "client_id": config.google_client_id,
+            "client_secret": config.google_client_secret,
+            "redirect_uri": config.google_web_redirect_uri,
+            "grant_type": "authorization_code",
+        },
+    )
+
+    if token_response.status_code != 200:
+        logger.error("OAuth token exchange failed: %s", token_response.text)
+        return RedirectResponse(f"{config.web_app_url}?error=token_exchange_failed")
+
+    tokens = token_response.json()
+    access_token = tokens["access_token"]
+    refresh_token = tokens.get("refresh_token")
+
+    if not refresh_token:
+        return RedirectResponse(f"{config.web_app_url}?error=no_refresh_token")
+
+    # Get user's email from Google
+    userinfo_response = httpx.get(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    if userinfo_response.status_code != 200:
+        logger.error("Userinfo request failed: status=%s body=%s", userinfo_response.status_code, userinfo_response.text)
+        return RedirectResponse(f"{config.web_app_url}?error=userinfo_failed")
+
+    email = userinfo_response.json().get("email")
+    if not email:
+        return RedirectResponse(f"{config.web_app_url}?error=no_email")
+
+    # Upsert user in database
+    from scheduler.db import upsert_user
+
+    expires_in = tokens.get("expires_in")
+    expires_at = None
+    if expires_in:
+        from datetime import timedelta
+        expires_at = datetime.now() + timedelta(seconds=expires_in)
+
+    user = upsert_user(
+        email=email,
+        google_refresh_token=refresh_token,
+        google_access_token=access_token,
+        access_token_expires_at=expires_at,
+    )
+
+    # Create signed session and redirect to web app
+    session_token = _sign_session(str(user.id), email)
+    redirect_url = f"{config.web_app_url}/onboarding"
+    response = RedirectResponse(redirect_url)
+    response.set_cookie(
+        key="session",
+        value=session_token,
+        httponly=True,
+        secure=config.web_app_url.startswith("https"),
+        samesite="lax",
+        max_age=60 * 60 * 24 * 30,  # 30 days
+        path="/",
+    )
+    return response
+
+
+@app.get("/auth/me")
+def auth_me(request: Request):
+    """Return the current user's info from the session cookie."""
+    session_cookie = request.cookies.get("session")
+    if not session_cookie:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    payload = _verify_session(session_cookie)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid session")
+
+    return {"user_id": payload["user_id"], "email": payload["email"]}
+
 
 # --- Session store ---
 
