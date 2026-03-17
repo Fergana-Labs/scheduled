@@ -38,10 +38,10 @@ export default function Header() {
         {/* CTA Button */}
         <div className="flex items-center gap-2 sm:gap-3">
           <a
-            href={`${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google`}
+            href="/settings"
             className="inline-flex items-center rounded-xl border border-transparent bg-[#43614a] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors duration-200 hover:cursor-pointer hover:bg-[#527559] focus:ring-2 focus:ring-[#43614a] focus:ring-offset-2 focus:outline-none sm:px-4 sm:py-2 sm:text-sm"
           >
-            Sign Up
+            Sign In
           </a>
         </div>
       </nav>

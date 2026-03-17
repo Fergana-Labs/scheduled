@@ -1,31 +1,22 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import PendingState from '@/components/onboarding/PendingState';
-import ReadyState from '@/components/onboarding/ReadyState';
 
 interface UserInfo {
   user_id: string;
   email: string;
 }
 
-interface Settings {
-  system_enabled: boolean;
-  autopilot_enabled: boolean;
-  stash_branding_enabled: boolean;
-  stash_calendar_id: string | null;
-  guides: { name: string; content: string; updated_at: string }[];
-}
-
 export default function OnboardingPage() {
+  const router = useRouter();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
-  const [settings, setSettings] = useState<Settings | null>(null);
 
   useEffect(() => {
     api<UserInfo>('/auth/me')
@@ -43,24 +34,22 @@ export default function OnboardingPage() {
     try {
       const status = await api<{ ready: boolean }>('/web/api/v1/onboarding/status');
       if (status.ready) {
-        const s = await api<Settings>('/web/api/v1/settings');
-        setSettings(s);
-        setReady(true);
+        router.push('/settings');
       }
     } catch {
       // ignore — will retry on next poll
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
-    if (!user || ready) return;
+    if (!user) return;
 
     // Check immediately
     checkStatus();
 
     const interval = setInterval(checkStatus, 10_000);
     return () => clearInterval(interval);
-  }, [user, ready, checkStatus]);
+  }, [user, checkStatus]);
 
   if (loading) {
     return (
@@ -125,18 +114,7 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          {/* Pending or Ready state */}
-          {ready && settings ? (
-            <ReadyState
-              systemEnabled={settings.system_enabled}
-              autopilotEnabled={settings.autopilot_enabled}
-              brandingEnabled={settings.stash_branding_enabled}
-              calendarId={settings.stash_calendar_id}
-              guides={settings.guides}
-            />
-          ) : (
-            <PendingState />
-          )}
+          <PendingState />
         </div>
       </div>
     </div>
