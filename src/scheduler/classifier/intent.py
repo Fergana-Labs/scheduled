@@ -25,6 +25,7 @@ class SchedulingIntent(Enum):
     REQUESTING_MEETING = "requesting_meeting"  # Someone wants to meet with the user
     PROPOSING_TIMES = "proposing_times"  # Someone is proposing specific times
     CONFIRMING_TIME = "confirming_time"  # Someone is confirming a previously discussed time
+    CANCELLING_RESCHEDULING = "cancelling_rescheduling"  # Someone is cancelling or rescheduling
 
 
 @dataclass
@@ -45,6 +46,7 @@ class _EmailClassificationJSON(TypedDict, total=False):
         "requesting_meeting",
         "proposing_times",
         "confirming_time",
+        "cancelling_rescheduling",
     ]
     confidence: float
     summary: str
@@ -96,10 +98,11 @@ def classify_email(subject: str, body: str, sender: str) -> ClassificationResult
         "- not_scheduling: Email is not about scheduling at all.\n"
         "- requesting_meeting: Someone wants to meet with the user.\n"
         "- proposing_times: Someone proposes one or more specific times.\n"
-        "- confirming_time: Someone confirms a previously discussed time.\n\n"
+        "- confirming_time: Someone confirms a previously discussed time.\n"
+        "- cancelling_rescheduling: Someone is cancelling or rescheduling a previously agreed meeting.\n\n"
         "You MUST respond with a single JSON object only, no prose, matching this schema:\n"
         "{\n"
-        '  \"intent\": \"not_scheduling\" | \"requesting_meeting\" | \"proposing_times\" | \"confirming_time\",\n'
+        '  \"intent\": \"not_scheduling\" | \"requesting_meeting\" | \"proposing_times\" | \"confirming_time\" | \"cancelling_rescheduling\",\n'
         "  \"confidence\": number between 0 and 1,\n"
         "  \"summary\": string,\n"
         "  \"proposed_times\": list of strings,\n"

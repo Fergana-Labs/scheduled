@@ -47,6 +47,9 @@ description.
 hours for meals, etc.) when the duration isn't specified.
 - Include context in the event description: who it's with, what it's about, \
 and the source email subject.
+- Note any location information from threads (office address, restaurant, \
+coffee shop, Zoom/Meet link, etc.) and include it in the event description. \
+Track frequently mentioned locations as they indicate user preferences.
 - When you've exhausted your search queries and feel confident you've found \
 the major commitments, stop.
 """

@@ -233,6 +233,58 @@ class GmailClient:
         )
         return draft["id"]
 
+    def send_email(self, thread_id: str, to: str, subject: str, body: str, content_type: str = "plain") -> str:
+        """Send an email reply in a thread (actually sends, does not create a draft).
+
+        Args:
+            thread_id: The thread to reply to.
+            to: Recipient email address.
+            subject: Email subject (usually "Re: ...").
+            body: The email body.
+            content_type: MIME content type ("plain" or "html").
+
+        Returns:
+            The ID of the sent message.
+        """
+        service = self._get_service()
+
+        # Fetch thread to get Message-Id of last message for threading headers
+        thread_data = (
+            service.users()
+            .threads()
+            .get(userId="me", id=thread_id, format="metadata", metadataHeaders=["Message-Id"])
+            .execute()
+        )
+        messages = thread_data.get("messages", [])
+        message_id_header = ""
+        if messages:
+            last_msg = messages[-1]
+            for header in last_msg.get("payload", {}).get("headers", []):
+                if header["name"].lower() == "message-id":
+                    message_id_header = header["value"]
+                    break
+
+        # Build MIME message
+        mime_msg = MIMEText(body, content_type)
+        mime_msg["To"] = to
+        mime_msg["Subject"] = subject if subject.lower().startswith("re:") else f"Re: {subject}"
+        if message_id_header:
+            mime_msg["In-Reply-To"] = message_id_header
+            mime_msg["References"] = message_id_header
+
+        raw = base64.urlsafe_b64encode(mime_msg.as_bytes()).decode("ascii")
+
+        sent = (
+            service.users()
+            .messages()
+            .send(
+                userId="me",
+                body={"raw": raw, "threadId": thread_id},
+            )
+            .execute()
+        )
+        return sent["id"]
+
     def watch(self, topic_name: str) -> dict:
         """Start receiving push notifications for new emails.
 

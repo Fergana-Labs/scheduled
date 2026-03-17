@@ -22,7 +22,7 @@ from datetime import datetime
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from scheduler.auth.google_auth import SCOPES, load_credentials
@@ -307,6 +307,10 @@ class UpdateBrandingRequest(BaseModel):
     enabled: bool
 
 
+class UpdateAutopilotRequest(BaseModel):
+    enabled: bool
+
+
 class WriteGuideRequest(BaseModel):
     name: str
     content: str
@@ -402,6 +406,27 @@ def settings_branding_put(req: UpdateBrandingRequest, session: dict = Depends(ge
         raise HTTPException(status_code=404, detail="User not found")
     update_stash_branding(session["user_id"], req.enabled)
     return {"stash_branding_enabled": req.enabled}
+
+
+@app.get("/api/v1/settings/autopilot")
+def settings_autopilot_get(session: dict = Depends(get_session)):
+    from scheduler.db import get_user_by_id
+
+    user = get_user_by_id(session["user_id"])
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"autopilot_enabled": user.autopilot_enabled}
+
+
+@app.put("/api/v1/settings/autopilot")
+def settings_autopilot_put(req: UpdateAutopilotRequest, session: dict = Depends(get_session)):
+    from scheduler.db import get_user_by_id, update_autopilot
+
+    user = get_user_by_id(session["user_id"])
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    update_autopilot(session["user_id"], req.enabled)
+    return {"autopilot_enabled": req.enabled}
 
 
 # --- Guide routes ---
@@ -531,8 +556,11 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 classification.confidence,
             )
 
-            composer = DraftComposer(gmail, calendar, user_id)
+            composer = DraftComposer(gmail, calendar, user_id, autopilot=user.autopilot_enabled)
             draft_id = composer.compose_and_create_draft(email, classification)
+            if draft_id is None:
+                logger.info("gmail_webhook: thread for message %s already resolved, no draft created", message_id)
+                continue
             logger.info("gmail_webhook: created draft %s for message %s", draft_id, message_id)
 
         except Exception:
@@ -578,6 +606,116 @@ async def gmail_webhook(request: Request, background_tasks: BackgroundTasks):
     background_tasks.add_task(_process_new_messages, str(user.id), email_address, history_id)
 
     return {"status": "ok"}
+
+
+# --- Web API routes (cookie auth) ---
+
+
+def get_web_user(request: Request) -> dict:
+    """Validate the session cookie and return the user payload."""
+    session_cookie = request.cookies.get("session")
+    if not session_cookie:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    payload = _verify_session(session_cookie)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    return payload
+
+
+@app.get("/web/api/v1/onboarding/status")
+def web_onboarding_status(user: dict = Depends(get_web_user)):
+    from scheduler.db import get_guides_for_user
+
+    guides = get_guides_for_user(user["user_id"])
+    guide_names = {g.name for g in guides}
+    ready = "scheduling_preferences" in guide_names and "email_style" in guide_names
+    return {"ready": ready}
+
+
+@app.get("/web/api/v1/settings")
+def web_settings_get(user: dict = Depends(get_web_user)):
+    from scheduler.db import get_guides_for_user, get_user_by_id
+
+    db_user = get_user_by_id(user["user_id"])
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    guides = get_guides_for_user(user["user_id"])
+
+    return {
+        "autopilot_enabled": db_user.autopilot_enabled,
+        "stash_branding_enabled": db_user.stash_branding_enabled,
+        "stash_calendar_id": db_user.stash_calendar_id,
+        "guides": [
+            {"name": g.name, "content": g.content, "updated_at": g.updated_at.isoformat()}
+            for g in guides
+        ],
+    }
+
+
+class WebUpdateAutopilotRequest(BaseModel):
+    enabled: bool
+
+
+@app.put("/web/api/v1/settings/autopilot")
+def web_settings_autopilot(req: WebUpdateAutopilotRequest, user: dict = Depends(get_web_user)):
+    from scheduler.db import update_autopilot
+
+    update_autopilot(user["user_id"], req.enabled)
+    return {"autopilot_enabled": req.enabled}
+
+
+class WebUpdateBrandingRequest(BaseModel):
+    enabled: bool
+
+
+@app.put("/web/api/v1/settings/branding")
+def web_settings_branding(req: WebUpdateBrandingRequest, user: dict = Depends(get_web_user)):
+    from scheduler.db import update_stash_branding
+
+    update_stash_branding(user["user_id"], req.enabled)
+    return {"stash_branding_enabled": req.enabled}
+
+
+class WebUpdateGuideRequest(BaseModel):
+    content: str
+
+
+@app.put("/web/api/v1/guides/{name}")
+def web_guide_update(name: str, req: WebUpdateGuideRequest, user: dict = Depends(get_web_user)):
+    from scheduler.db import upsert_guide
+
+    guide = upsert_guide(user["user_id"], name, req.content)
+    return {"name": guide.name, "content": guide.content, "updated_at": guide.updated_at.isoformat()}
+
+
+@app.post("/web/api/v1/account/disconnect")
+def web_account_disconnect(request: Request, user: dict = Depends(get_web_user)):
+    from scheduler.db import delete_user, get_user_by_id
+
+    db_user = get_user_by_id(user["user_id"])
+    if db_user and db_user.google_refresh_token:
+        import httpx
+
+        try:
+            httpx.post(
+                "https://oauth2.googleapis.com/revoke",
+                params={"token": db_user.google_refresh_token},
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
+            )
+        except Exception:
+            logger.warning("Failed to revoke Google token for user=%s", user["user_id"])
+
+    delete_user(user["user_id"])
+
+    response = JSONResponse({"status": "disconnected"})
+    response.delete_cookie(
+        key="session",
+        path="/",
+        secure=config.web_app_url.startswith("https"),
+        samesite="lax",
+    )
+    return response
 
 
 @app.post("/api/v1/gmail/watch/renew")

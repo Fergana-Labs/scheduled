@@ -21,6 +21,7 @@ class UserRow:
     stash_calendar_id: str | None
     gmail_history_id: str | None
     stash_branding_enabled: bool
+    autopilot_enabled: bool
     created_at: datetime
     updated_at: datetime
 
@@ -115,6 +116,15 @@ def update_stash_branding(user_id: str, enabled: bool) -> None:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             "UPDATE users SET stash_branding_enabled = %s, updated_at = now() WHERE id = %s",
+            (enabled, user_id),
+        )
+        conn.commit()
+
+
+def update_autopilot(user_id: str, enabled: bool) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET autopilot_enabled = %s, updated_at = now() WHERE id = %s",
             (enabled, user_id),
         )
         conn.commit()
@@ -247,4 +257,11 @@ def get_pending_invite_by_thread(user_id: str, thread_id: str) -> PendingInviteR
 def delete_pending_invite(invite_id: str) -> None:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute("DELETE FROM pending_invites WHERE id = %s", (invite_id,))
+        conn.commit()
+
+
+def delete_user(user_id: str) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM guides WHERE user_id = %s", (user_id,))
+        cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
         conn.commit()

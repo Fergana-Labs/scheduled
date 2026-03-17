@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN autopilot_enabled BOOLEAN DEFAULT FALSE;

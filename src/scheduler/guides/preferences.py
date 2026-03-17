@@ -100,6 +100,11 @@ where they propose or accept times.
    - Recurring commitments
    - How far in advance they typically schedule
    - Any preferences they explicitly state in emails
+   - Preferred in-person meeting locations (coffee shops, restaurants, offices)
+   - Location patterns by meeting type (e.g. coffee for 1:1s, office for team meetings)
+   - In-person vs. virtual preference
+   - Common video conferencing tools (Zoom, Google Meet, Teams, etc.)
+   - Geographic patterns (neighborhoods, areas of the city frequently used)
 4. Write a Markdown guide addressed to a future AI scheduling agent.
 5. Only report patterns you actually observe — note confidence levels (strong \
 pattern vs. weak signal). Do not fabricate patterns.

@@ -9,3 +9,7 @@ token.json
 credentials.json
 .DS_store
 guides/
+web/.next/
+uv.lock
+node_modules/
+web/node_modules/
