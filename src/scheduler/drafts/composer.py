@@ -102,7 +102,7 @@ class DraftComposer:
             "for availability, and compose a natural-sounding draft reply."
         ]
 
-        scheduling_prefs = load_guide("scheduling_preferences")
+        scheduling_prefs = load_guide("scheduling_preferences", user_id=self._user_id)
         if scheduling_prefs:
             parts.append(
                 "\n\n## Scheduling Preferences\n"
@@ -110,7 +110,7 @@ class DraftComposer:
                 + scheduling_prefs
             )
 
-        email_style = load_guide("email_style")
+        email_style = load_guide("email_style", user_id=self._user_id)
         if email_style:
             parts.append(
                 "\n\n## Email Style Guide\n"

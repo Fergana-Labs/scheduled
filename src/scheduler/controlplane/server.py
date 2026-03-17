@@ -412,11 +412,11 @@ class ReadGuideRequest(BaseModel):
 
 @app.post("/api/v1/guides/write")
 def guides_write(req: WriteGuideRequest, session: dict = Depends(get_session)):
-    from scheduler.db import upsert_guide
+    from scheduler.guides import save_guide
 
     user_id = session["user_id"]
-    guide = upsert_guide(user_id=user_id, name=req.name, content=req.content)
-    return {"status": "written", "guide_id": str(guide.id)}
+    save_guide(name=req.name, content=req.content, user_id=user_id)
+    return {"status": "written"}
 
 
 @app.post("/api/v1/guides/read")
@@ -470,9 +470,33 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
         new_message_ids,
     )
 
-    # TODO: trigger classifier agent for each new message
-    # for message_id in new_message_ids:
-    #     classify_and_process(user_id, message_id)
+    from scheduler.classifier.intent import SchedulingIntent, classify_email
+    from scheduler.drafts.composer import DraftComposer
+
+    calendar = CalendarClient(creds, config.stash_calendar_name)
+
+    for message_id in new_message_ids:
+        try:
+            email = gmail.get_email(message_id)
+            classification = classify_email(email.subject, email.body, email.sender)
+
+            if classification.intent == SchedulingIntent.NOT_SCHEDULING:
+                logger.info("gmail_webhook: message %s is not scheduling-related, skipping", message_id)
+                continue
+
+            logger.info(
+                "gmail_webhook: message %s classified as %s (confidence=%.2f), composing draft",
+                message_id,
+                classification.intent.value,
+                classification.confidence,
+            )
+
+            composer = DraftComposer(gmail, calendar, user_id)
+            draft_id = composer.compose_and_create_draft(email, classification)
+            logger.info("gmail_webhook: created draft %s for message %s", draft_id, message_id)
+
+        except Exception:
+            logger.exception("gmail_webhook: failed to process message %s for user=%s", message_id, email_address)
 
 
 @app.post("/webhooks/gmail")
