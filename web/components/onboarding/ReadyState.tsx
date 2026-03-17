@@ -37,6 +37,7 @@ export default function ReadyState({
           name="scheduling_preferences"
           label="Scheduling Preferences"
           initialContent={schedulingGuide.content}
+          updatedAt={schedulingGuide.updated_at}
         />
       )}
 
@@ -45,6 +46,7 @@ export default function ReadyState({
           name="email_style"
           label="Email Style"
           initialContent={emailGuide.content}
+          updatedAt={emailGuide.updated_at}
         />
       )}
 

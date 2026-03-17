@@ -768,6 +768,40 @@ def web_guide_update(name: str, req: WebUpdateGuideRequest, user: dict = Depends
     return {"name": guide.name, "content": guide.content, "updated_at": guide.updated_at.isoformat()}
 
 
+@app.post("/web/api/v1/guides/{name}/regenerate")
+def web_guide_regenerate(name: str, background_tasks: BackgroundTasks, user: dict = Depends(get_web_user)):
+    """Regenerate a single guide by re-running the appropriate agent."""
+    if name not in ("scheduling_preferences", "email_style"):
+        raise HTTPException(status_code=400, detail=f"Unknown guide: {name}")
+    background_tasks.add_task(_run_guide_regeneration, user["user_id"], name)
+    return {"status": "regenerating"}
+
+
+def _run_guide_regeneration(user_id: str, guide_name: str) -> None:
+    """Background task: re-run a single guide agent for a user."""
+    import anyio
+
+    from scheduler.guides.backends import LocalGuideBackend
+
+    creds = load_credentials(user_id)
+    gmail = GmailClient(creds)
+    calendar = CalendarClient(creds, config.stash_calendar_name)
+    calendar.get_or_create_stash_calendar()
+
+    guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
+
+    if guide_name == "scheduling_preferences":
+        from scheduler.guides.preferences import run_preferences_agent
+
+        anyio.run(run_preferences_agent, guide_backend)
+    elif guide_name == "email_style":
+        from scheduler.guides.style import run_style_agent
+
+        anyio.run(run_style_agent, guide_backend)
+
+    logger.info("guide_regeneration: completed %s for user=%s", guide_name, user_id)
+
+
 @app.post("/web/api/v1/account/disconnect")
 def web_account_disconnect(request: Request, user: dict = Depends(get_web_user)):
     from scheduler.db import delete_user, get_user_by_id
