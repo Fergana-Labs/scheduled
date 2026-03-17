@@ -172,20 +172,23 @@ export default function GuideEditor({ name, label, initialContent, updatedAt }: 
   return (
     <>
       {/* Card view (truncated) */}
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setModalOpen(true)}
-        className="group relative w-full rounded-xl border border-gray-100 bg-[#FAFAFA] p-4 text-left transition-colors hover:border-gray-200"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setModalOpen(true); } }}
+        className="group relative w-full cursor-pointer overflow-hidden rounded-xl border border-gray-100 bg-[#FAFAFA] p-4 text-left transition-colors hover:border-gray-200"
+        style={{ maxHeight: '10rem' }}
       >
         <div className="mb-2 flex items-center justify-between">
           <p className="text-sm font-medium text-gray-900">{label}</p>
           <Maximize2 className="h-3.5 w-3.5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100" />
         </div>
-        <div className="relative max-h-[5.5rem] overflow-hidden">
+        <div className="relative overflow-hidden" style={{ maxHeight: '5.5rem' }}>
           <ReactMarkdown components={mdComponents}>{content}</ReactMarkdown>
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#FAFAFA]" />
         </div>
-      </button>
+      </div>
 
       {/* Modal */}
       {modalOpen && (
