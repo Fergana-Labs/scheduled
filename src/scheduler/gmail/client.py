@@ -279,7 +279,6 @@ class GmailClient:
                 "userId": "me",
                 "startHistoryId": start_history_id,
                 "historyTypes": ["messageAdded"],
-                "labelId": "INBOX",
             }
             if page_token:
                 kwargs["pageToken"] = page_token

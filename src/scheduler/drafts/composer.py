@@ -66,7 +66,7 @@ DRAFT_AGENT_TOOLS = [
     },
     {
         "name": "create_draft",
-        "description": "Create a draft reply in Gmail with the composed response.",
+        "description": "Create a draft reply in Gmail with the composed response. Set send_invite=true to automatically create a calendar invite when the user sends this draft.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -74,6 +74,11 @@ DRAFT_AGENT_TOOLS = [
                 "to": {"type": "string", "description": "Recipient email"},
                 "subject": {"type": "string", "description": "Email subject"},
                 "body": {"type": "string", "description": "Email body text"},
+                "send_invite": {"type": "boolean", "description": "If true, automatically create a calendar invite when the user sends this draft", "default": False},
+                "invite_attendee_email": {"type": "string", "description": "Attendee email for the invite (required if send_invite is true)"},
+                "invite_event_summary": {"type": "string", "description": "Event title (required if send_invite is true)"},
+                "invite_event_start": {"type": "string", "description": "Event start time ISO format (required if send_invite is true)"},
+                "invite_event_end": {"type": "string", "description": "Event end time ISO format (required if send_invite is true)"},
             },
             "required": ["thread_id", "to", "subject", "body"],
         },
@@ -173,8 +178,21 @@ class DraftComposer:
 
         @tool(
             "create_draft",
-            "Create a draft reply in Gmail with the composed response.",
-            {"thread_id": str, "to": str, "subject": str, "body": str},
+            "Create a draft reply in Gmail with the composed response. "
+            "Set send_invite=true to automatically create a calendar invite when the user sends this draft. "
+            "When send_invite is true, you must also provide invite_attendee_email, invite_event_summary, "
+            "invite_event_start, and invite_event_end.",
+            {
+                "thread_id": str,
+                "to": str,
+                "subject": str,
+                "body": str,
+                "send_invite": bool,
+                "invite_attendee_email": str,
+                "invite_event_summary": str,
+                "invite_event_start": str,
+                "invite_event_end": str,
+            },
         )
         async def create_draft(args):
             body = args["body"]
@@ -199,6 +217,20 @@ class DraftComposer:
                 content_type=content_type,
             )
             draft_result["draft_id"] = draft_id
+
+            # Store pending invite if requested
+            if args.get("send_invite"):
+                from scheduler.db import create_pending_invite
+
+                create_pending_invite(
+                    user_id=self._user_id,
+                    thread_id=args["thread_id"],
+                    attendee_email=args["invite_attendee_email"],
+                    event_summary=args["invite_event_summary"],
+                    event_start=datetime.fromisoformat(args["invite_event_start"]),
+                    event_end=datetime.fromisoformat(args["invite_event_end"]),
+                )
+
             return {"content": [{"type": "text", "text": json.dumps({"draft_id": draft_id})}]}
 
         return [get_calendar_events, read_thread, create_draft], draft_result
@@ -245,7 +277,13 @@ class DraftComposer:
             "3. Propose concrete meeting times that respect the user's existing commitments and "
             "the extracted details from the classification.\n"
             "4. Create a natural-sounding draft reply using create_draft. "
-            "When you are satisfied with the draft, call create_draft exactly once.\n\n"
+            "When you are satisfied with the draft, call create_draft exactly once.\n"
+            "5. If your draft proposes a specific meeting time, set send_invite=true on create_draft "
+            "and fill in the invite fields (invite_attendee_email, invite_event_summary, "
+            "invite_event_start, invite_event_end). This will automatically send a calendar invite "
+            "when the user sends the draft. Only do this when a concrete time is being proposed. "
+            "When you set send_invite=true, mention in the email body that you're sending a calendar invite "
+            "(e.g. 'I've sent over a calendar invite as well.').\n\n"
             "Email summary (for quick reference):\n"
             f"Message ID: {email.id}\n"
             f"Thread ID: {email.thread_id}\n"

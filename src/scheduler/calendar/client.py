@@ -193,3 +193,32 @@ class CalendarClient:
             if summary_lower in event.summary.lower():
                 return event
         return None
+
+    def create_invite_event(
+        self,
+        summary: str,
+        start: datetime,
+        end: datetime,
+        attendee_email: str,
+        description: str = "",
+    ) -> str:
+        """Create an event on the PRIMARY calendar with an attendee.
+
+        Google Calendar automatically sends an invite email to the attendee.
+        """
+        service = self._get_service()
+
+        body = {
+            "summary": summary,
+            "start": {"dateTime": start.isoformat()},
+            "end": {"dateTime": end.isoformat()},
+            "description": description,
+            "attendees": [{"email": attendee_email}],
+        }
+
+        result = service.events().insert(
+            calendarId="primary",
+            body=body,
+            sendUpdates="all",
+        ).execute()
+        return result["id"]

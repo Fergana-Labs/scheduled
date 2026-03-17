@@ -480,9 +480,42 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
         try:
             email = gmail.get_email(message_id)
 
-            # Skip messages sent by the user themselves (including draft replies we created)
+            # For messages sent by the user: check if this is a sent invite draft
             if email.sender and email_address in email.sender:
-                logger.info("gmail_webhook: message %s is from the user, skipping", message_id)
+                from scheduler.db import delete_pending_invite, get_pending_invite_by_thread
+
+                invite = get_pending_invite_by_thread(user_id, email.thread_id)
+                if invite:
+                    # Classify whether the sent message still confirms the meeting
+                    from scheduler.classifier.intent import classify_sent_message_confirms_invite
+
+                    confirms = classify_sent_message_confirms_invite(email.body, invite.event_summary)
+                    if not confirms:
+                        logger.info(
+                            "gmail_webhook: message %s in thread %s does not confirm the meeting, deleting pending invite",
+                            message_id,
+                            email.thread_id,
+                        )
+                        delete_pending_invite(str(invite.id))
+                    else:
+                        logger.info(
+                            "gmail_webhook: message %s confirms invite for thread %s, creating calendar event",
+                            message_id,
+                            email.thread_id,
+                        )
+                        try:
+                            event_id = calendar.create_invite_event(
+                                summary=invite.event_summary,
+                                start=invite.event_start,
+                                end=invite.event_end,
+                                attendee_email=invite.attendee_email,
+                            )
+                            delete_pending_invite(str(invite.id))
+                            logger.info("gmail_webhook: created invite event %s for thread %s", event_id, email.thread_id)
+                        except Exception:
+                            logger.exception("gmail_webhook: failed to create invite event for thread %s", email.thread_id)
+                else:
+                    logger.info("gmail_webhook: message %s is from the user, skipping", message_id)
                 continue
 
             classification = classify_email(email.subject, email.body, email.sender)

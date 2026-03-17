@@ -185,3 +185,66 @@ def get_guides_for_user(user_id: str) -> list[GuideRow]:
             return []
         cols = [desc[0] for desc in cur.description]
         return [GuideRow(**dict(zip(cols, row))) for row in rows]
+
+
+# --- Pending Invites ---
+
+
+@dataclass
+class PendingInviteRow:
+    id: str
+    user_id: str
+    thread_id: str
+    attendee_email: str
+    event_summary: str
+    event_start: datetime
+    event_end: datetime
+    created_at: datetime
+
+
+def create_pending_invite(
+    user_id: str,
+    thread_id: str,
+    attendee_email: str,
+    event_summary: str,
+    event_start: datetime,
+    event_end: datetime,
+) -> PendingInviteRow:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO pending_invites (user_id, thread_id, attendee_email,
+                                         event_summary, event_start, event_end)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (user_id, thread_id) DO UPDATE SET
+                attendee_email = EXCLUDED.attendee_email,
+                event_summary = EXCLUDED.event_summary,
+                event_start = EXCLUDED.event_start,
+                event_end = EXCLUDED.event_end
+            RETURNING *
+            """,
+            (user_id, thread_id, attendee_email, event_summary, event_start, event_end),
+        )
+        row = cur.fetchone()
+        cols = [desc[0] for desc in cur.description]
+        conn.commit()
+        return PendingInviteRow(**dict(zip(cols, row)))
+
+
+def get_pending_invite_by_thread(user_id: str, thread_id: str) -> PendingInviteRow | None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT * FROM pending_invites WHERE user_id = %s AND thread_id = %s",
+            (user_id, thread_id),
+        )
+        row = cur.fetchone()
+        if not row:
+            return None
+        cols = [desc[0] for desc in cur.description]
+        return PendingInviteRow(**dict(zip(cols, row)))
+
+
+def delete_pending_invite(invite_id: str) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM pending_invites WHERE id = %s", (invite_id,))
+        conn.commit()
