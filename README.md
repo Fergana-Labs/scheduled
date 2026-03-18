@@ -1,3 +1,5 @@
+[Blog post](https://x.com/samzliu/status/2034412249201443116?s=20)
+
 # Scheduler
 
 Inbound scheduling agent — automatically drafts email responses with proposed meeting times by checking all the places you store your commitments. Saves us a ton of time on recruiting, we hope it saves you time as well!
