@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { api, captureSessionFromURL, getSession } from '@/lib/api';
 import PendingState from '@/components/onboarding/PendingState';
+import FailedState from '@/components/onboarding/FailedState';
 
 interface UserInfo {
   user_id: string;
@@ -21,6 +22,8 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [failedError, setFailedError] = useState<string | null>(null);
 
   useEffect(() => {
     captureSessionFromURL();
@@ -37,9 +40,12 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
 
   const checkStatus = useCallback(async () => {
     try {
-      const status = await api<{ ready: boolean }>('/web/api/v1/onboarding/status');
+      const status = await api<{ ready: boolean; failed?: boolean; error?: string }>('/web/api/v1/onboarding/status');
       if (status.ready) {
         router.push('/settings');
+      } else if (status.failed) {
+        setFailed(true);
+        setFailedError(status.error || null);
       }
     } catch {
       // ignore — will retry on next poll
@@ -47,14 +53,24 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
   }, [router]);
 
   useEffect(() => {
-    if (!user || needsGoogle) return;
+    if (!user || needsGoogle || failed) return;
 
     // Check immediately
     checkStatus();
 
     const interval = setInterval(checkStatus, 10_000);
     return () => clearInterval(interval);
-  }, [user, needsGoogle, checkStatus]);
+  }, [user, needsGoogle, failed, checkStatus]);
+
+  const handleRetry = useCallback(async () => {
+    setFailed(false);
+    setFailedError(null);
+    try {
+      await api('/api/v1/onboarding/run', { method: 'POST' });
+    } catch {
+      // will pick up failure on next poll
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -164,7 +180,11 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
             </div>
           </div>
 
-          <PendingState />
+          {failed ? (
+            <FailedState error={failedError} onRetry={handleRetry} />
+          ) : (
+            <PendingState />
+          )}
         </div>
       </div>
     </div>

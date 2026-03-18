@@ -39,6 +39,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 logger = logging.getLogger(__name__)
 
 _WATCH_RENEWAL_INTERVAL = 12 * 3600  # 12 hours
+_onboarding_status: dict[str, dict] = {}  # user_id -> {"status": ..., "error": ...}
 _UNKNOWN_GMAIL_WEBHOOK_TTL = 300  # 5 minutes
 _unknown_gmail_webhook_emails: dict[str, float] = {}
 
@@ -1020,26 +1021,48 @@ def _run_onboarding_all(user_id: str) -> None:
 
 def _run_onboarding_for_runtime(user_id: str) -> None:
     """Dispatch onboarding to the configured runtime."""
-    runtime = config.agent_runtime.strip().lower()
-    if runtime == "local":
-        _run_onboarding_all(user_id)
-        return
+    _onboarding_status[user_id] = {"status": "running"}
+    try:
+        runtime = config.agent_runtime.strip().lower()
+        if runtime == "local":
+            _run_onboarding_all(user_id)
+            _onboarding_status.pop(user_id, None)
+            return
 
-    if runtime == "e2b":
-        control_plane_url = config.control_plane_public_url.strip()
-        if not control_plane_url:
-            raise RuntimeError("CONTROL_PLANE_PUBLIC_URL must be set when AGENT_RUNTIME=e2b")
+        if runtime == "e2b":
+            control_plane_url = config.control_plane_public_url.strip()
+            if not control_plane_url:
+                raise RuntimeError("CONTROL_PLANE_PUBLIC_URL must be set when AGENT_RUNTIME=e2b")
 
-        from scheduler.run_e2b import launch_onboarding_in_sandbox
+            # Ensure Stash calendar exists before sandbox launch (agents need it)
+            creds = load_credentials(user_id)
+            calendar = CalendarClient(creds, config.stash_calendar_name)
+            calendar.get_or_create_stash_calendar()
 
-        launch_onboarding_in_sandbox(
-            user_id=user_id,
-            control_plane_url=control_plane_url,
-            lookback_days=config.onboarding_lookback_days,
-        )
-        return
+            from scheduler.run_e2b import launch_onboarding_in_sandbox
 
-    raise RuntimeError(f"Unsupported AGENT_RUNTIME: {config.agent_runtime}")
+            launch_onboarding_in_sandbox(
+                user_id=user_id,
+                control_plane_url=control_plane_url,
+                lookback_days=config.onboarding_lookback_days,
+            )
+
+            # Set up Gmail watch so incoming emails are processed
+            from scheduler.gmail.watch import setup_gmail_watch
+
+            try:
+                setup_gmail_watch(user_id)
+                logger.info("onboarding[e2b]: gmail watch set up for user=%s", user_id)
+            except Exception:
+                logger.exception("onboarding[e2b]: failed to set up gmail watch for user=%s", user_id)
+
+            _onboarding_status.pop(user_id, None)
+            return
+
+        raise RuntimeError(f"Unsupported AGENT_RUNTIME: {config.agent_runtime}")
+    except Exception as e:
+        logger.exception("onboarding: failed for user=%s", user_id)
+        _onboarding_status[user_id] = {"status": "failed", "error": str(e)}
 
 
 def _compose_draft_for_runtime(
@@ -1302,7 +1325,13 @@ def web_onboarding_status(user: dict = Depends(get_authenticated_user)):
     else:
         ready = False
 
-    return {"ready": ready, "connected": connected}
+    result = {"ready": ready, "connected": connected}
+    if not ready:
+        status_entry = _onboarding_status.get(user["user_id"])
+        if status_entry and status_entry.get("status") == "failed":
+            result["failed"] = True
+            result["error"] = status_entry.get("error", "Unknown error")
+    return result
 
 
 @app.get("/web/api/v1/settings")

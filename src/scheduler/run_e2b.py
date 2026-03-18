@@ -257,14 +257,25 @@ def launch_onboarding_in_sandbox(user_id: str, control_plane_url: str, lookback_
 
         # Run the sandbox onboarding agent, streaming output to logs
         print("Running onboarding agent...\n")
-        result = sandbox.commands.run(
-            "cd /home/user/scheduler && python3 -m scheduler.sandbox.onboarding",
-            timeout=_SANDBOX_CMD_TIMEOUT,
-            on_stdout=lambda msg: logger.info("e2b[onboarding]: %s", msg.line),
-            on_stderr=lambda msg: logger.warning("e2b[onboarding]: %s", msg.line),
-        )
-        if result.exit_code != 0:
-            logger.error("e2b onboarding sandbox exited with code %d", result.exit_code)
+        try:
+            result = sandbox.commands.run(
+                "cd /home/user/scheduler && python3 -m scheduler.sandbox.onboarding",
+                timeout=_SANDBOX_CMD_TIMEOUT,
+                on_stdout=lambda msg: logger.info("e2b[onboarding]: %s", msg.line),
+                on_stderr=lambda msg: logger.warning("e2b[onboarding]: %s", msg.line),
+            )
+            if result.exit_code != 0:
+                raise RuntimeError(
+                    f"e2b onboarding sandbox exited with code {result.exit_code}: {result.stderr[:500] if result.stderr else 'no stderr'}"
+                )
+        except TimeoutError:
+            logger.error("e2b onboarding sandbox timed out after %ds for user=%s", _SANDBOX_CMD_TIMEOUT, user_id)
+            raise RuntimeError(f"Onboarding sandbox timed out after {_SANDBOX_CMD_TIMEOUT}s")
+        except RuntimeError:
+            raise
+        except Exception as e:
+            logger.error("e2b onboarding sandbox failed for user=%s: %s", user_id, e)
+            raise RuntimeError(f"Onboarding sandbox failed: {e}") from e
 
     finally:
         try:
