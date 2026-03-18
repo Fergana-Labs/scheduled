@@ -108,8 +108,7 @@ export default function Hero() {
         </h1>
 
         <p className="mx-auto mt-8 max-w-lg text-lg leading-relaxed text-gray-500 sm:text-xl">
-          An AI that reads your calendar and suggests times
-          that work — so you never have to check yourself.
+          Scheduled is an open-source agent that lives in your email and automatically drafts responses.
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-3">
