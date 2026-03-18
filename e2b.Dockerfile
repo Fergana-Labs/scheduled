@@ -12,6 +12,7 @@ WORKDIR /home/user/scheduler
 COPY e2b.pyproject.toml /home/user/scheduler/pyproject.toml
 COPY src/scheduler/__init__.py /home/user/scheduler/src/scheduler/__init__.py
 COPY src/scheduler/config.py /home/user/scheduler/src/scheduler/config.py
+COPY src/scheduler/claude_runtime.py /home/user/scheduler/src/scheduler/claude_runtime.py
 COPY src/scheduler/sandbox /home/user/scheduler/src/scheduler/sandbox
 COPY src/scheduler/onboarding /home/user/scheduler/src/scheduler/onboarding
 COPY src/scheduler/guides /home/user/scheduler/src/scheduler/guides
