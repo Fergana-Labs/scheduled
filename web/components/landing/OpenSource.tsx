@@ -1,35 +1,26 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
-export default function Header() {
-  const router = useRouter();
-
+export default function OpenSource() {
   return (
-    <header className="absolute top-0 left-0 right-0 z-10">
-      <nav
-        className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-8"
-        aria-label="Global"
-      >
-        <button
-          onClick={() => router.push('/')}
-          className="flex cursor-pointer items-center gap-3 transition-opacity hover:opacity-70"
-        >
-          <span className="sr-only">Go to Scheduled homepage</span>
-          <img
-            src="/scheduled_logo.svg"
-            alt="Scheduled"
-            className="h-5"
-          />
-        </button>
+    <section className="relative px-6 py-24 sm:py-32">
+      <div className="mx-auto max-w-3xl text-center">
+        <p className="text-sm font-medium uppercase tracking-widest text-[#43614a]">
+          Open Source
+        </p>
+        <h2 className="font-[family-name:var(--font-playfair)] mt-4 text-3xl font-normal italic tracking-tight text-gray-900 sm:text-5xl">
+          Built in the open
+        </h2>
+        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-500">
+          Scheduled is fully open source. Read the code, run it yourself,
+          or contribute — your calendar data is yours.
+        </p>
 
-        <div className="flex items-center gap-5">
+        <div className="mt-10 flex items-center justify-center gap-5">
           <a
             href="https://github.com/Fergana-Labs/scheduler"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-400 transition-colors hover:text-gray-900"
-            aria-label="GitHub"
+            className="inline-flex items-center gap-2.5 rounded-full border border-gray-900 px-7 py-3.5 text-base font-medium text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
           >
             <svg
               className="h-5 w-5"
@@ -43,15 +34,10 @@ export default function Header() {
                 clipRule="evenodd"
               />
             </svg>
-          </a>
-          <a
-            href="mailto:henry@ferganalabs.com"
-            className="text-sm text-gray-500 transition-colors hover:text-gray-900"
-          >
-            Contact
+            View on GitHub
           </a>
         </div>
-      </nav>
-    </header>
+      </div>
+    </section>
   );
 }
