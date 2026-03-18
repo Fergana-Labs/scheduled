@@ -43,6 +43,21 @@ _UNKNOWN_GMAIL_WEBHOOK_TTL = 300  # 5 minutes
 _unknown_gmail_webhook_emails: dict[str, float] = {}
 
 
+def _is_auth0_mode() -> bool:
+    """Return True when Auth0-backed login is explicitly enabled."""
+    return (
+        config.deployment_mode == "auth0"
+        and bool(config.auth0_domain)
+        and bool(config.auth0_client_id)
+        and bool(config.auth0_client_secret)
+    )
+
+
+def _is_self_hosted_mode() -> bool:
+    """Return True for local/self-hosted mode."""
+    return config.deployment_mode == "self_hosted"
+
+
 def _is_cached_unknown_gmail_webhook_email(email_address: str) -> bool:
     """Return True when an unknown webhook email was seen recently."""
     now = time.time()
@@ -152,8 +167,8 @@ def get_authenticated_user(request: Request) -> dict:
         raise HTTPException(status_code=401, detail="Not authenticated")
     token = auth_header[7:]
 
-    # Try Auth0 JWT first
-    if config.auth0_domain:
+    # Try Auth0 JWT first when Auth0 mode is enabled
+    if _is_auth0_mode():
         try:
             payload = _validate_auth0_jwt(token)
             from scheduler.db import get_user_by_auth0_sub
@@ -182,7 +197,14 @@ get_web_user = get_authenticated_user
 
 @app.get("/auth/login")
 def auth0_login(signup: str | None = None):
-    """Redirect to Auth0 Universal Login."""
+    """Start interactive login."""
+    if _is_self_hosted_mode() and not _is_auth0_mode():
+        redirect = f"/auth/google?signin=1" if signup == "1" else "/auth/google"
+        return RedirectResponse(redirect)
+
+    if not _is_auth0_mode():
+        return RedirectResponse(f"{config.web_app_url}?error=auth0_not_enabled")
+
     params = {
         "client_id": config.auth0_client_id,
         "redirect_uri": f"{config.google_web_redirect_uri}/auth/callback",
@@ -199,6 +221,9 @@ def auth0_login(signup: str | None = None):
 @app.get("/auth/callback")
 def auth0_callback(code: str | None = None, error: str | None = None):
     """Handle Auth0 callback — exchange code for tokens, create/match user."""
+    if not _is_auth0_mode():
+        return RedirectResponse(f"{config.web_app_url}?error=auth0_not_enabled")
+
     if error:
         return RedirectResponse(f"{config.web_app_url}?error={error}")
 
@@ -286,6 +311,9 @@ def auth0_callback(code: str | None = None, error: str | None = None):
 @app.get("/auth/logout")
 def auth0_logout():
     """Redirect to Auth0 logout endpoint."""
+    if not _is_auth0_mode():
+        return RedirectResponse(config.web_app_url)
+
     params = {
         "client_id": config.auth0_client_id,
         "returnTo": config.web_app_url,
@@ -302,13 +330,13 @@ _google_connect_states: dict[str, float] = {}
 
 @app.get("/auth/google/connect")
 def auth_google_connect(token: str | None = None):
-    """Start Google API token OAuth flow. Requires Auth0 JWT via query param."""
+    """Start Google API token OAuth flow. Requires authenticated session token via query param."""
     if not token:
         raise HTTPException(status_code=401, detail="Missing token")
 
     # Validate Auth0 JWT (or legacy HMAC)
     try:
-        if config.auth0_domain:
+        if _is_auth0_mode():
             payload = _validate_auth0_jwt(token)
             from scheduler.db import get_user_by_auth0_sub
             user = get_user_by_auth0_sub(payload["sub"])

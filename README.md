@@ -33,25 +33,35 @@ Inbound scheduling agent — automatically drafts email responses with proposed 
 └─────────────────┘
 ```
 
-## Phases
+## Self-Hosted Setup
 
-- **v0**: Checks Google Calendar only
-- **v1**: Also checks text messages
-- **v2**: Beeper integration for all messaging services + Slack
+See [docs/self-hosting.md](docs/self-hosting.md) for detailed instructions including GCP webhook setup and optional E2B sandboxing.
 
-## Setup
+### Quick start
 
 ```bash
+# Install
 pip install -e ".[dev]"
+
+# Configure
 cp .env.example .env
-# Fill in your Google OAuth credentials and Anthropic API key
-python -m scheduler.auth.google_auth  # Complete OAuth flow
+# Fill in: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ANTHROPIC_API_KEY, DATABASE_URL
+# SCHEDULER_DEPLOYMENT_MODE defaults to self_hosted (no Auth0 needed)
+
+# Authenticate with Google
+python -m scheduler.auth.google_auth
+
+# Run onboarding (backfill scheduled calendar from last 2 months of Gmail)
+python -m scheduler.onboarding
+
+# Start the email watcher (monitors for scheduling emails, creates drafts)
+python -m scheduler.watcher
 ```
 
 ## Usage
 
 ```bash
-# Run onboarding (backfill stash calendar from last 2 months of Gmail)
+# Run onboarding (backfill scheduled calendar from last 2 months of Gmail)
 python -m scheduler.onboarding
 
 # Start the email watcher (monitors for scheduling emails, creates drafts)
@@ -61,22 +71,35 @@ python -m scheduler.watcher
 python -m scheduler.hook --message-id <id>
 ```
 
-## E2B Template
+## Deployment modes
 
-For low-latency E2B runs, build a preprovisioned sandbox template instead of
-installing Python and dependencies on every run.
+| Mode | `SCHEDULER_DEPLOYMENT_MODE` | Auth provider | When to use |
+|------|---------------------------|---------------|-------------|
+| **Self-hosted** (default) | `self_hosted` | Google OAuth only | Running your own instance |
+| **Auth0** | `auth0` | Auth0 + Google OAuth | Multi-tenant hosted deployment |
+
+## E2B Sandbox (optional)
+
+For running agents in isolated cloud sandboxes instead of locally:
 
 ```bash
+# Build a preprovisioned sandbox template
 e2b template build -n scheduler-agents
-```
 
-Then set:
-
-```bash
+# Configure
 export AGENT_RUNTIME=e2b
 export CONTROL_PLANE_PUBLIC_URL=https://your-control-plane-url
 export E2B_TEMPLATE_ID=scheduler-agents
 ```
 
-If `E2B_TEMPLATE_ID` is unset, the code falls back to runtime provisioning
-inside a fresh sandbox.
+If `E2B_TEMPLATE_ID` is unset, the code falls back to runtime provisioning inside a fresh sandbox.
+
+## Phases
+
+- **v0**: Checks Google Calendar only
+- **v1**: Also checks text messages
+- **v2**: Beeper integration for all messaging services + Slack
+
+## License
+
+MIT
