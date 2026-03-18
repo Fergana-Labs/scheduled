@@ -268,7 +268,7 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
         httponly=True,
         secure=is_production,
         samesite="none" if is_production else "lax",
-        max_age=60 * 60 * 24 * 365 * 10,  # 10 years
+        max_age=60 * 60 * 24 * 365 * 10,  # ~10 years
         path="/",
     )
     return response
