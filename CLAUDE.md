@@ -4,13 +4,15 @@ If you are about to ask the user to do something for you, think about whether yo
 
 - **Never ask the user to check logs.** Check them yourself — via Render MCP, ngrok inspector (`localhost:4040`), or by running the server with captured output.
 - **Never ask permission to kill/restart local processes.** If you need to restart uvicorn, ngrok, or any dev server to make progress, just do it.
-- **Never speculate about env vars, API keys, or config.** If you need to know whether something is set, check it yourself (e.g. `env | grep`, read `.env`, etc.). Do not guess or assume.
+- **Never speculate about env vars, API keys, or config.** If you need to know whether something is set, check it yourself (e.g. `env | grep`, read `.env`, etc.). Do not guess or assume. Do not ask the user. Check it yourself.
 
 ### 1. Check Render Deployment
 
 The control plane runs on Render as `scheduler-control-plane` (service ID: `srv-d6s55t1j16oc73eih6i0`).
 
 - Use `mcp__render__list_logs` to check for errors after deploying, etc
+
+Do not ask the user to check render. Check it yourself.
 
 ### 2. Check Neon Database
 
@@ -23,6 +25,8 @@ When using `mcp__neon__run_sql`, always include `branchId`:
 ```
 mcp__neon__run_sql(projectId="blue-pine-43043371", branchId="br-cold-mouse-am8uwd1y", sql="...")
 ```
+
+Do not ask the user to check neon. Check it yourself.
 
 ### 3. Refresh Gmail Watcher
 
@@ -98,6 +102,8 @@ print(f'Sent message ID: {result[\"id\"]}')
 - Confirm the classifier runs, draft composer fires, and draft appears in Gmail
 - For invite testing: send the draft and check logs for `classify_sent_message_confirms_invite` and `created invite event`
 
+Do not ask the user to send an email. Do it yourself.
+
 ### 5. Past Conversation Context
 
 Previous Claude coding sessions are stored as `.jsonl` files at:
@@ -106,3 +112,8 @@ Previous Claude coding sessions are stored as `.jsonl` files at:
 ```
 
 Read these to understand prior decisions, debugging sessions, and context that isn't in git history.
+
+### 6. Testing a UI with playwright
+
+You have access to the Playwright MCP. Use it to verify any UI changes that you make for the user. Do not ask the user
+to check to see if your UI changes worked or not. Use the Playwright MCP, and do it yourself.
