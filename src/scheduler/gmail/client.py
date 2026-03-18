@@ -34,13 +34,16 @@ class GmailClient:
     def __init__(self, credentials):
         """Initialize with Google OAuth2 credentials."""
         self._credentials = credentials
-        self._service = None  # Lazily initialized
 
     def _get_service(self):
-        """Build and cache the Gmail API service."""
-        if self._service is None:
-            self._service = build("gmail", "v1", credentials=self._credentials)
-        return self._service
+        """Build a fresh Gmail API service.
+
+        A new service (and underlying httplib2.Http connection) is created on
+        every call because httplib2 is not thread-safe.  Reusing a cached
+        service across the Starlette/FastAPI thread-pool causes SSL errors
+        (DECRYPTION_FAILED_OR_BAD_RECORD_MAC / WRONG_VERSION_NUMBER).
+        """
+        return build("gmail", "v1", credentials=self._credentials)
 
     def _extract_body(self, payload: dict) -> str:
         """Recursively walk the Gmail message payload to find body text.
