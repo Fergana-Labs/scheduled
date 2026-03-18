@@ -7,7 +7,7 @@ export default function DisconnectedState() {
         Your Google account has been disconnected.
       </h2>
       <p className="mt-3 text-sm text-gray-600">
-        Reconnect to resume using Stash.
+        Reconnect to resume using Scheduled.
       </p>
       <a
         href={`${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google`}

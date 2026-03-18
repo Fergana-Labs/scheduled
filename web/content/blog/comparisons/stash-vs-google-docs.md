@@ -1,21 +1,21 @@
 ---
 slug: stash-vs-google-docs
-title: 'Stash vs Google Docs: AI Automation vs Document Collaboration'
-description: 'Stash vs Google Docs comparison - autonomous AI agents for file automation versus collaborative document editing. Which tool do you need?'
+title: 'Scheduled vs Google Docs: AI Automation vs Document Collaboration'
+description: 'Scheduled vs Google Docs comparison - autonomous AI agents for file automation versus collaborative document editing. Which tool do you need?'
 date: '2025-09-03'
 author: 'Fergana Labs Team'
 category: 'Comparisons'
 keywords: 'stash vs google docs, google docs alternative, ai document automation, google workspace comparison'
-metaDescription: 'Stash vs Google Docs: AI automation versus collaborative editing. Compare features and find the right tool for your document workflow.'
+metaDescription: 'Scheduled vs Google Docs: AI automation versus collaborative editing. Compare features and find the right tool for your document workflow.'
 ---
 
-# Stash vs Google Docs: AI Automation vs Document Collaboration
+# Scheduled vs Google Docs: AI Automation vs Document Collaboration
 
-**Google Docs** is the world's most popular collaborative document editor. **Stash** is an AI agent that automates work across your documents. These aren't competing products - they solve fundamentally different problems.
+**Google Docs** is the world's most popular collaborative document editor. **Scheduled** is an AI agent that automates work across your documents. These aren't competing products - they solve fundamentally different problems.
 
-Google Docs helps you _write_ documents together. Stash helps you _automate_ work across many documents. Here's how to think about which tool (or both) you need.
+Google Docs helps you _write_ documents together. Scheduled helps you _automate_ work across many documents. Here's how to think about which tool (or both) you need.
 
-<!-- Screenshot placeholder: Google Docs interface vs Stash Desktop interface -->
+<!-- Screenshot placeholder: Google Docs interface vs Scheduled Desktop interface -->
 
 ## What is Google Docs?
 
@@ -33,9 +33,9 @@ Google Docs helps you _write_ documents together. Stash helps you _automate_ wor
 
 Google Docs is a **document editor** with collaboration and AI writing assistance.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is an AI-powered desktop application that combines a persistent file system, long-term memory, and real-time access to your files and information.
+[Scheduled](/about) is an AI-powered desktop application that combines a persistent file system, long-term memory, and real-time access to your files and information.
 
 **Key Features:**
 
@@ -48,13 +48,13 @@ Google Docs is a **document editor** with collaboration and AI writing assistanc
 - **Bulk operations**: Update hundreds of documents at once
 - **Version control**: Full change history with instant rollback
 
-Stash is an **automation tool** that works _on_ your documents (including Google Docs), not a document editor.
+Scheduled is an **automation tool** that works _on_ your documents (including Google Docs), not a document editor.
 
-<!-- Screenshot placeholder: Stash editing multiple Google Docs at once -->
+<!-- Screenshot placeholder: Scheduled editing multiple Google Docs at once -->
 
 ## Key Differences
 
-| Feature              | Stash                             | Google Docs                    |
+| Feature              | Scheduled                             | Google Docs                    |
 | -------------------- | --------------------------------- | ------------------------------ |
 | **Core Purpose**     | Automate work across files        | Create & edit documents        |
 | **Primary Function** | AI automation                     | Document editing               |
@@ -89,7 +89,7 @@ Stash is an **automation tool** that works _on_ your documents (including Google
 ❌ **Sequential work** - Can't delegate multi-doc tasks to AI
 ❌ **Google ecosystem lock-in** - Best with other Google products
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 
@@ -109,7 +109,7 @@ Stash is an **automation tool** that works _on_ your documents (including Google
 ❌ **Desktop only** - No mobile or web version yet
 ❌ **Requires local setup** - Download and installation needed
 
-<!-- Screenshot placeholder: Google Docs real-time collaboration vs Stash bulk automation -->
+<!-- Screenshot placeholder: Google Docs real-time collaboration vs Scheduled bulk automation -->
 
 ## Who Should Choose Google Docs?
 
@@ -127,9 +127,9 @@ Google Docs is essential if you:
 
 **What it doesn't do:** Automate work across many documents, remember long-term project context, execute multi-step tasks.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is essential if you:
+Scheduled is essential if you:
 
 - Need to **update many Google Docs files** at once (bulk operations)
 - Deal with **information overload** across multiple systems
@@ -150,31 +150,31 @@ Stash is essential if you:
 
 **Use Google Docs for:** Writing, editing, collaborating with teammates on documents in real-time.
 
-**Use Stash for:** Automating repetitive work across those Google Docs files (and others).
+**Use Scheduled for:** Automating repetitive work across those Google Docs files (and others).
 
 **Example workflow:**
 
 1. **Write in Google Docs** - You and your team collaborate on a project template
-2. **Automate with Stash** - "Take this template and create 30 customized versions for each client, updating the name, metrics, and date"
+2. **Automate with Scheduled** - "Take this template and create 30 customized versions for each client, updating the name, metrics, and date"
 3. **Review in Google Docs** - Share the customized documents with your team for final review
 
-They're complementary: **Google Docs is for creation, Stash is for automation.**
+They're complementary: **Google Docs is for creation, Scheduled is for automation.**
 
-<!-- Screenshot placeholder: Workflow showing Google Docs + Stash working together -->
+<!-- Screenshot placeholder: Workflow showing Google Docs + Scheduled working together -->
 
 ## Common Misconceptions
 
-### "Stash replaces Google Docs"
+### "Scheduled replaces Google Docs"
 
-**No.** Stash works _with_ Google Docs files. You still edit documents in Google Docs (or Word, or any editor). Stash automates tasks across those files.
+**No.** Scheduled works _with_ Google Docs files. You still edit documents in Google Docs (or Word, or any editor). Scheduled automates tasks across those files.
 
-### "Google Docs has AI, so I don't need Stash"
+### "Google Docs has AI, so I don't need Scheduled"
 
-Google Docs AI helps you write better within a single document (grammar, suggestions, summarization). Stash AI autonomously executes multi-step tasks across many files. Different capabilities.
+Google Docs AI helps you write better within a single document (grammar, suggestions, summarization). Scheduled AI autonomously executes multi-step tasks across many files. Different capabilities.
 
 ### "I can just manually update my documents"
 
-Sure - if you have time to update 100 documents manually. Stash exists for when that doesn't scale.
+Sure - if you have time to update 100 documents manually. Scheduled exists for when that doesn't scale.
 
 ## Final Recommendation
 
@@ -182,20 +182,20 @@ This isn't an either/or decision - these tools serve different purposes.
 
 **You need Google Docs if** you create and edit documents, especially with teammates. It's the standard for good reason.
 
-**You need Stash if** you find yourself doing repetitive work across many documents - updating figures in 20 reports, standardizing formatting across 50 files, customizing templates for different clients.
+**You need Scheduled if** you find yourself doing repetitive work across many documents - updating figures in 20 reports, standardizing formatting across 50 files, customizing templates for different clients.
 
-**Most knowledge workers need both:** Google Docs for document creation and collaboration, Stash for automation and bulk operations.
+**Most knowledge workers need both:** Google Docs for document creation and collaboration, Scheduled for automation and bulk operations.
 
 The real question is: **Are you wasting hours on repetitive document tasks that AI could automate?**
 
-If you're manually updating the same information across multiple documents, reformatting dozens of files, or spending hours on work that feels repetitive - Stash will save you significant time.
+If you're manually updating the same information across multiple documents, reformatting dozens of files, or spending hours on work that feels repetitive - Scheduled will save you significant time.
 
 If you're collaboratively writing and editing documents with teammates - Google Docs is already the right tool.
 
-Use both. Write and collaborate in Google Docs. Automate the tedious parts with Stash.
+Use both. Write and collaborate in Google Docs. Automate the tedious parts with Scheduled.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop integrates with Google Drive and automates work across your Google Docs files (and many others).
+Scheduled Desktop integrates with Google Drive and automates work across your Google Docs files (and many others).
 
-[Download Stash Desktop]({{STASH_DESKTOP_DOWNLOAD_URL}}) • [See automation use cases](/blog) • [Learn more](/about)
+[Download Scheduled Desktop]({{STASH_DESKTOP_DOWNLOAD_URL}}) • [See automation use cases](/blog) • [Learn more](/about)

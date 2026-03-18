@@ -1,12 +1,12 @@
 ---
 slug: essay-writing-assistant
 title: 'Write Your Essay 10x Faster: AI That Actually Reads Your Class Materials'
-description: 'Stop staring at blank pages. Import all your class materials to Stash and get an AI writing assistant that actually understands what your professor taught—perfect for essays and assignments.'
+description: 'Stop staring at blank pages. Import all your class materials to Scheduled and get an AI writing assistant that actually understands what your professor taught—perfect for essays and assignments.'
 date: '2025-08-08'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'essay writing ai, homework help ai, class materials assistant, stash student, academic writing tool'
-metaDescription: 'Upload class materials to Stash and get essay help grounded in what was actually taught. Citations from lectures, examples from readings—writing with full context.'
+metaDescription: 'Upload class materials to Scheduled and get essay help grounded in what was actually taught. Citations from lectures, examples from readings—writing with full context.'
 ---
 
 # Write Your Essay 10x Faster: AI That Actually Reads Your Class Materials
@@ -23,7 +23,7 @@ You've attended all the lectures. You did the readings (most of them). You have 
 
 **What you need:** An AI that actually knows what your professor taught and can help you write _based on the course content._
 
-That's exactly what **Stash does for students.**
+That's exactly what **Scheduled does for students.**
 
 ## The College Essay Problem
 
@@ -60,7 +60,7 @@ Here's the typical essay-writing nightmare:
 
 **Sound familiar?**
 
-## How Stash Becomes Your Course-Aware Writing Assistant
+## How Scheduled Becomes Your Course-Aware Writing Assistant
 
 Instead of fumbling through materials, give yourself an AI that's already read everything:
 
@@ -74,9 +74,9 @@ At the start of the semester (or before the essay):
 - Include discussion notes
 - Drop in the syllabus
 
-Everything your professor covered goes into a Stash workspace for that class.
+Everything your professor covered goes into a Scheduled workspace for that class.
 
-### 2. **Stash Reads Everything**
+### 2. **Scheduled Reads Everything**
 
 The AI processes all your materials and understands:
 
@@ -94,7 +94,7 @@ Now when you work on the essay, you can ask:
 
 **"What did the course materials say about X theory?"**
 
-Stash pulls from lectures, readings, and notes—showing you exactly what was covered and where.
+Scheduled pulls from lectures, readings, and notes—showing you exactly what was covered and where.
 
 **"What examples can I use for this argument?"**
 
@@ -112,18 +112,18 @@ Points you to the most relevant sources from the syllabus.
 
 **Assignment:** "Analyze the evolution of democratic institutions using examples from the course."
 
-**Without Stash:**
+**Without Scheduled:**
 
 - Try to remember which readings covered democratic institutions
 - Flip through 8 PDFs looking for relevant sections
 - Check your notes for lecture examples
 - Spend 2 hours gathering materials before even starting to write
 
-**With Stash:**
+**With Scheduled:**
 
 **You:** "What did we learn about democratic institutions?"
 
-**Stash returns:**
+**Scheduled returns:**
 
 - Summary from Lecture 4 on institutional evolution
 - Key arguments from the Fukuyama reading
@@ -132,7 +132,7 @@ Points you to the most relevant sources from the syllabus.
 
 **You:** "Give me an outline for this essay."
 
-**Stash generates:**
+**Scheduled generates:**
 
 ```
 I. Introduction: Define democratic institutions (from Lecture 1)
@@ -165,7 +165,7 @@ V. Conclusion: Synthesize using course themes
 - You still have to find citations yourself
 - Professor can tell it's not grounded in class materials
 
-**Stash:**
+**Scheduled:**
 
 - Only uses your actual course materials
 - Knows exactly what was taught in your class
@@ -208,7 +208,7 @@ Basically: any assignment where you need to demonstrate you understood the cours
 
 **Total: 8+ hours**
 
-**With Stash:**
+**With Scheduled:**
 
 - 15 minutes: Ask for outline and key points
 - 30 minutes: Review and refine structure
@@ -221,7 +221,7 @@ Basically: any assignment where you need to demonstrate you understood the cours
 
 ## Academic Integrity Note
 
-**Stash helps you write better** by organizing course materials and providing structure—it doesn't write the essay for you.
+**Scheduled helps you write better** by organizing course materials and providing structure—it doesn't write the essay for you.
 
 You're still:
 
@@ -246,10 +246,10 @@ Use it to work smarter, not to plagiarize.
 
 ## Getting Started
 
-1. **Before your next big assignment**, import all course materials to Stash
-2. **Read the essay prompt** and ask Stash for relevant materials
+1. **Before your next big assignment**, import all course materials to Scheduled
+2. **Read the essay prompt** and ask Scheduled for relevant materials
 3. **Get an outline** based on course content
-4. **Write using Stash** to quickly reference materials and examples
+4. **Write using Scheduled** to quickly reference materials and examples
 5. **Actually sleep** instead of pulling an all-nighter
 
 Works for:
@@ -262,4 +262,4 @@ Works for:
 
 ---
 
-**Stop panicking over essays at midnight.** [Try Stash](/) and write with your entire course at your fingertips.
+**Stop panicking over essays at midnight.** [Try Scheduled](/) and write with your entire course at your fingertips.

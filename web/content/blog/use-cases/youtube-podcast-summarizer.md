@@ -1,12 +1,12 @@
 ---
 slug: youtube-podcast-summarizer
 title: 'Consume YouTube Videos & Podcasts at the Speed of Thought'
-description: 'Stop watching 2-hour videos at 2x speed. Use Stash to transcribe and summarize YouTube videos and podcasts—get key insights in minutes, not hours.'
+description: 'Stop watching 2-hour videos at 2x speed. Use Scheduled to transcribe and summarize YouTube videos and podcasts—get key insights in minutes, not hours.'
 date: '2025-09-27'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'youtube summarizer, podcast transcription summary, video to text summary, stash youtube, fast learning tools'
-metaDescription: 'Download and summarize YouTube videos and podcasts with Stash. Get key insights from hours of content in minutes—learn at the speed of thought.'
+metaDescription: 'Download and summarize YouTube videos and podcasts with Scheduled. Get key insights from hours of content in minutes—learn at the speed of thought.'
 ---
 
 # Consume YouTube Videos & Podcasts at the Speed of Thought
@@ -19,7 +19,7 @@ So you bookmark it. Add it to your "watch later" list. Tell yourself you'll get 
 
 Here's the problem: **Long-form content is valuable but inefficient.** You want the insights, not the filler.
 
-That's exactly what **Stash solves**: Turn hours of video/audio into minutes of actionable insights.
+That's exactly what **Scheduled solves**: Turn hours of video/audio into minutes of actionable insights.
 
 ## The Long-Form Content Problem
 
@@ -48,13 +48,13 @@ You're forced to choose between:
 
 **Neither option is good.** You want the insights without the time investment.
 
-## How Stash Compresses Long-Form Content
+## How Scheduled Compresses Long-Form Content
 
 Here's the workflow:
 
 ### 1. **Download the Video or Podcast**
 
-Paste the YouTube link or upload the podcast file to Stash. It handles:
+Paste the YouTube link or upload the podcast file to Scheduled. It handles:
 
 - YouTube videos of any length
 - Podcast episodes (MP3, audio files)
@@ -63,7 +63,7 @@ Paste the YouTube link or upload the podcast file to Stash. It handles:
 
 ### 2. **Get the Full Transcript**
 
-Stash automatically transcribes the audio. You get:
+Scheduled automatically transcribes the audio. You get:
 
 - Complete, searchable text
 - Timestamp markers for key moments
@@ -73,7 +73,7 @@ Now the content is readable, searchable, and scan-able.
 
 ### 3. **AI-Powered Summarization**
 
-This is where it gets powerful. Stash doesn't just dump the transcript—it summarizes intelligently:
+This is where it gets powerful. Scheduled doesn't just dump the transcript—it summarizes intelligently:
 
 **Key Points:** The main ideas and insights
 **Actionable Takeaways:** Things you can actually do based on the content
@@ -110,11 +110,11 @@ Let's say you want insights from a 3-hour interview with a successful founder.
 
 **Time:** 3 hours (or infinite, because you never actually watch)
 
-**With Stash:**
+**With Scheduled:**
 
-1. Paste YouTube link into Stash (10 seconds)
+1. Paste YouTube link into Scheduled (10 seconds)
 2. Wait for transcription and summary (8 minutes processing)
-3. Read the 10-minute summary Stash generates
+3. Read the 10-minute summary Scheduled generates
 4. Dive into specific sections if something is interesting (optional)
 
 **Time:** 10-15 minutes, complete understanding
@@ -176,7 +176,7 @@ Basically: if you want to extract value from long-form audio/video without spend
 
 Think about how many valuable podcasts and videos you skip because they're "too long."
 
-If Stash lets you consume even **3 extra pieces of long-form content per week**, that's:
+If Scheduled lets you consume even **3 extra pieces of long-form content per week**, that's:
 
 - **150+ pieces of content per year** you would've otherwise skipped
 - **Hundreds of insights and ideas** you would've missed
@@ -187,7 +187,7 @@ The learning gap compounds fast when you can consume at 10x speed.
 ## Getting Started
 
 1. **Find a long YouTube video or podcast** you've been meaning to watch
-2. **Paste the link into Stash** (or upload the audio file)
+2. **Paste the link into Scheduled** (or upload the audio file)
 3. **Wait a few minutes** for transcription and summary
 4. **Read the summary** and decide if you want to dive deeper
 5. **Repeat with everything** in your "watch later" backlog
@@ -196,4 +196,4 @@ The barrier between "I should watch this" and "I learned from this" just collaps
 
 ---
 
-**Stop letting valuable content pile up unwatched.** [Try Stash](/) and consume at the speed of thought, not the speed of talking.
+**Stop letting valuable content pile up unwatched.** [Try Scheduled](/) and consume at the speed of thought, not the speed of talking.

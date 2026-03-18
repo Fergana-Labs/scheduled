@@ -85,13 +85,13 @@ export default function SettingsPage() {
           <div className="mb-8 flex items-center gap-3">
             <Image
               src="/logo.png"
-              alt="Stash Logo"
+              alt="Scheduled Logo"
               width={40}
               height={40}
               className="h-10 w-10"
             />
             <span className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold text-gray-900">
-              Stash
+              Scheduled
             </span>
           </div>
 

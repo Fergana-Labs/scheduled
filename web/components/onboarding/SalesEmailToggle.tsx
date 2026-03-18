@@ -29,7 +29,7 @@ export default function SalesEmailToggle({ initialEnabled }: SalesEmailTogglePro
       <div>
         <p className="text-sm font-medium text-gray-900">Process sales emails</p>
         <p className="mt-1 text-xs text-gray-500">
-          When on, Stash will draft replies to sales outreach, pitches, and
+          When on, Scheduled will draft replies to sales outreach, pitches, and
           promotional emails. When off, these are silently skipped.
         </p>
       </div>

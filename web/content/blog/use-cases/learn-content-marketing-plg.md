@@ -1,15 +1,15 @@
 ---
 slug: learn-content-marketing-plg
-title: 'Build Your Content Marketing & PLG Knowledge Base with Stash'
-description: 'Learn content marketing and product-led growth faster with Stash. Collect resources, synthesize patterns, and build reusable knowledge instead of scattered bookmarks.'
+title: 'Build Your Content Marketing & PLG Knowledge Base with Scheduled'
+description: 'Learn content marketing and product-led growth faster with Scheduled. Collect resources, synthesize patterns, and build reusable knowledge instead of scattered bookmarks.'
 date: '2025-10-12'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'learn content marketing, product-led growth learning, marketing knowledge base, stash learning, synthesize marketing resources'
-metaDescription: 'Master content marketing and PLG with Stash. Aggregate articles, videos, and case studies—then let AI extract patterns and create your personal marketing playbook.'
+metaDescription: 'Master content marketing and PLG with Scheduled. Aggregate articles, videos, and case studies—then let AI extract patterns and create your personal marketing playbook.'
 ---
 
-# Build Your Content Marketing & PLG Knowledge Base with Stash
+# Build Your Content Marketing & PLG Knowledge Base with Scheduled
 
 You want to get good at content marketing. Or product-led growth. Or both.
 
@@ -19,7 +19,7 @@ Three months later, you've "learned" a lot... but can you actually explain what 
 
 **Information ≠ Knowledge.** Reading 50 articles doesn't mean you understand the underlying patterns. It just means you read 50 articles.
 
-This is where **Stash transforms learning from passive consumption to active knowledge building.**
+This is where **Scheduled transforms learning from passive consumption to active knowledge building.**
 
 ## The Learning Problem: Information Overload
 
@@ -33,9 +33,9 @@ Here's the typical "I want to learn content marketing" journey:
 
 **Result:** You're well-read but not actually skilled. You can't synthesize what you've learned into actionable strategies.
 
-## How Stash Builds Real Knowledge
+## How Scheduled Builds Real Knowledge
 
-Stash doesn't just store resources—it helps you **learn the patterns and build expertise**. Here's how:
+Scheduled doesn't just store resources—it helps you **learn the patterns and build expertise**. Here's how:
 
 ### 1. **Aggregate All Your Resources in One Place**
 
@@ -49,13 +49,13 @@ Instead of bookmarks scattered across browsers, apps, and platforms:
 
 Everything about content marketing (or PLG, or whatever topic) lives in one workspace.
 
-### 2. **Let Stash Extract Patterns and Insights**
+### 2. **Let Scheduled Extract Patterns and Insights**
 
-This is the magic. Once you have 20+ resources on a topic, ask Stash:
+This is the magic. Once you have 20+ resources on a topic, ask Scheduled:
 
 **"What are the common patterns in successful content marketing strategies?"**
 
-Stash reads through all your saved content and synthesizes:
+Scheduled reads through all your saved content and synthesizes:
 
 - **Recurring tactics:** What successful companies do repeatedly
 - **Core principles:** The underlying frameworks that apply across examples
@@ -67,7 +67,7 @@ You're not just consuming individual articles—**you're building a comprehensiv
 
 ### 3. **Create Your Personal Playbook**
 
-As Stash identifies patterns, it helps you create:
+As Scheduled identifies patterns, it helps you create:
 
 - **Strategy frameworks** pulled from multiple sources
 - **Tactical checklists** based on what works
@@ -79,7 +79,7 @@ Now when you need to plan a content strategy, you're not Googling from scratch�
 
 ## Real Example: Mastering Product-Led Growth (PLG)
 
-Let's say you want to understand PLG deeply. Here's your Stash workflow:
+Let's say you want to understand PLG deeply. Here's your Scheduled workflow:
 
 ### **Week 1: Collect Resources**
 
@@ -93,14 +93,14 @@ Drop everything into your "PLG Learning" workspace.
 
 ### **Week 2: Synthesize Patterns**
 
-Ask Stash questions like:
+Ask Scheduled questions like:
 
 - "What are the key characteristics of successful PLG products?"
 - "How do PLG companies approach pricing?"
 - "What's the difference between PLG and traditional sales-led growth?"
 - "What metrics matter most for PLG businesses?"
 
-Stash generates answers pulled from ALL your resources, showing:
+Scheduled generates answers pulled from ALL your resources, showing:
 
 - Common patterns (freemium models, self-serve onboarding, viral loops)
 - Successful examples (how Figma did X, how Notion approached Y)
@@ -121,11 +121,11 @@ Based on the synthesis, you create:
 
 **Traditional approach:** Read → Bookmark → Forget → Re-Google later
 
-**Stash approach:** Read → Synthesize → Reference → Apply
+**Scheduled approach:** Read → Synthesize → Reference → Apply
 
 You're building **compound knowledge.** Each new resource strengthens your understanding of existing patterns instead of being a random data point.
 
-Plus, Stash makes your learning:
+Plus, Scheduled makes your learning:
 
 - **Searchable:** Find that specific tactic instantly
 - **Connected:** See how different concepts relate
@@ -145,7 +145,7 @@ This workflow applies to learning anything:
 The pattern is the same:
 
 1. Collect quality resources on the topic
-2. Let Stash synthesize patterns and principles
+2. Let Scheduled synthesize patterns and principles
 3. Build a personal knowledge base you can actually use
 4. Apply what you learned to real work
 
@@ -153,7 +153,7 @@ The pattern is the same:
 
 1. **Pick a topic** you want to master (content marketing, PLG, etc.)
 2. **Spend a week collecting** 20-30 high-quality resources
-3. **Import everything to Stash** in a dedicated workspace
+3. **Import everything to Scheduled** in a dedicated workspace
 4. **Start asking questions** to extract patterns and insights
 5. **Build your playbook** based on what you learn
 6. **Keep adding to it** as you discover new resources
@@ -162,4 +162,4 @@ Learning isn't about how many articles you read. It's about how well you can app
 
 ---
 
-**Ready to turn information into knowledge?** [Try Stash](/) and build expertise that actually sticks.
+**Ready to turn information into knowledge?** [Try Scheduled](/) and build expertise that actually sticks.

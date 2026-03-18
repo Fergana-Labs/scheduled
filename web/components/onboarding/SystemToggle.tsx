@@ -29,7 +29,7 @@ export default function SystemToggle({ initialEnabled }: SystemToggleProps) {
       <div>
         <p className="text-sm font-medium text-gray-900">System</p>
         <p className="mt-1 text-xs text-gray-500">
-          When off, Stash stops processing your emails entirely.
+          When off, Scheduled stops processing your emails entirely.
         </p>
       </div>
       <button

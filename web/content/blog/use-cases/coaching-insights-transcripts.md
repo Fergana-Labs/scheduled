@@ -1,12 +1,12 @@
 ---
 slug: coaching-insights-transcripts
 title: 'Extract Coaching Insights from Meeting Transcripts with AI'
-description: 'Turn your Granola recordings, coaching sessions, and manager meetings into personalized insights. Let Stash AI identify growth areas, blind spots, and wins automatically.'
+description: 'Turn your Granola recordings, coaching sessions, and manager meetings into personalized insights. Let Scheduled AI identify growth areas, blind spots, and wins automatically.'
 date: '2025-09-02'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'coaching insights ai, meeting transcript analysis, personal development ai, stash coaching, leadership feedback'
-metaDescription: 'Get personalized coaching insights from meeting transcripts with Stash. Identify patterns, growth areas, and actionable feedback from coaching calls and manager 1-on-1s.'
+metaDescription: 'Get personalized coaching insights from meeting transcripts with Scheduled. Identify patterns, growth areas, and actionable feedback from coaching calls and manager 1-on-1s.'
 ---
 
 # Extract Coaching Insights from Meeting Transcripts with AI
@@ -19,7 +19,7 @@ But here's what actually happens: You nod along during the conversation, maybe j
 
 **What if you could extract and synthesize all those coaching insights automatically?**
 
-That's exactly what Stash does with meeting transcripts.
+That's exactly what Scheduled does with meeting transcripts.
 
 ## The Coaching Insight Problem
 
@@ -45,7 +45,7 @@ Coaching and feedback conversations are valuable, but insights get lost because:
 
 **Result:** You're getting coaching but not systematically improving. The insights don't compound.
 
-## How Stash Extracts Coaching Insights
+## How Scheduled Extracts Coaching Insights
 
 Here's the workflow:
 
@@ -59,13 +59,13 @@ Whether it's:
 - Therapy session notes (if you transcribe them)
 - Performance review discussions
 
-Upload the transcripts to your Stash workspace.
+Upload the transcripts to your Scheduled workspace.
 
 ### 2. **Ask for Insight Extraction**
 
-Tell Stash: "Extract coaching insights from these transcripts."
+Tell Scheduled: "Extract coaching insights from these transcripts."
 
-Stash analyzes the conversations and identifies:
+Scheduled analyzes the conversations and identifies:
 
 **Growth Areas:**
 
@@ -93,7 +93,7 @@ Stash analyzes the conversations and identifies:
 
 ### 3. **Get Personalized Action Items**
 
-Based on the insights, Stash suggests:
+Based on the insights, Scheduled suggests:
 
 **High-Impact Actions:**
 
@@ -115,11 +115,11 @@ Based on the insights, Stash suggests:
 
 ## Real Example: Six Months of Manager 1-on-1s
 
-Let's say you've had monthly 1-on-1s with your manager for six months. You upload all the Granola transcripts to Stash.
+Let's say you've had monthly 1-on-1s with your manager for six months. You upload all the Granola transcripts to Scheduled.
 
 **You ask:** "What patterns do you see in my 1-on-1s? What should I focus on?"
 
-**Stash analyzes and returns:**
+**Scheduled analyzes and returns:**
 
 **Top Growth Area: Strategic Thinking**
 
@@ -203,7 +203,7 @@ Instead of vague "work on leadership," you get specific patterns and actions.
 ## Getting Started
 
 1. **Collect transcripts** from your last 3-6 coaching conversations (Granola, meeting notes, etc.)
-2. **Upload to a "Personal Development" workspace** in Stash
+2. **Upload to a "Personal Development" workspace** in Scheduled
 3. **Ask for insight extraction:** "What are my top growth areas?"
 4. **Review patterns** and pick 1-2 to focus on this month
 5. **Track progress** by adding new transcripts and asking "Am I improving on X?"
@@ -212,4 +212,4 @@ Coaching stops being random conversations and becomes a **systematic development
 
 ---
 
-**Ready to actually use all that coaching feedback?** [Try Stash](/) and turn transcripts into personal growth.
+**Ready to actually use all that coaching feedback?** [Try Scheduled](/) and turn transcripts into personal growth.

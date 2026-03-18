@@ -1,12 +1,12 @@
 ---
 slug: competitive-reddit-research
 title: 'Competitive Research from Reddit: What People Really Think About Competitors'
-description: 'Skip the marketing fluff. Use Stash to aggregate and analyze Reddit comments about competitors—discover real pain points, missing features, and market opportunities.'
+description: 'Skip the marketing fluff. Use Scheduled to aggregate and analyze Reddit comments about competitors—discover real pain points, missing features, and market opportunities.'
 date: '2025-07-24'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'reddit competitive research, competitor analysis reddit, market research reddit, stash reddit analysis, customer pain points'
-metaDescription: 'Find what customers really think about competitors using Reddit research with Stash. Aggregate comments, identify pain points, and spot market opportunities.'
+metaDescription: 'Find what customers really think about competitors using Reddit research with Scheduled. Aggregate comments, identify pain points, and spot market opportunities.'
 ---
 
 # Competitive Research from Reddit: What People Really Think About Competitors
@@ -21,7 +21,7 @@ Want to know what people actually think about your competitors? Not what their m
 
 **The problem:** This information is scattered across hundreds of threads, dozens of subreddits, and years of comments.
 
-**The solution:** Use Stash to aggregate all Reddit mentions of competitors, analyze sentiment, and extract actionable insights.
+**The solution:** Use Scheduled to aggregate all Reddit mentions of competitors, analyze sentiment, and extract actionable insights.
 
 ## The Competitive Research Problem
 
@@ -49,7 +49,7 @@ Most competitive research is either too shallow or too manual:
 
 **Result:** You have vague insights at best, and possibly completely wrong assumptions about what users actually care about.
 
-## How to Do Reddit Competitive Research with Stash
+## How to Do Reddit Competitive Research with Scheduled
 
 Here's the workflow:
 
@@ -62,9 +62,9 @@ Identify who/what you're researching:
 - Related pain points ("email automation problems")
 - Alternative product searches ("Notion alternative", "better than Asana")
 
-### 2. **Use Stash to Aggregate Reddit Content**
+### 2. **Use Scheduled to Aggregate Reddit Content**
 
-Stash can pull:
+Scheduled can pull:
 
 - All Reddit comments mentioning competitor names
 - Threads in relevant subreddits (r/SaaS, r/productivity, etc.)
@@ -77,11 +77,11 @@ Everything gets pulled into one workspace for analysis.
 
 ### 3. **Extract Insights Automatically**
 
-Ask Stash to analyze the collected data:
+Ask Scheduled to analyze the collected data:
 
 **"What are the most common complaints about [Competitor]?"**
 
-Stash surfaces recurring themes:
+Scheduled surfaces recurring themes:
 
 - "Pricing is too expensive for small teams" (mentioned 23 times)
 - "Mobile app is buggy" (17 mentions)
@@ -131,7 +131,7 @@ You're building a project management tool and want to understand the competitive
 
 **You research:** Asana, Monday.com, ClickUp, Notion
 
-**Stash aggregates:**
+**Scheduled aggregates:**
 
 - 500+ Reddit comments across r/productivity, r/projectmanagement, r/startups
 - Comparison threads: "Asana vs Monday"
@@ -139,7 +139,7 @@ You're building a project management tool and want to understand the competitive
 - Complaint threads and rants
 - Migration stories (why people switched)
 
-**Insights Stash extracts:**
+**Insights Scheduled extracts:**
 
 **Top Complaints:**
 
@@ -219,9 +219,9 @@ Reddit discussions often surface problems before they show up in reviews or form
 - Inconsistent and incomplete
 - Easy to miss patterns
 
-**With Stash:**
+**With Scheduled:**
 
-- Cost: Included in Stash
+- Cost: Included in Scheduled
 - Time: 2-3 hours to aggregate and analyze
 - Result: Comprehensive, specific, actionable insights from real users
 
@@ -229,12 +229,12 @@ Reddit discussions often surface problems before they show up in reviews or form
 
 1. **List your top 3-5 competitors** or category leaders
 2. **Define search terms** (company names, product names, category terms)
-3. **Use Stash to aggregate** Reddit mentions and discussions
+3. **Use Scheduled to aggregate** Reddit mentions and discussions
 4. **Ask for insights:** complaints, feature requests, switching triggers
 5. **Build your strategy** based on real user frustration, not assumptions
 
-**Pro tip:** Set up recurring searches so Stash monitors Reddit continuously. Get alerts when new patterns or major complaints emerge.
+**Pro tip:** Set up recurring searches so Scheduled monitors Reddit continuously. Get alerts when new patterns or major complaints emerge.
 
 ---
 
-**Stop guessing what customers want.** [Try Stash](/) and do competitive research based on what people actually say.
+**Stop guessing what customers want.** [Try Scheduled](/) and do competitive research based on what people actually say.

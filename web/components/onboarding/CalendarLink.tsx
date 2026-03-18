@@ -15,9 +15,9 @@ export default function CalendarLink({ calendarId }: CalendarLinkProps) {
         <Calendar className="h-5 w-5 text-blue-600" />
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-900">Stash Calendar</p>
+        <p className="text-sm font-medium text-gray-900">Scheduled Calendar</p>
         <p className="mt-1 text-xs text-gray-500">
-          Meetings that Stash schedules are added to this calendar so your
+          Meetings scheduled through Scheduled are added to this calendar so your
           availability stays up to date.
         </p>
         <a

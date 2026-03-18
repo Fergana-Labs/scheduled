@@ -1,12 +1,12 @@
 ---
 slug: forgotten-insights-transcripts
 title: 'Never Forget a Follow-Up Again: Pull Insights from Call Transcripts'
-description: 'Stop losing action items and insights from meetings. Use Stash to extract commitments, forgotten ideas, and product feedback from call transcripts automatically.'
+description: 'Stop losing action items and insights from meetings. Use Scheduled to extract commitments, forgotten ideas, and product feedback from call transcripts automatically.'
 date: '2025-08-28'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'meeting action items, call transcript analysis, forgotten follow-ups, stash meeting insights, extract commitments'
-metaDescription: 'Automatically extract action items, commitments, and insights from meeting transcripts with Stash. Never let a follow-up or great idea slip through the cracks again.'
+metaDescription: 'Automatically extract action items, commitments, and insights from meeting transcripts with Scheduled. Never let a follow-up or great idea slip through the cracks again.'
 ---
 
 # Never Forget a Follow-Up Again: Pull Insights from Call Transcripts
@@ -19,7 +19,7 @@ What exactly did they say about the pricing concerns? Did you promise to send th
 
 **Most insights from meetings get lost** because we're terrible at remembering everything while also participating in the conversation.
 
-Stash solves this. Upload your call transcript, and it pulls out everything important automatically.
+Scheduled solves this. Upload your call transcript, and it pulls out everything important automatically.
 
 ## The Meeting Memory Problem
 
@@ -41,7 +41,7 @@ Here's what happens after most meetings:
 
 **Result:** Follow-ups don't happen. Insights are lost. Commitments forgotten. You look unresponsive or disorganized.
 
-## How Stash Pulls Forgotten Insights
+## How Scheduled Pulls Forgotten Insights
 
 Instead of relying on memory or frantic note-taking, let AI analyze the transcript:
 
@@ -55,15 +55,15 @@ Whether it's:
 - User interviews
 - Any recorded conversation
 
-Import the transcript to Stash (from Granola, Zoom, etc.).
+Import the transcript to Scheduled (from Granola, Zoom, etc.).
 
 ### 2. **Extract What Matters**
 
-Ask Stash specific questions:
+Ask Scheduled specific questions:
 
 **"What action items did I commit to?"**
 
-Stash finds every commitment you made:
+Scheduled finds every commitment you made:
 
 - "I'll send you that pricing proposal by Friday"
 - "Let me check with the team and get back to you"
@@ -74,7 +74,7 @@ Stash finds every commitment you made:
 
 **"What insights did people share about my product?"**
 
-Stash extracts feedback:
+Scheduled extracts feedback:
 
 - "The dashboard is confusing for first-time users"
 - "Love the export feature, use it constantly"
@@ -95,7 +95,7 @@ Those "oh, by the way" moments that often contain gold:
 
 ### 3. **Get Organized Outputs**
 
-Stash doesn't just dump a list—it organizes intelligently:
+Scheduled doesn't just dump a list—it organizes intelligently:
 
 **Action Items (by due date):**
 
@@ -119,9 +119,9 @@ Stash doesn't just dump a list—it organizes intelligently:
 
 You had a 45-minute call with a customer discussing their experience with your product. You recorded it with Granola.
 
-**You ask Stash:** "What action items did I commit to, and what product feedback was mentioned?"
+**You ask Scheduled:** "What action items did I commit to, and what product feedback was mentioned?"
 
-**Stash returns:**
+**Scheduled returns:**
 
 **Your Commitments:**
 
@@ -187,14 +187,14 @@ Think about how many meetings you have:
 
 **Manually tracking:** Requires perfect memory and diligent note-taking. Realistically, you forget 30-50% of it.
 
-**With Stash:** Zero slips through the cracks. Every commitment surfaces. Every insight gets captured.
+**With Scheduled:** Zero slips through the cracks. Every commitment surfaces. Every insight gets captured.
 
 Over a month, that's **hundreds of action items and insights** you'd otherwise lose.
 
 ## Getting Started
 
 1. **Record your next important call** (or use existing transcript)
-2. **Upload to Stash** after the meeting
+2. **Upload to Scheduled** after the meeting
 3. **Ask:** "What did I commit to?" and "What insights were shared?"
 4. **Create your follow-up list** in 2 minutes instead of 20
 5. **Actually follow through** because nothing got forgotten
@@ -203,4 +203,4 @@ The goal: **Never drop the ball on a commitment** or lose a valuable insight aga
 
 ---
 
-**Stop relying on memory for meeting follow-ups.** [Try Stash](/) and extract every insight automatically.
+**Stop relying on memory for meeting follow-ups.** [Try Scheduled](/) and extract every insight automatically.

@@ -6,7 +6,7 @@ Inbound scheduling agent — automatically drafts email responses with proposed 
 
 1. **Email monitoring**: Watches your Gmail for emails asking to schedule something
 2. **Scheduling intent classification**: LLM classifies whether an email is asking to schedule a meeting
-3. **Stash calendar**: A real Google Calendar that serves as the single source of truth for all commitments (even ones without formal calendar invites)
+3. **Scheduled calendar**: A real Google Calendar that serves as the single source of truth for all commitments (even ones without formal calendar invites)
 4. **Draft generation**: Proposes available times in a draft reply
 
 ## Architecture
@@ -20,7 +20,7 @@ Inbound scheduling agent — automatically drafts email responses with proposed 
                                                           │
                                                           ▼
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Onboarding      │────▶│  Stash Calendar   │────▶│ Draft Composer  │
+│  Onboarding      │────▶│  Scheduled Calendar   │────▶│ Draft Composer  │
 │  Agent           │     │  (Google Cal)     │     │ (propose times) │
 │ (backfill 2mo)   │     │                  │     │                 │
 └─────────────────┘     └──────────────────┘     └─────────────────┘

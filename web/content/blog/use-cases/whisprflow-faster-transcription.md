@@ -1,21 +1,21 @@
 ---
 slug: whisprflow-faster-transcription
-title: 'Stash + Whisprflow: Lightning-Fast Audio Transcription Workflow'
-description: 'Speed up your content creation workflow with Whisprflow and Stash. Better transcription quality, faster processing, and seamless AI integration for audio content.'
+title: 'Scheduled + Whisprflow: Lightning-Fast Audio Transcription Workflow'
+description: 'Speed up your content creation workflow with Whisprflow and Scheduled. Better transcription quality, faster processing, and seamless AI integration for audio content.'
 date: '2025-11-01'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'whisprflow transcription, audio transcription workflow, stash whisprflow integration, fast transcription ai, content creator tools'
-metaDescription: 'Combine Whisprflow and Stash for the fastest audio-to-content workflow. Better transcripts, faster processing, and automatic content generation from audio files.'
+metaDescription: 'Combine Whisprflow and Scheduled for the fastest audio-to-content workflow. Better transcripts, faster processing, and automatic content generation from audio files.'
 ---
 
-# Stash + Whisprflow: Lightning-Fast Audio Transcription Workflow
+# Scheduled + Whisprflow: Lightning-Fast Audio Transcription Workflow
 
 If you create content from audio—podcasts, interviews, voice notes, meeting recordings—you know the bottleneck: **transcription.**
 
 Standard voice memo transcription is... fine. But it's slow, often misses context, and requires a lot of cleanup. For content creators processing dozens of audio files, that friction adds up fast.
 
-**Whisprflow changes the game.** And when you combine it with Stash? You get a transcription-to-content pipeline that actually keeps up with how fast you think.
+**Whisprflow changes the game.** And when you combine it with Scheduled? You get a transcription-to-content pipeline that actually keeps up with how fast you think.
 
 ## The Transcription Speed Problem
 
@@ -32,7 +32,7 @@ Let's say you recorded a 30-minute podcast interview. Here's the traditional wor
 
 That's why most audio content never becomes text content. The friction is just too high.
 
-## How Whisprflow + Stash Works
+## How Whisprflow + Scheduled Works
 
 This combo cuts that timeline down dramatically. Here's the workflow:
 
@@ -51,9 +51,9 @@ Instead of generic transcription, Whisprflow uses advanced speech recognition th
 
 **Result:** Way cleaner transcripts that need minimal editing.
 
-### 3. **Auto-Import to Stash**
+### 3. **Auto-Import to Scheduled**
 
-Here's where it gets powerful. Your Whisprflow transcripts flow directly into Stash, where the AI can immediately:
+Here's where it gets powerful. Your Whisprflow transcripts flow directly into Scheduled, where the AI can immediately:
 
 - Extract key insights and quotes
 - Identify main themes and topics
@@ -67,11 +67,11 @@ No copy-paste. No manual organizing. Just audio in, content out.
 
 You run a weekly podcast. Each episode is 45 minutes. Old workflow meant spending 2+ hours per episode just dealing with transcription and formatting before you could create anything.
 
-**With Whisprflow + Stash:**
+**With Whisprflow + Scheduled:**
 
 - Drop the audio file into Whisprflow (30 seconds)
-- Get a clean transcript in Stash (8 minutes processing time)
-- Stash automatically generates:
+- Get a clean transcript in Scheduled (8 minutes processing time)
+- Scheduled automatically generates:
   - Episode summary
   - Key quotes for social media
   - Blog post draft highlighting main points
@@ -86,11 +86,11 @@ You run a weekly podcast. Each episode is 45 minutes. Old workflow meant spendin
 
 **Accuracy:** Better speech recognition means less time fixing typos and mishears. Especially crucial for technical content.
 
-**Context preservation:** The transcript quality is good enough that Stash's AI can actually understand what's being discussed, not just transcribe words.
+**Context preservation:** The transcript quality is good enough that Scheduled's AI can actually understand what's being discussed, not just transcribe words.
 
 **Bulk processing:** Got 20 podcast episodes to transcribe? Queue them all up. Whisprflow handles the heavy lifting while you focus on other work.
 
-**One workflow:** No juggling multiple tools. Audio → Whisprflow → Stash → finished content.
+**One workflow:** No juggling multiple tools. Audio → Whisprflow → Scheduled → finished content.
 
 ## Beyond Podcasts: Other Use Cases
 
@@ -109,7 +109,7 @@ Basically: if you regularly turn spoken words into written content, this stack s
 Let's do the math. If you process 10 audio files per week:
 
 - **Old way:** 1.5 hours × 10 = 15 hours/week
-- **Whisprflow + Stash:** 15 minutes × 10 = 2.5 hours/week
+- **Whisprflow + Scheduled:** 15 minutes × 10 = 2.5 hours/week
 
 **That's 12.5 hours saved every week.** Over a month? That's more than two full workdays.
 
@@ -118,12 +118,12 @@ What could you create with an extra 50 hours per month?
 ## Getting Started
 
 1. **Sign up for Whisprflow** and connect your audio sources
-2. **Link Whisprflow to your Stash workspace**
+2. **Link Whisprflow to your Scheduled workspace**
 3. **Upload your first audio file** and watch the magic happen
-4. **Use Stash to transform transcripts** into whatever content format you need
+4. **Use Scheduled to transform transcripts** into whatever content format you need
 
 The bottleneck in your content workflow just disappeared.
 
 ---
 
-**Ready to process audio at the speed of thought?** [Try Stash](/) with Whisprflow and see how fast transcription should actually be.
+**Ready to process audio at the speed of thought?** [Try Scheduled](/) with Whisprflow and see how fast transcription should actually be.

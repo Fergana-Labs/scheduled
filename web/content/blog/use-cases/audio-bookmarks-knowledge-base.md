@@ -1,12 +1,12 @@
 ---
 slug: audio-bookmarks-knowledge-base
 title: 'Turn Your Archived Links Into a Searchable Knowledge Base'
-description: 'Stop losing valuable bookmarks in browser chaos. Import your saved articles, papers, and links to Stash—create a personal knowledge base that actually gets used.'
+description: 'Stop losing valuable bookmarks in browser chaos. Import your saved articles, papers, and links to Scheduled—create a personal knowledge base that actually gets used.'
 date: '2025-07-29'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'bookmark organization, knowledge base creation, research archive, stash bookmarks, article organizer'
-metaDescription: 'Transform hundreds of bookmarked articles and papers into an organized, searchable knowledge base with Stash. Find related content, extract patterns, and actually use what you saved.'
+metaDescription: 'Transform hundreds of bookmarked articles and papers into an organized, searchable knowledge base with Scheduled. Find related content, extract patterns, and actually use what you saved.'
 ---
 
 # Turn Your Archived Links Into a Searchable Knowledge Base
@@ -43,7 +43,7 @@ Most people's bookmark situation looks like this:
 
 **Result:** You save things constantly but never actually use them. Your "knowledge base" is really just a disorganized digital hoard.
 
-## How Stash Builds a Real Knowledge Base
+## How Scheduled Builds a Real Knowledge Base
 
 Instead of scattered bookmarks, create an organized, searchable system:
 
@@ -58,11 +58,11 @@ Gather everything:
 - Newsletter archives
 - Notion/Evernote web clips
 
-Import it all to Stash in one workspace (or organized by topic).
+Import it all to Scheduled in one workspace (or organized by topic).
 
-### 2. **Stash Reads and Categorizes Everything**
+### 2. **Scheduled Reads and Categorizes Everything**
 
-This is where the magic happens. Stash:
+This is where the magic happens. Scheduled:
 
 **Fetches and saves the content:**
 No more dead links—the actual article text is stored
@@ -89,7 +89,7 @@ Now you can find things instantly:
 
 **"Find papers similar to this one"**
 
-Stash shows related research based on content similarity, not just keywords.
+Scheduled shows related research based on content similarity, not just keywords.
 
 **"What have I saved about neural networks?"**
 
@@ -118,11 +118,11 @@ You're working on a project and remember "there was a paper about attention mech
 
 **Time wasted:** 20 minutes, didn't find what you needed
 
-**With Stash:**
+**With Scheduled:**
 
 **You:** "Find papers I saved about attention mechanisms"
 
-**Stash returns:**
+**Scheduled returns:**
 
 - The Transformer paper you bookmarked
 - 3 blog posts explaining attention
@@ -131,7 +131,7 @@ You're working on a project and remember "there was a paper about attention mech
 
 **You:** "Show me papers similar to the Transformer paper"
 
-**Stash shows:**
+**Scheduled shows:**
 
 - BERT paper
 - GPT architecture breakdown
@@ -144,7 +144,7 @@ You're working on a project and remember "there was a paper about attention mech
 
 ## Beyond Finding: Pattern Recognition
 
-Stash doesn't just organize—it helps you learn from your collection:
+Scheduled doesn't just organize—it helps you learn from your collection:
 
 **"What topics come up most in my saved content?"**
 
@@ -196,7 +196,7 @@ You're not just hoarding links—you're building real knowledge.
 - Product management frameworks
 - Customer development examples
 
-Basically: if you save content about topics you care about, Stash turns it into a reusable knowledge resource.
+Basically: if you save content about topics you care about, Scheduled turns it into a reusable knowledge resource.
 
 ## The Knowledge Compounding Effect
 
@@ -209,7 +209,7 @@ Here's the real value:
 - Can't build on past learning
 - Knowledge doesn't compound
 
-**With Stash:**
+**With Scheduled:**
 
 - Save article → Automatically organized and connected
 - Find related content instantly
@@ -228,14 +228,14 @@ Each new piece of content:
 ## Getting Started
 
 1. **Export your bookmarks** from browsers and read-later apps
-2. **Import everything to Stash** (dump it all in—Stash will organize)
+2. **Import everything to Scheduled** (dump it all in—Scheduled will organize)
 3. **Let it process** and auto-categorize
 4. **Start searching** to test: "Find content about [topic you care about]"
 5. **Discover** articles you forgot you saved
 6. **Actually use** your saved knowledge instead of re-Googling everything
 
-**Pro tip:** Keep adding to it. Whenever you find something valuable, save it to Stash instead of bookmarks. Over time, you build a comprehensive personal knowledge base.
+**Pro tip:** Keep adding to it. Whenever you find something valuable, save it to Scheduled instead of bookmarks. Over time, you build a comprehensive personal knowledge base.
 
 ---
 
-**Stop hoarding bookmarks you'll never use again.** [Try Stash](/) and build a knowledge base that actually works.
+**Stop hoarding bookmarks you'll never use again.** [Try Scheduled](/) and build a knowledge base that actually works.

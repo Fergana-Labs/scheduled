@@ -28,10 +28,10 @@ export default function BrandingToggle({ initialEnabled }: BrandingToggleProps) 
     <div className="flex items-start justify-between gap-4 rounded-xl border border-gray-100 bg-[#FAFAFA] p-4">
       <div>
         <p className="text-sm font-medium text-gray-900">
-          &ldquo;Sent by Stash&rdquo; branding
+          &ldquo;Sent by Scheduled&rdquo; branding
         </p>
         <p className="mt-1 text-xs text-gray-500">
-          When on, a small &ldquo;sent by Stash&rdquo; note is added to emails
+          When on, a small &ldquo;sent by Scheduled&rdquo; note is added to emails
           sent on your behalf.
         </p>
       </div>

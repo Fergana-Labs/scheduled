@@ -51,7 +51,7 @@ class CalendarClient:
     formal calendar invites.
     """
 
-    def __init__(self, credentials, stash_calendar_name: str = "Stash Calendar"):
+    def __init__(self, credentials, stash_calendar_name: str = "Scheduled Calendar"):
         self._credentials = credentials
         self._stash_calendar_name = stash_calendar_name
         self._service = None
@@ -83,7 +83,7 @@ class CalendarClient:
         # Not found — create it
         new_cal = service.calendars().insert(body={
             "summary": self._stash_calendar_name,
-            "description": "Stash Scheduler Calendar",
+            "description": "Scheduled Calendar",
         }).execute()
         self._stash_calendar_id = new_cal["id"]
         return self._stash_calendar_id

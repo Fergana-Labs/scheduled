@@ -3,9 +3,9 @@ import Header from '@/components/landing/Header';
 import Footer from '@/components/landing/Footer';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Stash',
+  title: 'Privacy Policy | Scheduled',
   description:
-    'Learn how Stash by Fergana Labs collects, uses, and protects your personal information.',
+    'Learn how Scheduled by Fergana Labs collects, uses, and protects your personal information.',
 };
 
 export default function PrivacyPolicy() {
@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
                 Fergana Labs Inc. {`("we," "our," or "us")`} respects your privacy
                 and is committed to protecting your personal information. This
                 Privacy Policy explains how we collect, use, disclose, and
-                safeguard your information when you use our Stash application{' '}
+                safeguard your information when you use our Scheduled application{' '}
                 {`("the App")`}, a web-based platform that provides AI-powered
                 file management, document collaboration, and intelligent chat
                 features.
@@ -224,7 +224,7 @@ export default function PrivacyPolicy() {
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">Third-Party Services</h2>
               <p className="leading-relaxed text-gray-600">
-                Stash may integrate with (but limited to) the following
+                Scheduled may integrate with (but limited to) the following
                 third-party services to enhance functionality:
               </p>
               <ul className="ml-4 list-inside list-disc space-y-2 text-gray-600">

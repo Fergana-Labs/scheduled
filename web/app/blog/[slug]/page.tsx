@@ -25,13 +25,13 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: 'Blog Post Not Found | Stash',
+      title: 'Blog Post Not Found | Scheduled',
       description: 'The requested blog post could not be found.',
     };
   }
 
   return {
-    title: `${post.title} | Stash`,
+    title: `${post.title} | Scheduled`,
     description: post.metaDescription || post.description,
     keywords: post.keywords,
     authors: [{ name: post.author }],

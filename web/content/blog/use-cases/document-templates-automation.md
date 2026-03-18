@@ -1,15 +1,15 @@
 ---
 slug: document-templates-automation
-title: 'Never Start from a Blank Page: Smart Document Templates in Stash'
-description: 'Stop recreating the same documents. Use Stash templates that auto-populate with context—meeting notes, sales calls, project plans all start pre-filled and ready.'
+title: 'Never Start from a Blank Page: Smart Document Templates in Scheduled'
+description: 'Stop recreating the same documents. Use Scheduled templates that auto-populate with context—meeting notes, sales calls, project plans all start pre-filled and ready.'
 date: '2025-09-12'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'document templates automation, smart templates ai, meeting notes template, stash templates, auto-populate documents'
-metaDescription: 'Create smart document templates in Stash that auto-populate based on context. Meeting notes, sales calls, project plans—never start from blank again.'
+metaDescription: 'Create smart document templates in Scheduled that auto-populate based on context. Meeting notes, sales calls, project plans—never start from blank again.'
 ---
 
-# Never Start from a Blank Page: Smart Document Templates in Stash
+# Never Start from a Blank Page: Smart Document Templates in Scheduled
 
 How many times this week have you created a document that looked basically the same as one you made last week?
 
@@ -25,7 +25,7 @@ And every time you start from blank, you waste mental energy on:
 
 **Templates solve this.** But most templates are just empty shells. You still manually fill everything in.
 
-**Stash templates are smarter:** They auto-populate based on context, so you start with a document that's already 50-80% done.
+**Scheduled templates are smarter:** They auto-populate based on context, so you start with a document that's already 50-80% done.
 
 ## The Blank Page Problem
 
@@ -57,9 +57,9 @@ Starting every document from scratch is inefficient for anything you do regularl
 
 **The pattern:** You need the same structure repeatedly, but rebuilding it each time wastes time and creates inconsistency.
 
-## How Stash Templates Auto-Populate
+## How Scheduled Templates Auto-Populate
 
-Instead of empty templates you fill manually, Stash creates smart templates that know context:
+Instead of empty templates you fill manually, Scheduled creates smart templates that know context:
 
 ### 1. **Create Templates for Recurring Documents**
 
@@ -74,7 +74,7 @@ Define the structure once, reuse it forever.
 
 ### 2. **Templates Know Context**
 
-Here's the magic: Stash templates aren't just static forms. They pull in context automatically:
+Here's the magic: Scheduled templates aren't just static forms. They pull in context automatically:
 
 **Meeting notes template:**
 
@@ -132,10 +132,10 @@ Let's say you do discovery calls with prospects multiple times per week.
 
 **Time:** 15-20 minutes, inconsistent quality
 
-**With Stash Template:**
+**With Scheduled Template:**
 
 1. Select "Discovery Call" template
-2. Stash auto-populates:
+2. Scheduled auto-populates:
    - Prospect: Acme Corp (from your calendar)
    - Date: November 11, 2025
    - Attendees: John Smith, Sarah Lee (from meeting invite)
@@ -210,7 +210,7 @@ Basically: if you create it more than twice, it should be a template.
 ## Getting Started
 
 1. **Identify your 3 most common documents** (meeting notes, calls, etc.)
-2. **Create templates in Stash** with smart sections and prompts
+2. **Create templates in Scheduled** with smart sections and prompts
 3. **Set up auto-population rules** (dates, names, context)
 4. **Use the template next time** instead of starting blank
 5. **Refine based on what works** and add more templates
@@ -219,4 +219,4 @@ The goal: **Never recreate the same document structure twice.**
 
 ---
 
-**Stop starting from blank pages.** [Try Stash](/) and build smart templates that actually save you time.
+**Stop starting from blank pages.** [Try Scheduled](/) and build smart templates that actually save you time.

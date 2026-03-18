@@ -1,15 +1,15 @@
 ---
 slug: writing-in-your-style
-title: 'AI That Actually Sounds Like You: Personalized Writing with Stash'
-description: 'ChatGPT sounds generic. Stash learns your writing style, tone, and voice to generate content that actually sounds like you wrote it—no more robotic AI content.'
+title: 'AI That Actually Sounds Like You: Personalized Writing with Scheduled'
+description: 'ChatGPT sounds generic. Scheduled learns your writing style, tone, and voice to generate content that actually sounds like you wrote it—no more robotic AI content.'
 date: '2025-09-17'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'ai writing style, personalized ai content, brand voice ai, stash personalization, writing tone matching'
-metaDescription: 'Teach Stash your writing style and get AI-generated content that sounds authentically you. No more generic ChatGPT outputs—personalized content at scale.'
+metaDescription: 'Teach Scheduled your writing style and get AI-generated content that sounds authentically you. No more generic ChatGPT outputs—personalized content at scale.'
 ---
 
-# AI That Actually Sounds Like You: Personalized Writing with Stash
+# AI That Actually Sounds Like You: Personalized Writing with Scheduled
 
 You've tried using ChatGPT to write content. And the output is... fine. Technically correct. Grammatically sound.
 
@@ -19,7 +19,7 @@ It doesn't sound like you. It sounds like AI. That generic, slightly-too-formal,
 
 Here's the thing: **ChatGPT can't know your voice** because you never taught it. It generates in some bland middle-ground style that offends no one and excites no one.
 
-But **Stash can learn how you actually write.** And once it does, the content it generates sounds like you—not like a robot.
+But **Scheduled can learn how you actually write.** And once it does, the content it generates sounds like you—not like a robot.
 
 ## The Generic AI Writing Problem
 
@@ -44,11 +44,11 @@ See the difference? Same message, completely different voice.
 
 **The problem:** ChatGPT doesn't know you, so it can't write like you.
 
-## How Stash Learns Your Writing Style
+## How Scheduled Learns Your Writing Style
 
-Stash doesn't just generate content—it learns from your actual writing and mirrors your style. Here's how:
+Scheduled doesn't just generate content—it learns from your actual writing and mirrors your style. Here's how:
 
-### 1. **Feed Stash Examples of Your Writing**
+### 1. **Feed Scheduled Examples of Your Writing**
 
 Provide samples of your work:
 
@@ -58,7 +58,7 @@ Provide samples of your work:
 - Internal memos or docs
 - Previous content you're proud of
 
-The more examples, the better Stash understands your:
+The more examples, the better Scheduled understands your:
 
 - **Tone:** Formal vs. casual, serious vs. playful
 - **Vocabulary:** The words you use (and don't use)
@@ -74,11 +74,11 @@ If you have brand voice documentation or company style guides, import those too:
 - Example content with annotations
 - Do's and don'ts lists
 
-Stash reads these like instructions for how you want to sound.
+Scheduled reads these like instructions for how you want to sound.
 
-### 3. **Stash Builds Your Voice Profile**
+### 3. **Scheduled Builds Your Voice Profile**
 
-Behind the scenes, Stash analyzes everything and creates a personalized writing model:
+Behind the scenes, Scheduled analyzes everything and creates a personalized writing model:
 
 - Identifies patterns in your writing
 - Learns your preferred phrasing
@@ -87,7 +87,7 @@ Behind the scenes, Stash analyzes everything and creates a personalized writing 
 
 ### 4. **Generate Content That Sounds Like You**
 
-Now when you ask Stash to write something, it doesn't give you generic AI content—it gives you **content in your voice.**
+Now when you ask Scheduled to write something, it doesn't give you generic AI content—it gives you **content in your voice.**
 
 Same information, delivered the way you'd actually say it.
 
@@ -106,7 +106,7 @@ Let's say you need to write a product update email.
 > Best regards,
 > The Team
 
-**Stash (Trained on Your Voice):**
+**Scheduled (Trained on Your Voice):**
 
 > Subject: We shipped something cool 🚀
 >
@@ -122,7 +122,7 @@ Let's say you need to write a product update email.
 
 ## Beyond Tone: Context-Aware Personalization
 
-Stash doesn't just learn one voice—it learns how you adapt tone for different contexts:
+Scheduled doesn't just learn one voice—it learns how you adapt tone for different contexts:
 
 **Professional emails:**
 
@@ -148,12 +148,12 @@ Stash doesn't just learn one voice—it learns how you adapt tone for different 
 - Action-oriented
 - Team-specific language
 
-Tell Stash what you're writing, and it adjusts accordingly—**just like you would.**
+Tell Scheduled what you're writing, and it adjusts accordingly—**just like you would.**
 
 ## Why This Matters More Than You Think
 
 **Brand consistency at scale:**
-If you're creating a lot of content, maintaining your voice across everything is hard. Stash keeps it consistent.
+If you're creating a lot of content, maintaining your voice across everything is hard. Scheduled keeps it consistent.
 
 **Saves editing time:**
 Generic AI content needs heavy editing to sound human. Personalized content needs light polish at most.
@@ -162,7 +162,7 @@ Generic AI content needs heavy editing to sound human. Personalized content need
 Your audience can tell when content sounds like you vs. like a robot. Authentic voice builds trust.
 
 **Team alignment:**
-Multiple people can generate content that sounds cohesive because Stash enforces the brand voice.
+Multiple people can generate content that sounds cohesive because Scheduled enforces the brand voice.
 
 **You can scale without losing yourself:**
 Create 10x more content without it feeling mass-produced or impersonal.
@@ -198,8 +198,8 @@ Basically: anywhere you need content that sounds like you, not like AI.
 ## Getting Started with Voice Training
 
 1. **Gather 5-10 examples** of your best writing (different formats/contexts)
-2. **Import to Stash** along with any style guides or preferences
-3. **Let Stash analyze** and build your voice profile
+2. **Import to Scheduled** along with any style guides or preferences
+3. **Let Scheduled analyze** and build your voice profile
 4. **Generate a test piece** and see how it sounds
 5. **Refine with feedback:** "More casual" or "Less corporate"
 6. **Use for everything** you'd normally write from scratch
@@ -208,10 +208,10 @@ The more you use it, the better it gets at sounding like you.
 
 ## The Difference Is Night and Day
 
-Once Stash learns your voice, you'll wonder how you ever used generic AI writing tools.
+Once Scheduled learns your voice, you'll wonder how you ever used generic AI writing tools.
 
 Content generation stops feeling like "editing AI slop" and starts feeling like **working with a co-writer who actually gets you.**
 
 ---
 
-**Tired of AI that sounds like everyone else?** [Try Stash](/) and teach it to write like you.
+**Tired of AI that sounds like everyone else?** [Try Scheduled](/) and teach it to write like you.

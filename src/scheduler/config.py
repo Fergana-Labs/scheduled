@@ -19,7 +19,7 @@ class Config:
         )
     )
     stash_calendar_name: str = field(
-        default_factory=lambda: os.environ.get("STASH_CALENDAR_NAME", "Stash Calendar")
+        default_factory=lambda: os.environ.get("STASH_CALENDAR_NAME", "Scheduled Calendar")
     )
     anthropic_api_key: str = field(
         default_factory=lambda: os.environ.get("ANTHROPIC_API_KEY", "")

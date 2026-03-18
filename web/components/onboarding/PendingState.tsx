@@ -32,7 +32,7 @@ export default function PendingState() {
         </h2>
         <Image
           src="/how-it-works.svg"
-          alt="How Stash works: 1. Meeting request arrives, 2. AI drafts a reply, 3. You accept the draft, 4. Meeting is scheduled"
+          alt="How Scheduled works: 1. Meeting request arrives, 2. AI drafts a reply, 3. You accept the draft, 4. Meeting is scheduled"
           width={680}
           height={620}
           className="w-full"

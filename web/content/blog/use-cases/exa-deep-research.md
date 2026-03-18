@@ -1,15 +1,15 @@
 ---
 slug: exa-deep-research
-title: 'Stash + Exa: Deep Research Tasks Without the Rabbit Holes'
-description: 'Combine Exa search with Stash AI for comprehensive research that stays organized. From SEO to competitive analysis, get better research results faster.'
+title: 'Scheduled + Exa: Deep Research Tasks Without the Rabbit Holes'
+description: 'Combine Exa search with Scheduled AI for comprehensive research that stays organized. From SEO to competitive analysis, get better research results faster.'
 date: '2025-10-27'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'exa search, deep research ai, competitive research tools, stash exa integration, ai research assistant'
-metaDescription: 'Use Exa and Stash together for deep research without information overload. Automatically organize findings, extract insights, and build knowledge bases from search results.'
+metaDescription: 'Use Exa and Scheduled together for deep research without information overload. Automatically organize findings, extract insights, and build knowledge bases from search results.'
 ---
 
-# Stash + Exa: Deep Research Tasks Without the Rabbit Holes
+# Scheduled + Exa: Deep Research Tasks Without the Rabbit Holes
 
 Research is supposed to make you smarter. Instead, it usually makes you... overwhelmed.
 
@@ -17,7 +17,7 @@ You start with a simple question: "What's the current state of SEO for SaaS comp
 
 The problem isn't finding information—Google's great at that. The problem is **making sense of everything you find** and turning it into something actionable.
 
-That's exactly what **Stash + Exa** solves.
+That's exactly what **Scheduled + Exa** solves.
 
 ## The Deep Research Problem
 
@@ -31,15 +31,15 @@ Traditional research workflows are broken:
 
 **Result:** Tons of effort, minimal insight. And good luck finding those notes when you need them three months from now.
 
-## How Exa + Stash Changes Research
+## How Exa + Scheduled Changes Research
 
-Exa is a next-generation search engine built for deep research. Combined with Stash's organizational AI, you get a research workflow that actually builds knowledge instead of just collecting links.
+Exa is a next-generation search engine built for deep research. Combined with Scheduled's organizational AI, you get a research workflow that actually builds knowledge instead of just collecting links.
 
 ### Here's How It Works:
 
 ### 1. **Frame Your Research Question**
 
-Instead of random Googling, start with a clear question in Stash:
+Instead of random Googling, start with a clear question in Scheduled:
 
 - "What are the emerging SEO strategies for B2B SaaS in 2025?"
 - "How are competitors positioning their pricing pages?"
@@ -58,9 +58,9 @@ Exa doesn't just surface the most popular articles. It finds:
 
 **This is stuff Google wouldn't surface** until page 3 or 4 of results—if at all.
 
-### 3. **Stash Organizes Everything Automatically**
+### 3. **Scheduled Organizes Everything Automatically**
 
-Here's where it gets powerful. As Exa pulls in search results, Stash:
+Here's where it gets powerful. As Exa pulls in search results, Scheduled:
 
 - **Categorizes findings by theme** (technical SEO vs. content strategy vs. link building)
 - **Extracts key insights** from each source
@@ -74,11 +74,11 @@ No manual note-taking. No trying to remember which article said what. Just organ
 
 Let's say you're researching how competitors approach SEO content.
 
-**Your Exa + Stash workflow:**
+**Your Exa + Scheduled workflow:**
 
 1. Ask: "Find examples of successful SEO content strategies in the project management software space"
 2. Exa searches across blogs, case studies, and marketing breakdowns
-3. Stash imports 20+ relevant sources and automatically creates:
+3. Scheduled imports 20+ relevant sources and automatically creates:
 
 **Your Research Output:**
 
@@ -97,11 +97,11 @@ Let's say you're researching how competitors approach SEO content.
 
 **Exa finds what Google misses.** Less SEO-optimized clickbait, more actual substance.
 
-**Stash prevents information overload.** It organizes as you go, so you're never drowning in tabs and bookmarks.
+**Scheduled prevents information overload.** It organizes as you go, so you're never drowning in tabs and bookmarks.
 
-**Pattern recognition happens automatically.** Stash identifies themes across sources that you'd miss reading one article at a time.
+**Pattern recognition happens automatically.** Scheduled identifies themes across sources that you'd miss reading one article at a time.
 
-**Everything stays searchable.** Need that insight six months from now? It's in your Stash workspace, not lost in a browser bookmark folder.
+**Everything stays searchable.** Need that insight six months from now? It's in your Scheduled workspace, not lost in a browser bookmark folder.
 
 **Research becomes reusable.** Build a knowledge base on topics you care about. Each research session adds to your understanding instead of starting from scratch.
 
@@ -123,11 +123,11 @@ Basically: if you need to go deep on a topic and actually understand it (not jus
 1. **Identify a research topic** you've been putting off because it feels overwhelming
 2. **Frame 2-3 specific questions** about that topic
 3. **Use Exa to search** for high-quality sources
-4. **Let Stash organize and synthesize** everything into a usable format
+4. **Let Scheduled organize and synthesize** everything into a usable format
 5. **Actually use the research** instead of letting it rot in bookmarks
 
 Research doesn't have to mean rabbit holes and information overload. Done right, it means building real understanding fast.
 
 ---
 
-**Ready to research smarter, not harder?** [Try Stash](/) with Exa and see what deep research should actually feel like.
+**Ready to research smarter, not harder?** [Try Scheduled](/) with Exa and see what deep research should actually feel like.

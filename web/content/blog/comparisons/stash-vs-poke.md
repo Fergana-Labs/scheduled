@@ -1,21 +1,21 @@
 ---
 slug: stash-vs-poke
-title: 'Stash vs Poke: Desktop AI Agents vs iMessage AI Assistant'
-description: 'Comparing Stash and Poke AI assistants - desktop file automation vs messaging-based task management. Find which approach fits your workflow.'
+title: 'Scheduled vs Poke: Desktop AI Agents vs iMessage AI Assistant'
+description: 'Comparing Scheduled and Poke AI assistants - desktop file automation vs messaging-based task management. Find which approach fits your workflow.'
 date: '2025-08-31'
 author: 'Fergana Labs Team'
 category: 'Comparisons'
 keywords: 'stash vs poke, poke alternative, imessage ai assistant, desktop ai agent'
-metaDescription: 'Stash vs Poke comparison: desktop file automation versus iMessage AI. Learn which AI assistant best fits your workflow needs.'
+metaDescription: 'Scheduled vs Poke comparison: desktop file automation versus iMessage AI. Learn which AI assistant best fits your workflow needs.'
 ---
 
-# Stash vs Poke: Desktop AI Agents vs iMessage AI Assistant
+# Scheduled vs Poke: Desktop AI Agents vs iMessage AI Assistant
 
-AI assistants are evolving beyond simple chatbots. **Stash** and **Poke** represent two distinct philosophies: Stash brings powerful AI agents to your desktop for file-heavy work, while Poke embeds AI directly into your messaging app to anticipate your needs.
+AI assistants are evolving beyond simple chatbots. **Scheduled** and **Poke** represent two distinct philosophies: Scheduled brings powerful AI agents to your desktop for file-heavy work, while Poke embeds AI directly into your messaging app to anticipate your needs.
 
 This comparison helps you understand which approach - desktop automation or messaging-first AI - better fits your workflow.
 
-<!-- Screenshot placeholder: Stash desktop interface vs Poke iMessage interface -->
+<!-- Screenshot placeholder: Scheduled desktop interface vs Poke iMessage interface -->
 
 ## What is Poke?
 
@@ -32,9 +32,9 @@ This comparison helps you understand which approach - desktop automation or mess
 
 Poke's philosophy: your phone is already your most-used device, so why not make AI accessible through messaging?
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is an AI-powered desktop application that combines a persistent file system, long-term memory, and real-time access to your files and information.
+[Scheduled](/about) is an AI-powered desktop application that combines a persistent file system, long-term memory, and real-time access to your files and information.
 
 **Key Features:**
 
@@ -46,13 +46,13 @@ Poke's philosophy: your phone is already your most-used device, so why not make 
 - **Learns your voice**: AI sounds and acts like you over time
 - **Version control**: See every change, rollback instantly
 
-Stash's philosophy: knowledge workers need AI that organizes, synthesizes, and acts on information, not just quick answers.
+Scheduled's philosophy: knowledge workers need AI that organizes, synthesizes, and acts on information, not just quick answers.
 
-<!-- Screenshot placeholder: Stash bulk file operations -->
+<!-- Screenshot placeholder: Scheduled bulk file operations -->
 
 ## Key Differences
 
-| Feature               | Stash                      | Poke                                 |
+| Feature               | Scheduled                      | Poke                                 |
 | --------------------- | -------------------------- | ------------------------------------ |
 | **Interface**         | Desktop application        | iMessage/SMS                         |
 | **Primary Use**       | File operations, documents | Quick tasks, messaging-based actions |
@@ -85,7 +85,7 @@ Stash's philosophy: knowledge workers need AI that organizes, synthesizes, and a
 ❌ **No version control** - Can't rollback changes
 ❌ **Messaging-limited** - Interface constrained by SMS/iMessage format
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 
@@ -120,9 +120,9 @@ Poke is ideal if you:
 
 **Best use cases:** Busy professionals managing inbox on the go, frequent travelers, anyone who lives in their phone rather than laptop, executives delegating quick tasks.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 
 - Deal with **information overload** across multiple systems
 - Want **persistent memory** that remembers your entire work context
@@ -141,16 +141,16 @@ These tools serve fundamentally different needs:
 
 **Choose Poke if** you want a mobile-first AI assistant living in your messaging app, perfect for quick tasks, email management, and travel bookings.
 
-**Choose Stash if** you do knowledge work involving documents and files, need bulk editing capabilities, and want persistent AI memory for complex projects.
+**Choose Scheduled if** you do knowledge work involving documents and files, need bulk editing capabilities, and want persistent AI memory for complex projects.
 
-Interestingly, these tools **aren't mutually exclusive**. Poke excels at quick mobile tasks ("Book me a flight to SF next Tuesday"), while Stash handles heavy document work ("Update all 50 client presentations with Q4 numbers").
+Interestingly, these tools **aren't mutually exclusive**. Poke excels at quick mobile tasks ("Book me a flight to SF next Tuesday"), while Scheduled handles heavy document work ("Update all 50 client presentations with Q4 numbers").
 
-For **knowledge workers and document-heavy roles** - consultants, product managers, researchers, analysts - Stash's file-first approach and persistent memory make it essential. For **mobile professionals** managing quick tasks throughout the day, Poke's messaging interface is unbeatable.
+For **knowledge workers and document-heavy roles** - consultants, product managers, researchers, analysts - Scheduled's file-first approach and persistent memory make it essential. For **mobile professionals** managing quick tasks throughout the day, Poke's messaging interface is unbeatable.
 
-If you're deciding between them, ask: "Do I spend more time in documents or in my inbox?" Document-heavy? Choose Stash. Inbox-heavy? Choose Poke.
+If you're deciding between them, ask: "Do I spend more time in documents or in my inbox?" Document-heavy? Choose Scheduled. Inbox-heavy? Choose Poke.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop is perfect for automating your document workflows.
+Scheduled Desktop is perfect for automating your document workflows.
 
-[Download Stash Desktop]({{STASH_DESKTOP_DOWNLOAD_URL}}) • [View all use cases](/blog) • [Learn more about Stash](/about)
+[Download Scheduled Desktop]({{STASH_DESKTOP_DOWNLOAD_URL}}) • [View all use cases](/blog) • [Learn more about Scheduled](/about)

@@ -1,15 +1,15 @@
 ---
 slug: celebrity-clone-advisory-board
-title: 'Build a Personal Advisory Board: Clone Your Favorite Experts with Stash'
-description: 'Create AI advisors based on your favorite founders, experts, and mentors. Collect their content, build knowledge bases, and get advice in their style with Stash.'
+title: 'Build a Personal Advisory Board: Clone Your Favorite Experts with Scheduled'
+description: 'Create AI advisors based on your favorite founders, experts, and mentors. Collect their content, build knowledge bases, and get advice in their style with Scheduled.'
 date: '2025-10-07'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'ai advisory board, clone expert thinking, personal mentor ai, stash knowledge base, founder advice ai'
-metaDescription: 'Get advice from your business heroes using Stash. Collect their talks, writings, and interviews to create AI advisors that think like your favorite experts.'
+metaDescription: 'Get advice from your business heroes using Scheduled. Collect their talks, writings, and interviews to create AI advisors that think like your favorite experts.'
 ---
 
-# Build a Personal Advisory Board: Clone Your Favorite Experts with Stash
+# Build a Personal Advisory Board: Clone Your Favorite Experts with Scheduled
 
 Imagine having Paul Graham, Sahil Bloom, or your favorite industry expert on speed dial. Someone who knows your business challenges and can give you advice grounded in their real thinking.
 
@@ -19,7 +19,7 @@ But here's the thing: **most successful people have shared their thinking extens
 
 What if you could collect it all and create an AI advisor that thinks like them?
 
-That's exactly what Stash lets you do.
+That's exactly what Scheduled lets you do.
 
 ## The Problem: You Want Mentorship, Not Content
 
@@ -41,7 +41,7 @@ When you watch a founder talk about their journey, you might think "that's inter
 
 ## How to Build Your AI Advisory Board
 
-With Stash, you can create "clones" of the people whose thinking you value most. Here's the process:
+With Scheduled, you can create "clones" of the people whose thinking you value most. Here's the process:
 
 ### 1. **Choose Your Advisors**
 
@@ -66,7 +66,7 @@ Scrape everything you can find:
 
 The more comprehensive your collection, the better the "advisor" will be.
 
-### 3. **Import Into Stash as a Knowledge Base**
+### 3. **Import Into Scheduled as a Knowledge Base**
 
 Create a workspace for each advisor (or one workspace with folders per person). Organize their content by:
 
@@ -74,7 +74,7 @@ Create a workspace for each advisor (or one workspace with folders per person). 
 - Format (videos, articles, tweets)
 - Date (to track how their thinking evolved)
 
-Stash processes everything and builds a searchable, queryable knowledge base of their thinking.
+Scheduled processes everything and builds a searchable, queryable knowledge base of their thinking.
 
 ### 4. **Ask for Advice in Their Style**
 
@@ -82,7 +82,7 @@ Now comes the magic. Instead of Googling generic advice, you can ask:
 
 **"What would [Founder Name] say about my pricing strategy?"**
 
-Stash draws from their entire body of work—not just a single article—and generates a response grounded in how they actually think. You get advice that sounds like them because it's based on their real perspectives.
+Scheduled draws from their entire body of work—not just a single article—and generates a response grounded in how they actually think. You get advice that sounds like them because it's based on their real perspectives.
 
 ## Real Example: Your Personal Paul Graham
 
@@ -97,7 +97,7 @@ Let's say you're building a startup and want Paul Graham's perspective. Here's w
 
 ### **Phase 2: Knowledge Base**
 
-Everything goes into your "Paul Graham Advisory" workspace in Stash. The AI reads it all and understands his frameworks, principles, and way of thinking.
+Everything goes into your "Paul Graham Advisory" workspace in Scheduled. The AI reads it all and understands his frameworks, principles, and way of thinking.
 
 ### **Phase 3: Get Advice**
 
@@ -107,7 +107,7 @@ Instead of generic startup advice, you ask:
 - "What would PG say about our burn rate and runway?"
 - "Should I focus on growth or profitability right now?"
 
-Stash responds with advice that sounds like Paul Graham because it's pulling from his actual thinking patterns, not generic startup wisdom.
+Scheduled responds with advice that sounds like Paul Graham because it's pulling from his actual thinking patterns, not generic startup wisdom.
 
 **It's like having him on your advisory board**, without needing to get into Y Combinator.
 
@@ -164,7 +164,7 @@ If someone has shared their thinking publicly, you can build an advisor based on
 
 1. **List 3 people** whose advice would be most valuable to you right now
 2. **Spend a few hours collecting** their best content (podcasts, articles, videos)
-3. **Import everything into Stash** workspaces labeled by advisor
+3. **Import everything into Scheduled** workspaces labeled by advisor
 4. **Start asking questions** relevant to your current challenges
 5. **Iterate based on what's helpful** and add more advisors as needed
 
@@ -172,4 +172,4 @@ You'll never have access to everyone you want to learn from. But you can get pre
 
 ---
 
-**Ready to build your dream advisory board?** [Try Stash](/) and get advice from the people you wish you could ask.
+**Ready to build your dream advisory board?** [Try Scheduled](/) and get advice from the people you wish you could ask.
