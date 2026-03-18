@@ -121,7 +121,7 @@ async def run_style_agent(backend: GuideBackend) -> None:
         mcp_servers={"style": server},
         system_prompt=STYLE_SYSTEM_PROMPT,
         permission_mode="bypassPermissions",
-        model="claude-opus-4-6",
+        model="claude-sonnet-4-6",
     )
 
     print("Starting email style analysis...")

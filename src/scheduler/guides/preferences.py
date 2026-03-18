@@ -141,7 +141,7 @@ async def run_preferences_agent(backend: GuideBackend) -> None:
         mcp_servers={"preferences": server},
         system_prompt=system_prompt,
         permission_mode="bypassPermissions",
-        model="claude-opus-4-6",
+        model="claude-sonnet-4-6",
     )
 
     print("Starting scheduling preferences analysis...")

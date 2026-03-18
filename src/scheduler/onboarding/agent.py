@@ -160,7 +160,7 @@ async def _run_onboarding_async(backend: OnboardingBackend, lookback_days: int):
         mcp_servers={"onboarding": server},
         system_prompt=system_prompt,
         permission_mode="bypassPermissions",
-        model="claude-opus-4-6",
+        model="claude-sonnet-4-6",
     )
 
     with nested_claude_session():
