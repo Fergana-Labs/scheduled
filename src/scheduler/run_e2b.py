@@ -261,8 +261,8 @@ def launch_onboarding_in_sandbox(user_id: str, control_plane_url: str, lookback_
             result = sandbox.commands.run(
                 "cd /home/user/scheduler && python3 -m scheduler.sandbox.onboarding",
                 timeout=_SANDBOX_CMD_TIMEOUT,
-                on_stdout=lambda msg: logger.info("e2b[onboarding]: %s", msg.line),
-                on_stderr=lambda msg: logger.warning("e2b[onboarding]: %s", msg.line),
+                on_stdout=lambda msg: logger.info("e2b[onboarding]: %s", msg),
+                on_stderr=lambda msg: logger.warning("e2b[onboarding]: %s", msg),
             )
             if result.exit_code != 0:
                 raise RuntimeError(
@@ -317,8 +317,8 @@ def launch_draft_composer_in_sandbox(
         result = sandbox.commands.run(
             "cd /home/user/scheduler && python3 -m scheduler.sandbox.drafting",
             timeout=_SANDBOX_CMD_TIMEOUT,
-            on_stdout=lambda msg: logger.info("e2b[drafting]: %s", msg.line),
-            on_stderr=lambda msg: logger.warning("e2b[drafting]: %s", msg.line),
+            on_stdout=lambda msg: logger.info("e2b[drafting]: %s", msg),
+            on_stderr=lambda msg: logger.warning("e2b[drafting]: %s", msg),
         )
         if result.exit_code != 0:
             logger.error("e2b drafting sandbox exited with code %d", result.exit_code)
