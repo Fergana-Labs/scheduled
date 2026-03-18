@@ -5,7 +5,7 @@ const SESSION_KEY = 'stash_session';
 export function captureSessionFromURL() {
   if (typeof window === 'undefined') return;
   const params = new URLSearchParams(window.location.search);
-  // Support both 'token' (Auth0) and 'session' (legacy) params
+  // Support both 'token' (hosted auth providers) and 'session' (legacy) params.
   const token = params.get('token') || params.get('session');
   if (token) {
     localStorage.setItem(SESSION_KEY, token);

@@ -1,17 +1,43 @@
+# Secrets & credentials
 .env
+.env.*
+token.json
+credentials.json
+
+# Python
 __pycache__/
 *.pyc
 *.egg-info/
 dist/
 build/
 .pytest_cache/
-token.json
-credentials.json
-.DS_store
-local_dev_guide_artifacts/
-web/.next/
-uv.lock
+.ruff_cache/
+
+# Node / Next.js
 node_modules/
 web/node_modules/
+web/.next/
 web/tsconfig.tsbuildinfo
+
+# OS
+.DS_Store
+
+# E2B
 e2b.toml
+
+# Local dev artifacts
+local_dev_guide_artifacts/
+.playwright-mcp/
+.mcp.json
+CLAUDE.md
+agents.md
+
+# Dev screenshots (root-level PNGs)
+/*.png
+
+# Lock files
+uv.lock
+
+# IDE
+.vscode/
+.idea/

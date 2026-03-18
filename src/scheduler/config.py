@@ -53,6 +53,11 @@ class Config:
     session_secret: str = field(
         default_factory=lambda: os.environ.get("SESSION_SECRET", "change-me-in-production")
     )
+    deployment_mode: str = field(
+        default_factory=lambda: os.environ.get(
+            "SCHEDULER_DEPLOYMENT_MODE", "self_hosted"
+        ).strip().lower().replace("-", "_")
+    )
     gmail_webhook_token: str = field(
         default_factory=lambda: os.environ.get("GMAIL_WEBHOOK_TOKEN", "")
     )
