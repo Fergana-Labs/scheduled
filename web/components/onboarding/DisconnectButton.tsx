@@ -39,7 +39,7 @@ export default function DisconnectButton({ onDisconnected }: DisconnectButtonPro
               Disconnect your account?
             </h3>
             <p className="mt-2 text-sm text-gray-500">
-              This will revoke Stash&apos;s access to your Google account. You
+              This will revoke Scheduled&apos;s access to your Google account. You
               can reconnect at any time.
             </p>
             <div className="mt-6 flex justify-end gap-3">

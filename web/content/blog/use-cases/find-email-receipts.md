@@ -1,12 +1,12 @@
 ---
 slug: find-email-receipts
 title: 'Find All Your Email Receipts Instantly: Expense Reports Made Easy'
-description: 'Stop manually hunting for receipts in your inbox. Use Stash to automatically find and organize all receipts from Uber, Amazon, and other services for expense tracking.'
+description: 'Stop manually hunting for receipts in your inbox. Use Scheduled to automatically find and organize all receipts from Uber, Amazon, and other services for expense tracking.'
 date: '2025-10-17'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'find email receipts, expense report automation, receipt organizer, stash gmail receipts, invoice finder'
-metaDescription: 'Automatically find and organize all receipts from your email with Stash. Export for reimbursement, taxes, or accounting in minutes instead of hours.'
+metaDescription: 'Automatically find and organize all receipts from your email with Scheduled. Export for reimbursement, taxes, or accounting in minutes instead of hours.'
 ---
 
 # Find All Your Email Receipts Instantly: Expense Reports Made Easy
@@ -23,7 +23,7 @@ You'll spend hours:
 - Organizing them into folders
 - Inevitably missing a few
 
-**There has to be a better way.** And with Stash, there is.
+**There has to be a better way.** And with Scheduled, there is.
 
 ## The Receipt Hunt Problem
 
@@ -46,30 +46,30 @@ These emails are scattered across months or years of inbox history. They have di
 
 **Manual searching is painful.** You'll spend 2-4 hours compiling receipts, and you'll still miss some.
 
-## How Stash Finds Receipts Automatically
+## How Scheduled Finds Receipts Automatically
 
 Instead of hunting manually, let AI do the work. Here's how:
 
-### 1. **Connect Your Email to Stash**
+### 1. **Connect Your Email to Scheduled**
 
-Link your Gmail (or other email provider) to your Stash workspace. This gives Stash read access to search through your messages.
+Link your Gmail (or other email provider) to your Scheduled workspace. This gives Scheduled read access to search through your messages.
 
 ### 2. **Set Up Receipt Search Queries**
 
-Stash can identify receipts based on:
+Scheduled can identify receipts based on:
 
 - **Common sender patterns** (Uber, Amazon, PayPal, etc.)
 - **Subject line keywords** ("receipt", "invoice", "payment confirmation")
 - **Email content patterns** (price amounts, order numbers, transaction IDs)
 - **Date ranges** (Q3 2025, last 6 months, this tax year)
 
-You don't have to manually configure all this—Stash knows the common patterns.
+You don't have to manually configure all this—Scheduled knows the common patterns.
 
 ### 3. **Run the Search**
 
 Just ask: "Find all my receipts from the last three months."
 
-Stash searches your entire email history and pulls together:
+Scheduled searches your entire email history and pulls together:
 
 - All Uber/Lyft ride receipts
 - All Amazon orders
@@ -81,7 +81,7 @@ Stash searches your entire email history and pulls together:
 
 ### 4. **Organize and Export**
 
-Once found, Stash automatically:
+Once found, Scheduled automatically:
 
 - **Categorizes receipts** by type (travel, meals, software, etc.)
 - **Extracts key details** (date, amount, vendor, tax amounts)
@@ -106,7 +106,7 @@ Let's say you're a consultant who needs to submit quarterly expense reports.
 
 **Time:** 3-4 hours of tedious work
 
-**With Stash:**
+**With Scheduled:**
 
 1. "Find all my business receipts from Q3 2025"
 2. Review the auto-generated list (2 minutes)
@@ -114,7 +114,7 @@ Let's say you're a consultant who needs to submit quarterly expense reports.
 
 **Time:** Less than 10 minutes
 
-**The report is more complete (Stash found receipts you would've missed) and more accurate (no manual math errors).**
+**The report is more complete (Scheduled found receipts you would've missed) and more accurate (no manual math errors).**
 
 ## Beyond Quarterly Reports: Other Use Cases
 
@@ -146,7 +146,7 @@ This workflow is valuable for anyone who needs to track expenses:
 - Warranty and purchase records
 - Subscription audit (what are we even paying for?)
 
-Basically: if you ever need to find "all the money I spent on X", Stash makes it instant instead of painful.
+Basically: if you ever need to find "all the money I spent on X", Scheduled makes it instant instead of painful.
 
 ## The Time Savings Compound
 
@@ -163,9 +163,9 @@ What would you do with an extra week of time?
 
 ## Getting Started
 
-1. **Connect your Gmail (or email provider)** to Stash
+1. **Connect your Gmail (or email provider)** to Scheduled
 2. **Define your time period:** Last month? Last quarter? All of 2025?
-3. **Run a receipt search** and see what Stash finds
+3. **Run a receipt search** and see what Scheduled finds
 4. **Export in your preferred format** (PDFs, CSV, summary doc)
 5. **Submit your expense report** or send to your accountant
 
@@ -173,4 +173,4 @@ The next time someone asks for receipts, you'll have them ready in minutes inste
 
 ---
 
-**Stop hunting for receipts like it's 2010.** [Try Stash](/) and make expense tracking automatic.
+**Stop hunting for receipts like it's 2010.** [Try Scheduled](/) and make expense tracking automatic.

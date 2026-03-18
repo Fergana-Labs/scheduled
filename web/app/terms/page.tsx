@@ -3,9 +3,9 @@ import Header from '@/components/landing/Header';
 import Footer from '@/components/landing/Footer';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Stash',
+  title: 'Terms of Service | Scheduled',
   description:
-    'Read the terms of service for Stash by Fergana Labs. Understand your rights and responsibilities when using our AI-powered platform.',
+    'Read the terms of service for Scheduled by Fergana Labs. Understand your rights and responsibilities when using our AI-powered platform.',
 };
 
 export default function TermsOfService() {
@@ -30,7 +30,7 @@ export default function TermsOfService() {
                 These Terms of Service {`("Terms")`} constitute a legally binding
                 agreement between you and Fergana Labs Inc.{' '}
                 {`("Company," "we," "our," or "us")`}
-                concerning your access to and use of the Stash application{' '}
+                concerning your access to and use of the Scheduled application{' '}
                 {`("App" or "Service")`}, a web-based platform that provides
                 AI-powered file management, document collaboration, and
                 intelligent chat features.
@@ -44,7 +44,7 @@ export default function TermsOfService() {
             <section className="space-y-4">
               <h2 className="text-2xl font-semibold">Description of Service</h2>
               <p className="leading-relaxed text-gray-600">
-                Stash is a web-based platform that provides:
+                Scheduled is a web-based platform that provides:
               </p>
               <ul className="ml-4 list-inside list-disc space-y-2 text-gray-600">
                 <li>

@@ -1,15 +1,15 @@
 ---
 slug: voice-notes-to-content
-title: 'From Voice Memos to Published Content: The Stash Workflow'
-description: 'Turn your Apple Voice Memos into blog posts, action plans, and polished content with Stash AI. Speak your ideas, get professional output in minutes.'
+title: 'From Voice Memos to Published Content: The Scheduled Workflow'
+description: 'Turn your Apple Voice Memos into blog posts, action plans, and polished content with Scheduled AI. Speak your ideas, get professional output in minutes.'
 date: '2025-11-06'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'voice notes to text, apple voice memos ai, voice dictation to blog post, speech to content, ai transcription workflow'
-metaDescription: 'Transform voice memos into polished content with Stash. Record ideas on your phone, export to Stash, and get blog posts, notes, and action plans automatically.'
+metaDescription: 'Transform voice memos into polished content with Scheduled. Record ideas on your phone, export to Scheduled, and get blog posts, notes, and action plans automatically.'
 ---
 
-# From Voice Memos to Published Content: The Stash Workflow
+# From Voice Memos to Published Content: The Scheduled Workflow
 
 The best ideas never show up when you're sitting at your computer.
 
@@ -17,7 +17,7 @@ They hit you in the shower. During your morning run. While you're making coffee.
 
 Here's the thing: **your spoken ideas have energy that typed notes can't capture.** The problem is turning those raw voice recordings into something actually useful.
 
-That's exactly what Stash solves.
+That's exactly what Scheduled solves.
 
 ## The Voice Memo Problem
 
@@ -36,9 +36,9 @@ And then... they sit there. Because who has time to:
 
 **The friction is real.** So those brilliant ideas stay trapped in your voice memos app forever.
 
-## The Stash Solution: Dictation to Output
+## The Scheduled Solution: Dictation to Output
 
-With Stash, your voice memos become first drafts automatically. Here's the workflow:
+With Scheduled, your voice memos become first drafts automatically. Here's the workflow:
 
 ### 1. **Record Your Ideas Naturally**
 
@@ -51,13 +51,13 @@ Pull out your phone and hit record in Apple Voice Memos (or any voice recording 
 
 The key: **speak naturally.** Pretend you're explaining it to a friend. That's where the good stuff lives.
 
-### 2. **Export the Transcript to Stash**
+### 2. **Export the Transcript to Scheduled**
 
-Once you're done recording, export the audio file or transcript to your Stash workspace. Just drag and drop—takes about 5 seconds.
+Once you're done recording, export the audio file or transcript to your Scheduled workspace. Just drag and drop—takes about 5 seconds.
 
-### 3. **Let Stash Do the Heavy Lifting**
+### 3. **Let Scheduled Do the Heavy Lifting**
 
-This is where it gets interesting. Stash doesn't just transcribe your rambling—it actually turns it into structured content:
+This is where it gets interesting. Scheduled doesn't just transcribe your rambling—it actually turns it into structured content:
 
 - **Blog post outlines** from a casual brainstorm
 - **Organized action items** from a list of ideas
@@ -75,7 +75,7 @@ Let's say you're out for a run and have an idea for a blog post. You record a 7-
 - A couple of examples
 - What readers should do with this info
 
-You export it to Stash and get back:
+You export it to Scheduled and get back:
 
 **A structured blog outline:**
 
@@ -92,7 +92,7 @@ From there? You're 80% done. Just polish a few sentences and hit publish.
 
 **You think faster than you type.** Speaking lets you get ideas out at the speed of thought without getting stuck on how to phrase things perfectly.
 
-**Your spoken voice has personality.** Transcripts from voice memos often read more naturally than carefully written text. Stash preserves that tone.
+**Your spoken voice has personality.** Transcripts from voice memos often read more naturally than carefully written text. Scheduled preserves that tone.
 
 **No context switching.** Capture ideas the moment they hit, wherever you are. No need to wait until you're "in writing mode."
 
@@ -100,7 +100,7 @@ From there? You're 80% done. Just polish a few sentences and hit publish.
 
 ## Beyond Blog Posts: Other Use Cases
 
-This workflow isn't just for writing. People use voice → Stash for:
+This workflow isn't just for writing. People use voice → Scheduled for:
 
 - **Meeting debriefs:** Record your thoughts after a call, get organized notes
 - **Content calendars:** Brainstorm 20 topic ideas verbally, get a structured list
@@ -108,17 +108,17 @@ This workflow isn't just for writing. People use voice → Stash for:
 - **Personal reflections:** Record daily thoughts, build a searchable journal
 - **Project planning:** Think out loud about a complex project, get a action plan
 
-Basically: if you can explain it verbally, Stash can turn it into something structured.
+Basically: if you can explain it verbally, Scheduled can turn it into something structured.
 
 ## Getting Started
 
 1. **Next time an idea hits you, grab your phone and record it** (voice memo, WhatsApp voice note, whatever works)
-2. **Export the recording or transcript to Stash**
-3. **Tell Stash what format you want:** blog post, action items, notes, etc.
+2. **Export the recording or transcript to Scheduled**
+3. **Tell Scheduled what format you want:** blog post, action items, notes, etc.
 4. **Edit lightly and you're done**
 
 The barrier between "random idea" and "finished content" just collapsed.
 
 ---
 
-**Stop letting great ideas die in your voice memos.** [Try Stash](/) and turn your thoughts into content worth sharing.
+**Stop letting great ideas die in your voice memos.** [Try Scheduled](/) and turn your thoughts into content worth sharing.

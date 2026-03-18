@@ -1,12 +1,12 @@
 ---
 slug: apply-content-to-business
 title: 'Stop Just Reading: Apply Articles and Videos to Your Actual Business'
-description: 'Reading growth articles is easy. Applying them to your business is hard. Use Stash to extract insights and get implementation advice tailored to your specific context.'
+description: 'Reading growth articles is easy. Applying them to your business is hard. Use Scheduled to extract insights and get implementation advice tailored to your specific context.'
 date: '2025-07-19'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'apply business advice, business implementation ai, growth tactics application, stash business strategy, actionable insights'
-metaDescription: 'Turn generic business articles into specific action plans with Stash. Get implementation advice customized to your business type, stage, and current challenges.'
+metaDescription: 'Turn generic business articles into specific action plans with Scheduled. Get implementation advice customized to your business type, stage, and current challenges.'
 ---
 
 # Stop Just Reading: Apply Articles and Videos to Your Actual Business
@@ -55,7 +55,7 @@ Here's the typical learning cycle:
 
 **Result:** You're well-read but not executing any better.
 
-## How Stash Translates Insights to Implementation
+## How Scheduled Translates Insights to Implementation
 
 Instead of generic advice, get customized guidance:
 
@@ -63,7 +63,7 @@ Instead of generic advice, get customized guidance:
 
 When you find valuable content:
 
-- Import the article, video, or thread to Stash
+- Import the article, video, or thread to Scheduled
 - Add context about your business:
   - Stage (pre-revenue, early traction, scaling)
   - Type (SaaS, marketplace, ecommerce, etc.)
@@ -71,7 +71,7 @@ When you find valuable content:
   - Team size and resources
   - Previous attempts and learnings
 
-Stash now understands both the advice AND your specific situation.
+Scheduled now understands both the advice AND your specific situation.
 
 ### 2. **Ask for Customized Implementation Advice**
 
@@ -79,7 +79,7 @@ Instead of just reading generically:
 
 **"How would [Author] apply this advice to my business?"**
 
-Stash analyzes the content through the lens of your context and suggests specific, relevant tactics.
+Scheduled analyzes the content through the lens of your context and suggests specific, relevant tactics.
 
 **"Which of these 5 growth tactics would work best for an early-stage SaaS like mine?"**
 
@@ -91,7 +91,7 @@ Detailed implementation plan adapted to your constraints and opportunities.
 
 ### 3. **Get Realistic Next Steps**
 
-Stash doesn't just say "do content marketing"—it gives you:
+Scheduled doesn't just say "do content marketing"—it gives you:
 
 **Specific tactics for your context:**
 "Given your B2B SaaS in the project management space, focus on:"
@@ -117,7 +117,7 @@ Stash doesn't just say "do content marketing"—it gives you:
 
 ### 4. **Build Your Custom Playbook**
 
-As you consume more content, Stash helps you build:
+As you consume more content, Scheduled helps you build:
 
 - **Your growth strategy** (compiled from best tactics across 10 articles)
 - **Your sales process** (adapted from 5 different founders' approaches)
@@ -138,11 +138,11 @@ You read 5 articles about product-led growth. Great insights, but your business 
 
 **Cool. But how do you actually implement this?**
 
-**With Stash:**
+**With Scheduled:**
 
 **You:** "I read these 5 PLG articles. My business is B2B analytics software, currently 50 customers, average deal size $5K/year. Which PLG tactics should I prioritize?"
 
-**Stash analyzes your context and recommends:**
+**Scheduled analyzes your context and recommends:**
 
 **Good fit for your business:**
 
@@ -200,7 +200,7 @@ You read 5 articles about product-led growth. Great insights, but your business 
 - You collect insights that sit unused
 - "Inspiration" without execution
 
-**With Stash:**
+**With Scheduled:**
 
 - Content becomes an implementation guide
 - Learning translates directly to doing
@@ -213,13 +213,13 @@ You read 5 articles about product-led growth. Great insights, but your business 
 **Month 3:** Learn about content strategy, build your adapted approach
 **Month 6:** Your business is running tactics from 20+ sources, all adapted to your context
 
-**Without Stash:** You read 50 articles and did... some generic stuff you sort of remembered.
+**Without Scheduled:** You read 50 articles and did... some generic stuff you sort of remembered.
 
-**With Stash:** You turned 50 articles into a custom playbook that actually drives your business.
+**With Scheduled:** You turned 50 articles into a custom playbook that actually drives your business.
 
 ## Getting Started
 
-1. **Add your business context** to a Stash workspace (stage, type, challenges, resources)
+1. **Add your business context** to a Scheduled workspace (stage, type, challenges, resources)
 2. **Import 3-5 pieces of content** you found valuable but haven't implemented
 3. **Ask:** "How should I apply this to my business?"
 4. **Get specific implementation plans** instead of generic advice
@@ -229,4 +229,4 @@ The goal: **Stop being well-read and start being well-executed.**
 
 ---
 
-**Stop collecting advice you never use.** [Try Stash](/) and turn learning into doing.
+**Stop collecting advice you never use.** [Try Scheduled](/) and turn learning into doing.

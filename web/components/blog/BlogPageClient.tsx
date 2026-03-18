@@ -32,7 +32,7 @@ export default function BlogPageClient({ allPosts }: BlogPageClientProps) {
           Blog
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
-          Insights, use cases, and updates from the Stash team
+          Insights, use cases, and updates from the Scheduled team
         </p>
       </div>
 

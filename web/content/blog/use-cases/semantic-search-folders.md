@@ -1,12 +1,12 @@
 ---
 slug: semantic-search-folders
 title: 'Find That Thing You Forgot About: Semantic Search for Messy Folders'
-description: 'Stop scrolling through hundreds of files. Use Stash semantic search to find files by concept and meaning—not just keywords that might not even be in the filename.'
+description: 'Stop scrolling through hundreds of files. Use Scheduled semantic search to find files by concept and meaning—not just keywords that might not even be in the filename.'
 date: '2025-08-23'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'semantic file search, find files by concept, ai file search, stash semantic search, smart file finder'
-metaDescription: 'Search files by meaning with Stash semantic search. Find that marketing analysis even if it is titled Document (3).pdf—search by concept, not just keywords.'
+metaDescription: 'Search files by meaning with Scheduled semantic search. Find that marketing analysis even if it is titled Document (3).pdf—search by concept, not just keywords.'
 ---
 
 # Find That Thing You Forgot About: Semantic Search for Messy Folders
@@ -49,14 +49,14 @@ Semantic search understands **what you mean**, not just what you type.
 
 **You search for:** "That marketing analysis I did for the Johnson account"
 
-**Stash understands you're looking for:**
+**Scheduled understands you're looking for:**
 
 - Marketing-related documents
 - Analysis or research (not proposals or invoices)
 - Connected to a client called Johnson
 - Something you created (not received)
 
-**Stash finds:**
+**Scheduled finds:**
 
 - "Final_deck_v3.pdf" → Contains market analysis for Johnson Corp
 - "Competitive_research_notes.docx" → Your research for the Johnson presentation
@@ -72,7 +72,7 @@ The AI reads the actual content and understands what each file is about, then ma
 
 **You search:** "Files about product-market fit"
 
-**Stash finds:**
+**Scheduled finds:**
 
 - Interview notes mentioning customers' needs
 - Market research documents
@@ -85,7 +85,7 @@ None of them have "product-market fit" in the title. But they're all _about_ tha
 
 **You search:** "That analysis I did around March for the executive team"
 
-**Stash filters by:**
+**Scheduled filters by:**
 
 - Created/modified in March timeframe
 - Analysis-type documents (not meetings notes or emails)
@@ -97,7 +97,7 @@ Finds it even if it's titled "Deck_final_UPDATED.pdf"
 
 **You search:** "Documents related to my conversation with Sarah about hiring"
 
-**Stash finds:**
+**Scheduled finds:**
 
 - Meeting notes from calls with Sarah
 - Documents mentioning hiring processes
@@ -109,7 +109,7 @@ Connects dots across different file types and contexts.
 
 **You search:** "That thing about pricing strategies I saved a while ago"
 
-**Stash finds:**
+**Scheduled finds:**
 
 - Articles you bookmarked about pricing
 - Competitor pricing analysis you created
@@ -165,11 +165,11 @@ Scroll through hoping to recognize it → 15 minutes later, still looking
 
 **Give up and recreate it → Waste 2 hours redoing work you already did**
 
-**Semantic search in Stash:**
+**Semantic search in Scheduled:**
 
 You: "Find that competitive analysis about project management software from spring"
 
-Stash instantly shows:
+Scheduled instantly shows:
 
 1. "Research_notes_March2025.pdf" → Your competitive deep-dive
 2. "PM_tools_comparison.xlsx" → Feature comparison spreadsheet
@@ -181,8 +181,8 @@ Stash instantly shows:
 
 ## Getting Started with Semantic Search
 
-1. **Import your messy folders** to Stash (Downloads, Documents, Desktop, wherever)
-2. **Let Stash index everything** (reads content, not just filenames)
+1. **Import your messy folders** to Scheduled (Downloads, Documents, Desktop, wherever)
+2. **Let Scheduled index everything** (reads content, not just filenames)
 3. **Search naturally:** Describe what you're looking for like you're talking to a person
 4. **Find the file in seconds** instead of minutes of frustrated scrolling
 5. **Realize how much time you've been wasting** on keyword search
@@ -209,4 +209,4 @@ Over a year? **That's 120-180 hours** you get back. An entire month of workdays.
 
 ---
 
-**Stop scrolling through folders like it's 2005.** [Try Stash](/) and find files by meaning, not guesswork.
+**Stop scrolling through folders like it's 2005.** [Try Scheduled](/) and find files by meaning, not guesswork.

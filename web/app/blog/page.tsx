@@ -5,7 +5,7 @@ import BlogPageClient from '@/components/blog/BlogPageClient';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Blog | Stash',
+  title: 'Blog | Scheduled',
   description:
     'Explore use cases, comparisons, and guides for AI-powered workflow automation.',
 };

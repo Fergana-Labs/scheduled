@@ -151,7 +151,7 @@ Anyone can inspect it, modify it, or build on top of it. That's how it should be
     category: 'Use Cases',
     content: `# Automate PowerPoint Creation with AI
 
-Creating presentations is one of the most time-consuming tasks in knowledge work. With Stash Desktop, you can transform rough notes into polished PowerPoint decks through simple conversation.
+Creating presentations is one of the most time-consuming tasks in knowledge work. With Scheduled Desktop, you can transform rough notes into polished PowerPoint decks through simple conversation.
 
 ## The Pain of Manual Updates
 
@@ -166,17 +166,17 @@ What should take 10 minutes becomes 2 hours of tedious, error-prone work. One wr
 
 ## How It Works
 
-Stash Desktop eliminates this pain entirely. Simply tell Stash what you want:
+Scheduled Desktop eliminates this pain entirely. Simply tell Scheduled what you want:
 
 - "Create a pitch deck from my meeting notes"
 - "Update the Q4 results slide with the latest data from the spreadsheet"
 - "Add a competitive analysis section to the strategy deck"
 
-Stash understands context from your existing files, maintains your brand guidelines, and can even pull in data from spreadsheets or research documents.
+Scheduled understands context from your existing files, maintains your brand guidelines, and can even pull in data from spreadsheets or research documents.
 
 ## Start with Your Existing Deck
 
-The best part? You don't need to start from scratch. Stash works with your existing presentations:
+The best part? You don't need to start from scratch. Scheduled works with your existing presentations:
 
 **Example 1: Updating an Existing Deck**
 "Take my Q3 board deck and update all the financial slides with Q4 numbers from the latest spreadsheet. Keep everything else the same."
@@ -187,7 +187,7 @@ The best part? You don't need to start from scratch. Stash works with your exist
 **Example 3: Monthly Recurring Updates**
 "Update the monthly performance deck with this week's data. You know the format - same as last month but with fresh numbers."
 
-Stash learns your organization's templates and can replicate them perfectly, saving hours of formatting work.
+Scheduled learns your organization's templates and can replicate them perfectly, saving hours of formatting work.
 
 ## Real-World Example
 
@@ -199,14 +199,14 @@ Stash learns your organization's templates and can replicate them perfectly, sav
 5. Realizing you copied the wrong quarter
 6. Starting over
 
-**The Stash Way:**
-"Stash, update the board deck with Q4 financials from finance_2024.xlsx. Update slides 7-12."
+**The Scheduled Way:**
+"Scheduled, update the board deck with Q4 financials from finance_2024.xlsx. Update slides 7-12."
 
 Result: Draft deck ready in 2 minutes. You review for accuracy and you're done.
 
 ## Key Features
 
-- **Template Awareness**: Stash learns your organization's presentation style and replicates it perfectly
+- **Template Awareness**: Scheduled learns your organization's presentation style and replicates it perfectly
 - **Smart Updates**: Updates existing decks while preserving formatting and layout
 - **Data Integration**: Pulls numbers directly from Excel, Google Sheets, or CSVs - no copy-paste errors
 - **Bulk Updates**: "Update all revenue slides across these 5 different decks with the latest numbers"
@@ -214,11 +214,11 @@ Result: Draft deck ready in 2 minutes. You review for accuracy and you're done.
 
 ## Getting Started
 
-1. Download Stash Desktop
+1. Download Scheduled Desktop
 2. Connect to your Google Drive or OneDrive
 3. Start a conversation: "Help me update my presentation with..."
 
-[Try Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Try Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'bulk-file-editing',
@@ -232,7 +232,7 @@ Result: Draft deck ready in 2 minutes. You review for accuracy and you're done.
 
 Ever needed to rename many files? Update headers across dozens of documents? Restructure an entire folder hierarchy? These tasks are tedious, error-prone, and time-consuming.
 
-Stash Desktop makes bulk file operations as simple as having a conversation.
+Scheduled Desktop makes bulk file operations as simple as having a conversation.
 
 ## What You Can Do
 
@@ -274,7 +274,7 @@ Your downloads folder is a mess with cryptic filenames.
 
 ## Getting Started
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'meeting-transcripts',
@@ -286,7 +286,7 @@ Your downloads folder is a mess with cryptic filenames.
     category: 'Use Cases',
     content: `# Find Gems in Meeting Transcripts
 
-Meetings generate valuable information, but the real gems - brilliant ideas, coaching moments, missed opportunities - get buried in hour-long transcripts. Stash Desktop finds them for you.
+Meetings generate valuable information, but the real gems - brilliant ideas, coaching moments, missed opportunities - get buried in hour-long transcripts. Scheduled Desktop finds them for you.
 
 ## From Transcript to Action Plan
 
@@ -299,7 +299,7 @@ Upload a meeting transcript (from Zoom, Google Meet, Teams, or any recording ser
 
 ## Smart Context Understanding
 
-Stash doesn't just extract keywords - it understands context:
+Scheduled doesn't just extract keywords - it understands context:
 
 - **Speaker Attribution**: "What did Sarah suggest about the timeline?"
 - **Topic Clustering**: Groups related discussions across the meeting
@@ -321,11 +321,11 @@ Perfect for sales managers looking to coach their team based on actual call perf
 ### Identify Missed Ideas & Opportunities
 "What interesting ideas or suggestions came up that we didn't fully explore? Were there any customer pain points mentioned that we should follow up on?"
 
-Stash catches the nuggets you might have missed - the offhand comment about a feature request, the casual mention of a budget increase, or the brilliant idea that got sidetracked.
+Scheduled catches the nuggets you might have missed - the offhand comment about a feature request, the casual mention of a budget increase, or the brilliant idea that got sidetracked.
 
 ## Example Workflow
 
-1. **Upload**: Drop your meeting transcript into Stash
+1. **Upload**: Drop your meeting transcript into Scheduled
 2. **Analyze**: "Summarize this meeting and create a list of action items with owners"
 3. **Share**: "Generate a follow-up email for the team with these notes"
 4. **Coach**: "What coaching opportunities can you identify from this sales call?"
@@ -333,7 +333,7 @@ Stash catches the nuggets you might have missed - the offhand comment about a fe
 
 All in natural language. No manual copying or formatting.
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'research-synthesis',
@@ -345,7 +345,7 @@ All in natural language. No manual copying or formatting.
     category: 'Use Cases',
     content: `# Research Synthesis at Scale
 
-Researching a topic means reading dozens of articles, papers, and reports. Synthesizing that information into coherent insights is the hard part. Stash Desktop handles both.
+Researching a topic means reading dozens of articles, papers, and reports. Synthesizing that information into coherent insights is the hard part. Scheduled Desktop handles both.
 
 ## How It Works
 
@@ -359,7 +359,7 @@ Drop in PDFs, web articles, academic papers, or even entire folders of research 
 - "Create a literature review on this topic"
 
 **3. Generate Reports**
-Stash produces structured research reports with citations, comparisons, and synthesis across all sources.
+Scheduled produces structured research reports with citations, comparisons, and synthesis across all sources.
 
 ## Real-World Applications with Concrete Examples
 
@@ -368,17 +368,17 @@ Want to learn from the best marketers? Download all of Alex Hormozi's YouTube vi
 
 **Workflow:**
 1. Use a YouTube transcript downloader to get all his video content
-2. Import transcripts into Stash Desktop
+2. Import transcripts into Scheduled Desktop
 3. Ask: "What are Alex's core principles on customer acquisition?" or "How does Alex recommend pricing high-ticket offers?"
 
 You now have instant access to hundreds of hours of marketing wisdom, searchable and synthesizable.
 
 ### Supercharged Research with EXA Integration
-Connect Stash Desktop with EXA via MCP (Model Context Protocol) for research that's faster and cheaper than ChatGPT's web search.
+Connect Scheduled Desktop with EXA via MCP (Model Context Protocol) for research that's faster and cheaper than ChatGPT's web search.
 
 **Example:** "Use EXA to find the latest research on transformer model architectures from 2024, then synthesize the key innovations across all papers."
 
-EXA's specialized search brings back higher-quality academic sources, and Stash synthesizes them into actionable insights - all without leaving your workspace.
+EXA's specialized search brings back higher-quality academic sources, and Scheduled synthesizes them into actionable insights - all without leaving your workspace.
 
 ### SEC 10K Audit Analysis
 Extracting audit notes from Fortune 500 10-Ks is a capability most existing products lack, but it's critical for financial due diligence.
@@ -412,7 +412,7 @@ Investment research or M&A analysis.
 
 ## Getting Started
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'data-analysis',
@@ -424,11 +424,11 @@ Investment research or M&A analysis.
     category: 'Use Cases',
     content: `# Data Analysis Without the Learning Curve
 
-Excel formulas, pivot tables, and chart formatting consume hours of productive time. Stash Desktop brings AI-powered data analysis that feels like working with a colleague.
+Excel formulas, pivot tables, and chart formatting consume hours of productive time. Scheduled Desktop brings AI-powered data analysis that feels like working with a colleague.
 
 ## Everything Through Natural Language
 
-The revolutionary part? You don't need to know Excel formulas, SQL, or Python. Just describe what you want in plain English, and Stash handles the rest.
+The revolutionary part? You don't need to know Excel formulas, SQL, or Python. Just describe what you want in plain English, and Scheduled handles the rest.
 
 Instead of wrestling with formulas:
 
@@ -441,7 +441,7 @@ All operations - analysis, visualization, data cleaning, reporting - happen thro
 
 ## AI Writes Python Code for You
 
-Behind the scenes, Stash writes and executes Python code to analyze your data. But you never see it unless you want to.
+Behind the scenes, Scheduled writes and executes Python code to analyze your data. But you never see it unless you want to.
 
 **For non-programmers:** Just ask your question and get your answer. The technical implementation is invisible.
 
@@ -450,18 +450,18 @@ Behind the scenes, Stash writes and executes Python code to analyze your data. B
 **Example:**
 **You:** "Calculate the 90-day moving average of daily revenue and show me where we exceeded it"
 
-**Stash:** *Writes Python code using pandas, calculates the metric, generates a chart*
+**Scheduled:** *Writes Python code using pandas, calculates the metric, generates a chart*
 
 **You:** "Show me the code"
 
-**Stash:** *Displays the Python script with explanations*
+**Scheduled:** *Displays the Python script with explanations*
 
 This means non-technical users get instant insights, while technical users can audit, customize, and learn from the AI's approach.
 
 ## From Data to Insights
 
 **Automatic Visualization**
-Stash chooses the right chart type and formatting based on your data and question. Everything through natural language - no clicking through chart menus.
+Scheduled chooses the right chart type and formatting based on your data and question. Everything through natural language - no clicking through chart menus.
 
 **Statistical Analysis**
 Correlation, regression, forecasting - just ask in plain English. No need to remember statistical formulas or function names.
@@ -477,17 +477,17 @@ Correlation, regression, forecasting - just ask in plain English. No need to rem
 ### Sales Analysis
 **You:** "Analyze Q4 sales data and identify underperforming regions"
 
-**Stash:** Creates a breakdown with visualizations, identifies patterns, and suggests potential causes. All through conversation.
+**Scheduled:** Creates a breakdown with visualizations, identifies patterns, and suggests potential causes. All through conversation.
 
 ### Financial Modeling
 **You:** "Build a 3-year revenue forecast based on historical data and 15% growth assumption"
 
-**Stash:** Generates the model, creates sensitivity analysis, and visualizes scenarios. No Excel formulas needed.
+**Scheduled:** Generates the model, creates sensitivity analysis, and visualizes scenarios. No Excel formulas needed.
 
 ### Customer Analytics
 **You:** "Segment customers by purchase behavior and lifetime value"
 
-**Stash:** Performs clustering analysis and creates customer personas with actionable insights. Python code runs invisibly in the background.
+**Scheduled:** Performs clustering analysis and creates customer personas with actionable insights. Python code runs invisibly in the background.
 
 ## Supports Multiple Data Sources
 
@@ -501,7 +501,7 @@ All accessible through natural language. No SQL queries to write, no import scri
 
 ## Getting Started
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'email-management',
@@ -513,9 +513,9 @@ All accessible through natural language. No SQL queries to write, no import scri
     category: 'Use Cases',
     content: `# Reclaim Your Inbox
 
-Email management consumes 28% of the average knowledge worker's day. Stash Desktop cuts that dramatically with intelligent automation.
+Email management consumes 28% of the average knowledge worker's day. Scheduled Desktop cuts that dramatically with intelligent automation.
 
-## What Stash Can Do
+## What Scheduled Can Do
 
 **Draft Responses**
 - "Reply to this email declining the meeting but suggesting alternatives"
@@ -533,7 +533,7 @@ Email management consumes 28% of the average knowledge worker's day. Stash Deskt
 
 ## Smart Context Awareness
 
-Stash learns your communication style, understands your role, and maintains context across conversations.
+Scheduled learns your communication style, understands your role, and maintains context across conversations.
 
 It can:
 - Reference previous emails in the thread
@@ -560,7 +560,7 @@ It can:
 
 ## Getting Started
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'document-generation',
@@ -572,7 +572,7 @@ It can:
     category: 'Use Cases',
     content: `# Document Generation, Simplified
 
-Creating professional documents from scratch is tedious. Stash Desktop transforms rough notes, templates, or simple instructions into polished documents instantly.
+Creating professional documents from scratch is tedious. Scheduled Desktop transforms rough notes, templates, or simple instructions into polished documents instantly.
 
 ## What You Can Create
 
@@ -606,7 +606,7 @@ Creating professional documents from scratch is tedious. Stash Desktop transform
 ## Advanced Features
 
 **Brand Consistency**
-Stash learns your organization's style guide and maintains consistent voice, tone, and formatting.
+Scheduled learns your organization's style guide and maintains consistent voice, tone, and formatting.
 
 **Dynamic Content**
 Pull in data from spreadsheets, databases, or other documents automatically.
@@ -630,7 +630,7 @@ Generate collaborative documents with inputs from multiple sources.
 
 ## Getting Started
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'custom-automations',
@@ -642,7 +642,7 @@ Generate collaborative documents with inputs from multiple sources.
     category: 'Use Cases',
     content: `# Custom Automations for Your Unique Workflows
 
-Every team has unique repetitive tasks. With Stash Desktop, you can create custom automations without writing code - just describe what you want in natural language.
+Every team has unique repetitive tasks. With Scheduled Desktop, you can create custom automations without writing code - just describe what you want in natural language.
 
 ## What You Can Automate
 
@@ -660,19 +660,19 @@ Every team has unique repetitive tasks. With Stash Desktop, you can create custo
 
 ## How Automation Works: A Unique Approach
 
-Unlike traditional automation tools, Stash uses a file-based workflow system that gives you both the power of AI and full manual control.
+Unlike traditional automation tools, Scheduled uses a file-based workflow system that gives you both the power of AI and full manual control.
 
 ### Step-by-Step Process
 
 **Step 1: Describe Your Workflow in Natural Language**
 
-Tell Stash what you want to automate:
+Tell Scheduled what you want to automate:
 
 "I want to automate my weekly report generation. Every Friday at 3pm, collect all the project updates from the team folder, summarize key progress and blockers, generate a PDF report using our template, and email it to stakeholders."
 
 **Step 2: AI Writes the Workflow to a File**
 
-Stash creates a new workflow file (e.g., \`weekly-report-automation.md\`) that contains:
+Scheduled creates a new workflow file (e.g., \`weekly-report-automation.md\`) that contains:
 - Clear step-by-step instructions
 - Triggers (time-based, file-based, etc.)
 - Actions to perform
@@ -682,7 +682,7 @@ The workflow is saved as a readable file in your workspace - not hidden in a dat
 
 **Step 3: You Can Manually Edit the Workflow**
 
-This is where Stash is different. You can open the workflow file and edit it directly:
+This is where Scheduled is different. You can open the workflow file and edit it directly:
 - Adjust the timing ("Change from 3pm to 4pm")
 - Modify the email template
 - Add new steps
@@ -692,12 +692,12 @@ The workflow file is yours to customize, just like any other document.
 
 **Step 4: AI Executes Based on the File**
 
-When the trigger fires (e.g., Friday at 4pm), Stash reads the workflow file and executes it exactly as written. If you've manually edited it, those changes take effect immediately - no "redeploying" or "republishing" required.
+When the trigger fires (e.g., Friday at 4pm), Scheduled reads the workflow file and executes it exactly as written. If you've manually edited it, those changes take effect immediately - no "redeploying" or "republishing" required.
 
 **Step 5: Iterate and Improve**
 
 After the workflow runs, you can:
-- Ask Stash to modify it: "Add a section for budget updates"
+- Ask Scheduled to modify it: "Add a section for budget updates"
 - Manually edit the file yourself
 - Review execution logs to debug issues
 
@@ -733,19 +733,19 @@ Smart fallbacks when automation encounters issues
 
 ## No-Code, But Powerful
 
-Unlike workflow builders that require visual programming, Stash uses natural language. No flowcharts, no connectors, no configuration screens.
+Unlike workflow builders that require visual programming, Scheduled uses natural language. No flowcharts, no connectors, no configuration screens.
 
 Just: "I want to automate X" → Automation created.
 
 ## Getting Started
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   {
     slug: 'onboarding-team-members',
     title: 'Onboard New Team Members Faster with AI',
     description:
-      'Connect Stash Desktop to your company folders and let new employees get up to speed through AI-powered conversation.',
+      'Connect Scheduled Desktop to your company folders and let new employees get up to speed through AI-powered conversation.',
     date: '2025-08-15',
     author: 'Fergana Labs Team',
     category: 'Use Cases',
@@ -753,11 +753,11 @@ Just: "I want to automate X" → Automation created.
 
 The first few weeks for a new employee are critical - and often overwhelming. They need to learn SOPs, understand past decisions, find templates, and absorb months of context while also trying to contribute. This usually means constant interruptions for the existing team.
 
-Stash Desktop changes this dynamic entirely.
+Scheduled Desktop changes this dynamic entirely.
 
 ## Connect to Your Company Knowledge Base
 
-Point Stash Desktop at your company's file folders - whether they're in Dropbox, Google Drive, OneDrive, or local servers:
+Point Scheduled Desktop at your company's file folders - whether they're in Dropbox, Google Drive, OneDrive, or local servers:
 
 - Standard Operating Procedures (SOPs)
 - Templates and examples
@@ -770,7 +770,7 @@ Once connected, new employees can have conversations with an AI that has full co
 
 ## Enable Self-Service Onboarding
 
-Instead of constantly asking senior team members basic questions, new hires can ask Stash:
+Instead of constantly asking senior team members basic questions, new hires can ask Scheduled:
 
 **SOP Lookups**
 "How do we handle customer refund requests?"
@@ -791,7 +791,7 @@ All without interrupting their colleagues.
 
 ## Real-World Impact
 
-### Before Stash Desktop
+### Before Scheduled Desktop
 **New Employee:** "Hey Sarah, where can I find the template for client proposals?"
 
 **Sarah:** *Stops working* "Oh, check the Google Drive... I think it's in Marketing > Templates > Proposals? Or maybe it's in the Sales folder. Actually, let me find it for you..."
@@ -804,18 +804,18 @@ All without interrupting their colleagues.
 
 Multiply this by dozens of questions per day, across multiple team members, and onboarding becomes a massive drag on team productivity.
 
-### With Stash Desktop
+### With Scheduled Desktop
 **New Employee:** "Show me the template for client proposals"
 
-**Stash:** *Instantly provides the template with context about when to use it*
+**Scheduled:** *Instantly provides the template with context about when to use it*
 
 **New Employee:** "What's our policy on discount approvals?"
 
-**Stash:** *Provides the policy, examples of past approvals, and escalation procedures*
+**Scheduled:** *Provides the policy, examples of past approvals, and escalation procedures*
 
 **New Employee:** "Why do we use this specific proposal structure?"
 
-**Stash:** *Explains the reasoning based on past meeting notes and decision documents*
+**Scheduled:** *Explains the reasoning based on past meeting notes and decision documents*
 
 Zero interruptions to the existing team. The new employee gets comprehensive answers immediately, with full context.
 
@@ -823,7 +823,7 @@ Zero interruptions to the existing team. The new employee gets comprehensive ans
 
 Your senior team members hold critical institutional knowledge, but they shouldn't be the bottleneck for every basic question.
 
-With Stash Desktop:
+With Scheduled Desktop:
 - New hires learn faster by having instant access to company knowledge
 - Senior team members stay focused on high-value work
 - Onboarding scales without adding headcount to support it
@@ -845,31 +845,31 @@ With Stash Desktop:
 
 ## Getting Started
 
-1. Download Stash Desktop
+1. Download Scheduled Desktop
 2. Connect to your company's Google Drive, Dropbox, or file server
 3. Give new team members access
 4. Watch them become productive faster than ever before
 
 No more knowledge silos. No more constant interruptions. Just faster, more independent onboarding.
 
-[Download Stash Desktop →](${BLOG_DOWNLOAD_URL})`,
+[Download Scheduled Desktop →](${BLOG_DOWNLOAD_URL})`,
   },
   // Comparison blog posts (SEO-focused)
   {
     slug: 'stash-vs-chatgpt',
-    title: 'Stash vs ChatGPT: AI Agents vs Conversational AI',
+    title: 'Scheduled vs ChatGPT: AI Agents vs Conversational AI',
     description:
-      'Stash vs ChatGPT comparison - autonomous file automation versus conversational AI assistant. Learn which tool fits your workflow needs.',
+      'Scheduled vs ChatGPT comparison - autonomous file automation versus conversational AI assistant. Learn which tool fits your workflow needs.',
     date: '2025-09-07',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs ChatGPT: AI Agents vs Conversational AI
+    content: `# Scheduled vs ChatGPT: AI Agents vs Conversational AI
 
-**ChatGPT** revolutionized how millions of people interact with AI. **Stash** represents the next evolution: AI that doesn't just talk - it acts.
+**ChatGPT** revolutionized how millions of people interact with AI. **Scheduled** represents the next evolution: AI that doesn't just talk - it acts.
 
-Both use large language models to help you work smarter, but they differ fundamentally in what they can do with your files. ChatGPT is a conversational assistant; Stash is an autonomous agent. Here's how to choose between them.
+Both use large language models to help you work smarter, but they differ fundamentally in what they can do with your files. ChatGPT is a conversational assistant; Scheduled is an autonomous agent. Here's how to choose between them.
 
-<!-- Screenshot placeholder: ChatGPT web interface vs Stash Desktop interface -->
+<!-- Screenshot placeholder: ChatGPT web interface vs Scheduled Desktop interface -->
 
 ## What is ChatGPT?
 
@@ -887,9 +887,9 @@ Both use large language models to help you work smarter, but they differ fundame
 
 ChatGPT excels at **answering questions and generating content** through conversation.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application that brings autonomous AI agents to your file workflows. It doesn't just talk about your work - it executes tasks autonomously.
+[Scheduled](/about) is a desktop application that brings autonomous AI agents to your file workflows. It doesn't just talk about your work - it executes tasks autonomously.
 
 **Key Features:**
 - **Autonomous agents**: Executes multi-step tasks without constant guidance
@@ -900,13 +900,13 @@ ChatGPT excels at **answering questions and generating content** through convers
 - **Version control**: Full change history with instant rollback
 - **MCP extensibility**: Connect custom tools and automations
 
-Stash excels at **autonomously executing work** across your files.
+Scheduled excels at **autonomously executing work** across your files.
 
-<!-- Screenshot placeholder: Stash executing bulk file operations -->
+<!-- Screenshot placeholder: Scheduled executing bulk file operations -->
 
 ## Key Differences
 
-| Feature | Stash | ChatGPT |
+| Feature | Scheduled | ChatGPT |
 |---------|-------|---------|
 | **Core Strength** | Autonomous file operations | Conversational assistance |
 | **File Editing** | ✅ (edits actual files) | ❌ (generates content, no direct file editing) |
@@ -940,7 +940,7 @@ Stash excels at **autonomously executing work** across your files.
 ❌ **No version control** - Can't rollback changes
 ❌ **Internet required** - Web-only, no offline use
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Edits actual files** - Directly modifies your Google Docs, Excel, PowerPoint
@@ -958,7 +958,7 @@ Stash excels at **autonomously executing work** across your files.
 ❌ **Requires installation** - Download and setup needed
 ❌ **Smaller community** - Newer tool with fewer users
 
-<!-- Screenshot placeholder: ChatGPT conversation vs Stash autonomous task execution -->
+<!-- Screenshot placeholder: ChatGPT conversation vs Scheduled autonomous task execution -->
 
 ## Who Should Choose ChatGPT?
 
@@ -976,9 +976,9 @@ ChatGPT is ideal if you:
 
 **Limitation:** ChatGPT can help you *create* content, but you still manually copy-paste into your actual work files. It doesn't automate file operations.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 - Work with **many files** that need regular updates (documents, spreadsheets, presentations)
 - Need **bulk file operations** (editing 50+ files at once)
 - Want **autonomous AI** that executes tasks without constant prompting
@@ -990,7 +990,7 @@ Stash is ideal if you:
 
 **Best use cases:** Updating client deliverables, automating monthly reports, bulk formatting changes, research synthesis across many documents, standardizing templates. [See PowerPoint automation](/blog/powerpoint-automation) and [bulk editing](/blog/bulk-file-editing).
 
-**Limitation:** Stash focuses on file-based workflows, not general conversational Q&A.
+**Limitation:** Scheduled focuses on file-based workflows, not general conversational Q&A.
 
 ## The "Goldfish Problem"
 
@@ -1003,7 +1003,7 @@ ChatGPT has what we call the **"goldfish problem"**: every conversation starts f
 
 You constantly re-explain context because ChatGPT forgets.
 
-**Stash solves this** with persistent memory. Upload files once, have conversations over weeks or months, and Stash remembers everything. No re-explaining. No re-uploading. True long-term context.
+**Scheduled solves this** with persistent memory. Upload files once, have conversations over weeks or months, and Scheduled remembers everything. No re-explaining. No re-uploading. True long-term context.
 
 <!-- Screenshot placeholder: Persistent memory comparison -->
 
@@ -1013,53 +1013,53 @@ Yes - and many users do.
 
 **Use ChatGPT for:** Quick questions, brainstorming, learning new topics, writing assistance when you don't have context from previous work.
 
-**Use Stash for:** Actually executing work on your files - bulk updates, automation, tasks requiring long-term memory of your projects.
+**Use Scheduled for:** Actually executing work on your files - bulk updates, automation, tasks requiring long-term memory of your projects.
 
 **Example workflow:**
 1. **Brainstorm with ChatGPT** - "What should be in a quarterly business review?"
-2. **Execute with Stash** - "Update all 20 quarterly review decks with the new structure and latest data from our spreadsheets"
+2. **Execute with Scheduled** - "Update all 20 quarterly review decks with the new structure and latest data from our spreadsheets"
 
-ChatGPT for exploration, Stash for execution.
+ChatGPT for exploration, Scheduled for execution.
 
 ## Final Recommendation
 
 **Choose ChatGPT if** you want a versatile conversational AI for questions, writing help, and brainstorming. It's excellent for general-purpose assistance.
 
-**Choose Stash if** you need AI to autonomously work on your files - updating documents, editing spreadsheets, automating repetitive file tasks.
+**Choose Scheduled if** you need AI to autonomously work on your files - updating documents, editing spreadsheets, automating repetitive file tasks.
 
 **The honest truth:** These tools serve different needs.
 
 ChatGPT is a **conversational assistant** - brilliant for dialogue, explanations, generating content that you then copy into your work.
 
-Stash is an **autonomous agent** - it directly operates on your files, remembers your projects long-term, and automates file-heavy work.
+Scheduled is an **autonomous agent** - it directly operates on your files, remembers your projects long-term, and automates file-heavy work.
 
-If you're doing **knowledge work with lots of files** - consultants updating client deliverables, product managers maintaining documentation, researchers organizing papers - **Stash saves hours of manual work** that ChatGPT can't automate.
+If you're doing **knowledge work with lots of files** - consultants updating client deliverables, product managers maintaining documentation, researchers organizing papers - **Scheduled saves hours of manual work** that ChatGPT can't automate.
 
 If you need **quick answers and writing help** for ad-hoc tasks, **ChatGPT is unmatched**.
 
-Many knowledge workers use both: ChatGPT for thinking, Stash for doing.
+Many knowledge workers use both: ChatGPT for thinking, Scheduled for doing.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop brings autonomous AI agents to your file workflows.
+Scheduled Desktop brings autonomous AI agents to your file workflows.
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [See what it can automate](/blog) • [Learn more](/about)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [See what it can automate](/blog) • [Learn more](/about)`,
   },
   {
     slug: 'stash-vs-claude-code',
-    title: 'Stash vs Claude Code: AI Agents for Everyone vs Developers Only',
+    title: 'Scheduled vs Claude Code: AI Agents for Everyone vs Developers Only',
     description:
-      'Stash vs Claude Code comparison - GUI desktop app for non-technical users versus powerful CLI for developers. Which AI agent tool is right for you?',
+      'Scheduled vs Claude Code comparison - GUI desktop app for non-technical users versus powerful CLI for developers. Which AI agent tool is right for you?',
     date: '2025-09-06',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs Claude Code: AI Agents for Everyone vs Developers Only
+    content: `# Scheduled vs Claude Code: AI Agents for Everyone vs Developers Only
 
 **Claude Code** is one of the most powerful AI agent tools available - capable of autonomous coding, file operations, and complex multi-step tasks. There's just one problem: it's locked behind a terminal window.
 
-**Stash** was built to solve this. It brings Claude Code-like functionality to non-technical users through an intuitive desktop application. But is Stash just "Claude Code with a GUI," or is there more to the story?
+**Scheduled** was built to solve this. It brings Claude Code-like functionality to non-technical users through an intuitive desktop application. But is Scheduled just "Claude Code with a GUI," or is there more to the story?
 
-<!-- Screenshot placeholder: Claude Code terminal vs Stash Desktop GUI -->
+<!-- Screenshot placeholder: Claude Code terminal vs Scheduled Desktop GUI -->
 
 ## What is Claude Code?
 
@@ -1075,9 +1075,9 @@ Stash Desktop brings autonomous AI agents to your file workflows.
 
 Claude Code represents the cutting edge of AI agent capabilities - if you can use it.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application built on the same Claude Agent SDK that powers Claude Code, but designed for knowledge workers who don't code.
+[Scheduled](/about) is a desktop application built on the same Claude Agent SDK that powers Claude Code, but designed for knowledge workers who don't code.
 
 **Key Features:**
 - **GUI desktop app**: No terminal, no command line, no coding required
@@ -1088,13 +1088,13 @@ Claude Code represents the cutting edge of AI agent capabilities - if you can us
 - **Version control**: Full change history with instant rollback
 - **Accessible**: Anyone can use it, regardless of technical background
 
-Stash makes AI agent capabilities accessible to everyone - product managers, consultants, researchers, executives, students.
+Scheduled makes AI agent capabilities accessible to everyone - product managers, consultants, researchers, executives, students.
 
-<!-- Screenshot placeholder: Stash Desktop easy-to-use interface -->
+<!-- Screenshot placeholder: Scheduled Desktop easy-to-use interface -->
 
 ## Key Differences
 
-| Feature | Stash | Claude Code |
+| Feature | Scheduled | Claude Code |
 |---------|-------|-------------|
 | **Interface** | Desktop GUI | Terminal CLI |
 | **Target User** | Non-technical knowledge workers | Developers |
@@ -1126,7 +1126,7 @@ Stash makes AI agent capabilities accessible to everyone - product managers, con
 ❌ **No persistent memory** - Starts fresh each session (unless you configure it)
 ❌ **Intimidating for non-coders** - Black terminal screen scares many users
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Zero technical barrier** - Anyone can use it, no coding required
@@ -1143,7 +1143,7 @@ Stash makes AI agent capabilities accessible to everyone - product managers, con
 ❌ **Limited for developers** - Claude Code is better for coding workflows
 ❌ **Newer project** - Smaller community than Claude Code
 
-<!-- Screenshot placeholder: Claude Code terminal commands vs Stash GUI actions -->
+<!-- Screenshot placeholder: Claude Code terminal commands vs Scheduled GUI actions -->
 
 ## Who Should Choose Claude Code?
 
@@ -1160,9 +1160,9 @@ Claude Code is ideal if you:
 
 **Reality check:** If you're not comfortable opening a terminal and running commands like \`npm install\` or \`git commit\`, Claude Code will be frustrating.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 - Are **not a developer** (product manager, consultant, researcher, executive, student)
 - Work primarily with **documents and files** (PowerPoint, Excel, Word, PDFs)
 - Want AI agent capabilities **without learning terminal commands**
@@ -1174,19 +1174,19 @@ Stash is ideal if you:
 
 **Best use cases:** PowerPoint automation, bulk document editing, research synthesis, meeting transcript analysis, email management, file organization. [See all use cases](/blog).
 
-**Reality check:** If you're building software applications, use Claude Code. Stash is for knowledge work, not development.
+**Reality check:** If you're building software applications, use Claude Code. Scheduled is for knowledge work, not development.
 
 ## The Honest Relationship Between Them
 
-Here's what matters: **Stash was specifically built to democratize Claude Code's capabilities.**
+Here's what matters: **Scheduled was specifically built to democratize Claude Code's capabilities.**
 
-The Stash team saw that Claude Code and similar agent tools were transforming work for developers - but only developers. Non-technical users who could benefit most from AI automation were locked out.
+The Scheduled team saw that Claude Code and similar agent tools were transforming work for developers - but only developers. Non-technical users who could benefit most from AI automation were locked out.
 
-Stash uses the same underlying technology (Claude Agent SDK) but wraps it in an accessible desktop app. Think of it as "Claude Code for everyone else."
+Scheduled uses the same underlying technology (Claude Agent SDK) but wraps it in an accessible desktop app. Think of it as "Claude Code for everyone else."
 
-**This isn't a competition - it's expansion.** Claude Code serves developers brilliantly. Stash brings that same power to the 90% of knowledge workers who don't code.
+**This isn't a competition - it's expansion.** Claude Code serves developers brilliantly. Scheduled brings that same power to the 90% of knowledge workers who don't code.
 
-<!-- Screenshot placeholder: Stash mission statement about democratizing AI agents -->
+<!-- Screenshot placeholder: Scheduled mission statement about democratizing AI agents -->
 
 ## Can You Use Both?
 
@@ -1194,45 +1194,45 @@ Yes - and if you're a developer who also does knowledge work, you might want bot
 
 **Use Claude Code for:** Software development, coding tasks, terminal operations, DevOps workflows.
 
-**Use Stash for:** Document work, presentations, research, file organization, anything non-coding.
+**Use Scheduled for:** Document work, presentations, research, file organization, anything non-coding.
 
-**Example:** A technical founder might use Claude Code for building their product and Stash for creating investor decks and organizing company documents.
+**Example:** A technical founder might use Claude Code for building their product and Scheduled for creating investor decks and organizing company documents.
 
 ## Final Recommendation
 
 **Choose Claude Code if** you're a developer comfortable with terminal interfaces who needs AI for coding workflows.
 
-**Choose Stash if** you're a knowledge worker who wants AI automation without touching a terminal.
+**Choose Scheduled if** you're a knowledge worker who wants AI automation without touching a terminal.
 
 The real question isn't "which is better?" - it's "which is designed for you?"
 
-If you're reading this and the phrase "command-line interface" makes you nervous, **Stash is your answer**. It brings you the same autonomous AI capabilities without requiring you to learn terminal commands.
+If you're reading this and the phrase "command-line interface" makes you nervous, **Scheduled is your answer**. It brings you the same autonomous AI capabilities without requiring you to learn terminal commands.
 
 If you're a developer who lives in the terminal, **Claude Code is purpose-built for you**.
 
-Stash's mission is simple: AI agents shouldn't be restricted to people who can code. The technology to automate knowledge work exists - it should be accessible to everyone.
+Scheduled's mission is simple: AI agents shouldn't be restricted to people who can code. The technology to automate knowledge work exists - it should be accessible to everyone.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop brings AI agent capabilities to anyone - no coding required.
+Scheduled Desktop brings AI agent capabilities to anyone - no coding required.
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [See what it can do](/blog) • [Learn more](/about)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [See what it can do](/blog) • [Learn more](/about)`,
   },
   {
     slug: 'stash-vs-gamma',
-    title: 'Stash vs Gamma: Multi-Purpose AI Agents vs AI Presentation Maker',
+    title: 'Scheduled vs Gamma: Multi-Purpose AI Agents vs AI Presentation Maker',
     description:
-      'Stash vs Gamma comparison - autonomous AI for all file types versus specialized AI presentation creation. Which tool fits your workflow needs?',
+      'Scheduled vs Gamma comparison - autonomous AI for all file types versus specialized AI presentation creation. Which tool fits your workflow needs?',
     date: '2025-09-05',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs Gamma: Multi-Purpose AI Agents vs AI Presentation Maker
+    content: `# Scheduled vs Gamma: Multi-Purpose AI Agents vs AI Presentation Maker
 
-**Gamma** has taken the presentation world by storm, hitting \$100M ARR and a \$2.1B valuation by making it incredibly easy to create beautiful slides with AI. **Stash** takes a different approach: instead of specializing in one format, it brings AI agents to all your files - presentations, documents, spreadsheets, PDFs, and more.
+**Gamma** has taken the presentation world by storm, hitting \$100M ARR and a \$2.1B valuation by making it incredibly easy to create beautiful slides with AI. **Scheduled** takes a different approach: instead of specializing in one format, it brings AI agents to all your files - presentations, documents, spreadsheets, PDFs, and more.
 
 Should you use an AI tool specialized for presentations, or a general-purpose AI agent? Let's compare.
 
-<!-- Screenshot placeholder: Gamma presentation builder vs Stash Desktop interface -->
+<!-- Screenshot placeholder: Gamma presentation builder vs Scheduled Desktop interface -->
 
 ## What is Gamma?
 
@@ -1249,9 +1249,9 @@ Should you use an AI tool specialized for presentations, or a general-purpose AI
 
 Gamma is **specialized for creating presentations, documents, and websites** with AI-powered design.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application that brings autonomous AI agents to all your file workflows - not just presentations.
+[Scheduled](/about) is a desktop application that brings autonomous AI agents to all your file workflows - not just presentations.
 
 **Key Features:**
 - **Works with any files**: PowerPoint, Google Slides, Excel, Word, PDFs, images
@@ -1262,13 +1262,13 @@ Gamma is **specialized for creating presentations, documents, and websites** wit
 - **Update existing presentations**: Works with your current PowerPoint/Slides files
 - **MCP extensibility**: Build custom automations
 
-Stash is **general-purpose** - it automates work across all your files, including presentations.
+Scheduled is **general-purpose** - it automates work across all your files, including presentations.
 
-<!-- Screenshot placeholder: Stash updating multiple PowerPoint files -->
+<!-- Screenshot placeholder: Scheduled updating multiple PowerPoint files -->
 
 ## Key Differences
 
-| Feature | Stash | Gamma |
+| Feature | Scheduled | Gamma |
 |---------|-------|-------|
 | **Core Strength** | Multi-file automation | Presentation creation |
 | **File Types** | All (PPT, Docs, Excel, PDFs) | Presentations, documents, websites |
@@ -1301,7 +1301,7 @@ Stash is **general-purpose** - it automates work across all your files, includin
 ❌ **Limited file types** - Focused on presentations/documents, not spreadsheets or PDFs
 ❌ **Migration required** - Need to recreate existing presentations in Gamma
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Works with existing files** - Updates your PowerPoint and Google Slides files directly
@@ -1318,7 +1318,7 @@ Stash is **general-purpose** - it automates work across all your files, includin
 ❌ **Limited templates** - Not a template library like Gamma
 ❌ **Creating from scratch** - Better at updating than creating new presentations
 
-<!-- Screenshot placeholder: Gamma AI design vs Stash bulk editing -->
+<!-- Screenshot placeholder: Gamma AI design vs Scheduled bulk editing -->
 
 ## Who Should Choose Gamma?
 
@@ -1336,9 +1336,9 @@ Gamma is ideal if you:
 
 **Limitation:** Gamma is great for creating new presentations but can't bulk-update your existing 50 PowerPoint files with new data.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 - Need to **update existing PowerPoint or Google Slides** files
 - Have **many presentations** requiring regular updates (client decks, monthly reports)
 - Want **bulk operations** (updating 20 decks with Q4 numbers simultaneously)
@@ -1350,7 +1350,7 @@ Stash is ideal if you:
 
 **Best use cases:** Updating quarterly board decks, maintaining client presentation libraries, automating monthly report slides, bulk updating templates, [PowerPoint automation workflows](/blog/powerpoint-automation).
 
-**Limitation:** Stash won't create beautiful designs from scratch like Gamma - it's better at updating and automating existing files.
+**Limitation:** Scheduled won't create beautiful designs from scratch like Gamma - it's better at updating and automating existing files.
 
 ## Can You Use Both?
 
@@ -1358,17 +1358,17 @@ Yes - and this is actually a smart combination.
 
 **Use Gamma for:** Creating new presentations from scratch with beautiful design.
 
-**Use Stash for:** Updating those presentations (and many others) with new data, automating monthly updates, bulk operations.
+**Use Scheduled for:** Updating those presentations (and many others) with new data, automating monthly updates, bulk operations.
 
 **Example workflow:**
 1. **Create with Gamma** - Build a beautiful quarterly review template
 2. **Export to PowerPoint** - Download as .pptx file
-3. **Automate with Stash** - "Update this template with Q1, Q2, Q3, Q4 data and create 4 versions"
+3. **Automate with Scheduled** - "Update this template with Q1, Q2, Q3, Q4 data and create 4 versions"
 4. **Share** - Distribute the updated PowerPoint files to stakeholders
 
-Gamma for creation, Stash for automation.
+Gamma for creation, Scheduled for automation.
 
-<!-- Screenshot placeholder: Workflow combining Gamma and Stash -->
+<!-- Screenshot placeholder: Workflow combining Gamma and Scheduled -->
 
 ## The PowerPoint Update Problem
 
@@ -1378,57 +1378,57 @@ Here's a common pain point: You have 30 client presentations that need monthly u
 - Create beautiful presentations from scratch ✅
 - Update 30 existing PowerPoint files with new data ❌
 
-**With Stash:**
+**With Scheduled:**
 - Create beautiful presentations from scratch ❌
 - Update 30 existing PowerPoint files with new data ✅
 
 If your problem is "I need beautiful slides quickly," choose Gamma.
 
-If your problem is "I have 30 decks that need updating every month," choose Stash.
+If your problem is "I have 30 decks that need updating every month," choose Scheduled.
 
 ## Final Recommendation
 
 **Choose Gamma if** you're creating presentations from scratch and want beautiful, modern design with minimal effort. Gamma is exceptional for this.
 
-**Choose Stash if** you have existing presentations (PowerPoint, Google Slides) that need regular updates, bulk operations, or automation across many files.
+**Choose Scheduled if** you have existing presentations (PowerPoint, Google Slides) that need regular updates, bulk operations, or automation across many files.
 
 **The reality:** These tools solve different problems.
 
 **Gamma is a presentation creation tool** - it replaces the blank canvas problem with AI-generated beautiful slides.
 
-**Stash is an automation tool** - it takes your existing presentations (and other files) and automates repetitive update work.
+**Scheduled is an automation tool** - it takes your existing presentations (and other files) and automates repetitive update work.
 
 For **one-time presentation creation with beautiful design**, Gamma wins hands down. Its AI design agent and template library are unmatched.
 
-For **recurring presentation updates, bulk operations, and multi-file automation**, Stash is purpose-built for this workflow. Updating 50 monthly client decks with new data? Stash does this in minutes; Gamma requires manual work on each deck.
+For **recurring presentation updates, bulk operations, and multi-file automation**, Scheduled is purpose-built for this workflow. Updating 50 monthly client decks with new data? Scheduled does this in minutes; Gamma requires manual work on each deck.
 
-Most knowledge workers could benefit from both: Gamma for creating beautiful decks from scratch, Stash for automating updates across existing presentation libraries.
+Most knowledge workers could benefit from both: Gamma for creating beautiful decks from scratch, Scheduled for automating updates across existing presentation libraries.
 
 But if you only choose one:
 - **Creating new → Gamma**
-- **Updating existing → Stash**
+- **Updating existing → Scheduled**
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop automates work across your presentations (and all your other files).
+Scheduled Desktop automates work across your presentations (and all your other files).
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [Learn about PowerPoint automation](/blog/powerpoint-automation) • [Explore all features](/about)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [Learn about PowerPoint automation](/blog/powerpoint-automation) • [Explore all features](/about)`,
   },
   {
     slug: 'stash-vs-genspark',
-    title: 'Stash vs Genspark: Which AI Agent Platform Is Right for You?',
+    title: 'Scheduled vs Genspark: Which AI Agent Platform Is Right for You?',
     description:
-      'Comparing Stash and Genspark AI platforms for autonomous task automation. Learn the key differences, pros and cons, and which tool fits your workflow.',
+      'Comparing Scheduled and Genspark AI platforms for autonomous task automation. Learn the key differences, pros and cons, and which tool fits your workflow.',
     date: '2025-09-04',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs Genspark: Which AI Agent Platform Is Right for You?
+    content: `# Scheduled vs Genspark: Which AI Agent Platform Is Right for You?
 
-AI agents are transforming how we work, automating everything from research to document creation to phone calls. Two platforms leading this shift are **Stash** and **Genspark**. Both promise to handle tedious tasks autonomously, but they take very different approaches.
+AI agents are transforming how we work, automating everything from research to document creation to phone calls. Two platforms leading this shift are **Scheduled** and **Genspark**. Both promise to handle tedious tasks autonomously, but they take very different approaches.
 
 If you're deciding between these tools, this comparison breaks down their strengths, weaknesses, and ideal use cases to help you choose.
 
-<!-- Screenshot placeholder: Side-by-side comparison of Stash and Genspark interfaces -->
+<!-- Screenshot placeholder: Side-by-side comparison of Scheduled and Genspark interfaces -->
 
 ## What is Genspark?
 
@@ -1443,9 +1443,9 @@ If you're deciding between these tools, this comparison breaks down their streng
 
 Genspark positions itself as the AI platform that "does everything" - from creating presentations to making phone calls on your behalf.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application that brings AI agent capabilities to non-technical users. Built by Fergana Labs, Stash democratizes access to tools previously locked behind coding CLIs like Claude Code.
+[Scheduled](/about) is a desktop application that brings AI agent capabilities to non-technical users. Built by Fergana Labs, Scheduled democratizes access to tools previously locked behind coding CLIs like Claude Code.
 
 **Key Features:**
 - **Persistent Memory**: AI that remembers every conversation and document across sessions
@@ -1456,13 +1456,13 @@ Genspark positions itself as the AI platform that "does everything" - from creat
 - **MCP Integration**: Connect custom tools via Model Context Protocol
 - **Multi-File Operations**: Edit hundreds of files at once
 
-Stash focuses on file-based workflows and persistent context, making it ideal for knowledge workers who live in documents and spreadsheets.
+Scheduled focuses on file-based workflows and persistent context, making it ideal for knowledge workers who live in documents and spreadsheets.
 
-<!-- Screenshot placeholder: Stash Desktop interface showing file operations -->
+<!-- Screenshot placeholder: Scheduled Desktop interface showing file operations -->
 
 ## Key Differences
 
-| Feature | Stash | Genspark |
+| Feature | Scheduled | Genspark |
 |---------|-------|----------|
 | **Architecture** | Desktop app, local-first | Cloud-based web platform |
 | **Best For** | Document work, file operations | Integrated workspace, phone automation |
@@ -1489,7 +1489,7 @@ Stash focuses on file-based workflows and persistent context, making it ideal fo
 ❌ **Learning curve** - All-in-one platforms can be overwhelming
 ❌ **Vendor lock-in** - Your workflows live inside Genspark's ecosystem
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Persistent memory** - AI remembers your entire work history
@@ -1505,7 +1505,7 @@ Stash focuses on file-based workflows and persistent context, making it ideal fo
 ❌ **No phone automation** - Can't make real phone calls like Genspark
 ❌ **Smaller tool ecosystem** - Fewer built-in integrations than Genspark
 
-<!-- Screenshot placeholder: Version control feature in Stash -->
+<!-- Screenshot placeholder: Version control feature in Scheduled -->
 
 ## Who Should Choose Genspark?
 
@@ -1518,9 +1518,9 @@ Genspark is ideal if you:
 
 **Best use cases:** Sales teams making calls, consultants creating client deliverables in one place, researchers synthesizing web content, anyone wanting phone automation.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 - Work with **many documents and files** that need bulk editing or organization
 - Want **persistent AI memory** that remembers your work across sessions
 - Need **version control** for peace of mind when making changes
@@ -1537,33 +1537,33 @@ Both tools are powerful, but they serve different needs:
 
 **Choose Genspark if** you want a comprehensive AI workspace with unique features like phone automation and you're comfortable with a cloud-based, paid platform.
 
-**Choose Stash if** you work primarily with files and documents, want persistent AI memory, or need bulk file operations and version control.
+**Choose Scheduled if** you work primarily with files and documents, want persistent AI memory, or need bulk file operations and version control.
 
-The good news? Both are pushing the boundaries of what AI agents can do. Genspark's "Call For Me" feature is genuinely innovative, while Stash's persistent memory and version control solve real pain points for knowledge workers.
+The good news? Both are pushing the boundaries of what AI agents can do. Genspark's "Call For Me" feature is genuinely innovative, while Scheduled's persistent memory and version control solve real pain points for knowledge workers.
 
-For most **document-heavy workflows** - whether you're a consultant, product manager, or researcher - Stash's file-first approach and persistent memory make it the stronger choice. For **teams wanting an all-in-one workspace** with cutting-edge phone automation, Genspark is worth exploring.
+For most **document-heavy workflows** - whether you're a consultant, product manager, or researcher - Scheduled's file-first approach and persistent memory make it the stronger choice. For **teams wanting an all-in-one workspace** with cutting-edge phone automation, Genspark is worth exploring.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop takes minutes to set up. Download it and start automating your document workflows today.
+Scheduled Desktop takes minutes to set up. Download it and start automating your document workflows today.
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [Read more comparisons](/blog) • [View all features](/about)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [Read more comparisons](/blog) • [View all features](/about)`,
   },
   {
     slug: 'stash-vs-google-docs',
-    title: 'Stash vs Google Docs: AI Automation vs Document Collaboration',
+    title: 'Scheduled vs Google Docs: AI Automation vs Document Collaboration',
     description:
-      'Stash vs Google Docs comparison - autonomous AI agents for file automation versus collaborative document editing. Which tool do you need?',
+      'Scheduled vs Google Docs comparison - autonomous AI agents for file automation versus collaborative document editing. Which tool do you need?',
     date: '2025-08-24',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs Google Docs: AI Automation vs Document Collaboration
+    content: `# Scheduled vs Google Docs: AI Automation vs Document Collaboration
 
-**Google Docs** is the world's most popular collaborative document editor. **Stash** is an AI agent that automates work across your documents. These aren't competing products - they solve fundamentally different problems.
+**Google Docs** is the world's most popular collaborative document editor. **Scheduled** is an AI agent that automates work across your documents. These aren't competing products - they solve fundamentally different problems.
 
-Google Docs helps you *write* documents together. Stash helps you *automate* work across many documents. Here's how to think about which tool (or both) you need.
+Google Docs helps you *write* documents together. Scheduled helps you *automate* work across many documents. Here's how to think about which tool (or both) you need.
 
-<!-- Screenshot placeholder: Google Docs interface vs Stash Desktop interface -->
+<!-- Screenshot placeholder: Google Docs interface vs Scheduled Desktop interface -->
 
 ## What is Google Docs?
 
@@ -1580,9 +1580,9 @@ Google Docs helps you *write* documents together. Stash helps you *automate* wor
 
 Google Docs is a **document editor** with collaboration and AI writing assistance.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application that brings autonomous AI agents to your file workflows - including Google Docs files.
+[Scheduled](/about) is a desktop application that brings autonomous AI agents to your file workflows - including Google Docs files.
 
 **Key Features:**
 - **Autonomous AI agents**: Execute multi-step tasks across many files
@@ -1593,13 +1593,13 @@ Google Docs is a **document editor** with collaboration and AI writing assistanc
 - **Version control**: Full change history with instant rollback
 - **MCP extensibility**: Build custom automations
 
-Stash is an **automation tool** that works *on* your documents (including Google Docs), not a document editor.
+Scheduled is an **automation tool** that works *on* your documents (including Google Docs), not a document editor.
 
-<!-- Screenshot placeholder: Stash editing multiple Google Docs at once -->
+<!-- Screenshot placeholder: Scheduled editing multiple Google Docs at once -->
 
 ## Key Differences
 
-| Feature | Stash | Google Docs |
+| Feature | Scheduled | Google Docs |
 |---------|-------|-------------|
 | **Core Purpose** | Automate work across files | Create & edit documents |
 | **Primary Function** | AI automation | Document editing |
@@ -1632,7 +1632,7 @@ Stash is an **automation tool** that works *on* your documents (including Google
 ❌ **Sequential work** - Can't delegate multi-doc tasks to AI
 ❌ **Google ecosystem lock-in** - Best with other Google products
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Bulk operations** - Update hundreds of Google Docs at once
@@ -1649,7 +1649,7 @@ Stash is an **automation tool** that works *on* your documents (including Google
 ❌ **Desktop only** - No mobile or web version yet
 ❌ **Requires local setup** - Download and installation needed
 
-<!-- Screenshot placeholder: Google Docs real-time collaboration vs Stash bulk automation -->
+<!-- Screenshot placeholder: Google Docs real-time collaboration vs Scheduled bulk automation -->
 
 ## Who Should Choose Google Docs?
 
@@ -1666,9 +1666,9 @@ Google Docs is essential if you:
 
 **What it doesn't do:** Automate work across many documents, remember long-term project context, execute multi-step tasks.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is essential if you:
+Scheduled is essential if you:
 - Need to **update many Google Docs files** at once (bulk operations)
 - Want **AI to automate** repetitive document work
 - Work with **files across multiple platforms** (not just Google)
@@ -1687,27 +1687,27 @@ Stash is essential if you:
 
 **Use Google Docs for:** Writing, editing, collaborating with teammates on documents in real-time.
 
-**Use Stash for:** Automating repetitive work across those Google Docs files (and others).
+**Use Scheduled for:** Automating repetitive work across those Google Docs files (and others).
 
 **Example workflow:**
 1. **Write in Google Docs** - You and your team collaborate on a project template
-2. **Automate with Stash** - "Take this template and create 30 customized versions for each client, updating the name, metrics, and date"
+2. **Automate with Scheduled** - "Take this template and create 30 customized versions for each client, updating the name, metrics, and date"
 3. **Review in Google Docs** - Share the customized documents with your team for final review
 
-They're complementary: **Google Docs is for creation, Stash is for automation.**
+They're complementary: **Google Docs is for creation, Scheduled is for automation.**
 
-<!-- Screenshot placeholder: Workflow showing Google Docs + Stash working together -->
+<!-- Screenshot placeholder: Workflow showing Google Docs + Scheduled working together -->
 
 ## Common Misconceptions
 
-### "Stash replaces Google Docs"
-**No.** Stash works *with* Google Docs files. You still edit documents in Google Docs (or Word, or any editor). Stash automates tasks across those files.
+### "Scheduled replaces Google Docs"
+**No.** Scheduled works *with* Google Docs files. You still edit documents in Google Docs (or Word, or any editor). Scheduled automates tasks across those files.
 
-### "Google Docs has AI, so I don't need Stash"
-Google Docs AI helps you write better within a single document (grammar, suggestions, summarization). Stash AI autonomously executes multi-step tasks across many files. Different capabilities.
+### "Google Docs has AI, so I don't need Scheduled"
+Google Docs AI helps you write better within a single document (grammar, suggestions, summarization). Scheduled AI autonomously executes multi-step tasks across many files. Different capabilities.
 
 ### "I can just manually update my documents"
-Sure - if you have time to update 100 documents manually. Stash exists for when that doesn't scale.
+Sure - if you have time to update 100 documents manually. Scheduled exists for when that doesn't scale.
 
 ## Final Recommendation
 
@@ -1715,39 +1715,39 @@ This isn't an either/or decision - these tools serve different purposes.
 
 **You need Google Docs if** you create and edit documents, especially with teammates. It's the standard for good reason.
 
-**You need Stash if** you find yourself doing repetitive work across many documents - updating figures in 20 reports, standardizing formatting across 50 files, customizing templates for different clients.
+**You need Scheduled if** you find yourself doing repetitive work across many documents - updating figures in 20 reports, standardizing formatting across 50 files, customizing templates for different clients.
 
-**Most knowledge workers need both:** Google Docs for document creation and collaboration, Stash for automation and bulk operations.
+**Most knowledge workers need both:** Google Docs for document creation and collaboration, Scheduled for automation and bulk operations.
 
 The real question is: **Are you wasting hours on repetitive document tasks that AI could automate?**
 
-If you're manually updating the same information across multiple documents, reformatting dozens of files, or spending hours on work that feels repetitive - Stash will save you significant time.
+If you're manually updating the same information across multiple documents, reformatting dozens of files, or spending hours on work that feels repetitive - Scheduled will save you significant time.
 
 If you're collaboratively writing and editing documents with teammates - Google Docs is already the right tool.
 
-Use both. Write and collaborate in Google Docs. Automate the tedious parts with Stash.
+Use both. Write and collaborate in Google Docs. Automate the tedious parts with Scheduled.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop integrates with Google Drive and automates work across your Google Docs files (and many others).
+Scheduled Desktop integrates with Google Drive and automates work across your Google Docs files (and many others).
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [See automation use cases](/blog) • [Learn more](/about)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [See automation use cases](/blog) • [Learn more](/about)`,
   },
   {
     slug: 'stash-vs-manus',
-    title: "Stash vs Manus AI: Desktop AI Agents vs China's Autonomous AI",
+    title: "Scheduled vs Manus AI: Desktop AI Agents vs China's Autonomous AI",
     description:
-      "Stash vs Manus AI comparison - desktop AI agents versus China's autonomous AI system. Features, performance, and which tool wins for different use cases.",
+      "Scheduled vs Manus AI comparison - desktop AI agents versus China's autonomous AI system. Features, performance, and which tool wins for different use cases.",
     date: '2025-09-02',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs Manus AI: Desktop AI Agents vs China's Autonomous AI
+    content: `# Scheduled vs Manus AI: Desktop AI Agents vs China's Autonomous AI
 
-Autonomous AI agents are having their moment. **Manus AI** made headlines in early 2025 as "the second DeepSeek," scoring 86.5% on GAIA benchmarks - beating OpenAI's Deep Research. Meanwhile, **Stash** has been quietly democratizing AI agent capabilities for non-technical users through desktop software.
+Autonomous AI agents are having their moment. **Manus AI** made headlines in early 2025 as "the second DeepSeek," scoring 86.5% on GAIA benchmarks - beating OpenAI's Deep Research. Meanwhile, **Scheduled** has been quietly democratizing AI agent capabilities for non-technical users through desktop software.
 
 Both promise to autonomously complete complex tasks, but they take radically different approaches. Here's how they compare.
 
-<!-- Screenshot placeholder: Manus AI interface vs Stash Desktop interface -->
+<!-- Screenshot placeholder: Manus AI interface vs Scheduled Desktop interface -->
 
 ## What is Manus AI?
 
@@ -1763,9 +1763,9 @@ Both promise to autonomously complete complex tasks, but they take radically dif
 
 Manus is currently in **closed beta** with limited access.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application that brings AI agent capabilities to anyone - no coding required. Built by Fergana Labs, it's the accessible alternative to developer tools like Claude Code.
+[Scheduled](/about) is a desktop application that brings AI agent capabilities to anyone - no coding required. Built by Fergana Labs, it's the accessible alternative to developer tools like Claude Code.
 
 **Key Features:**
 - **Persistent memory**: Remembers all conversations and documents across sessions
@@ -1775,13 +1775,13 @@ Manus is currently in **closed beta** with limited access.
 - **MCP extensibility**: Build custom tools and integrations
 - **Desktop-first**: Works locally, privacy-focused
 
-Stash is **publicly available** and ready to download today.
+Scheduled is **publicly available** and ready to download today.
 
-<!-- Screenshot placeholder: Stash version control feature -->
+<!-- Screenshot placeholder: Scheduled version control feature -->
 
 ## Key Differences
 
-| Feature | Stash | Manus AI |
+| Feature | Scheduled | Manus AI |
 |---------|-------|----------|
 | **Availability** | Public | Closed beta |
 | **Access** | Download now | Waitlist |
@@ -1812,7 +1812,7 @@ Stash is **publicly available** and ready to download today.
 ❌ **Limited file operations** - Not optimized for bulk document editing
 ❌ **No version control** - Can't rollback changes
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Available today** - Download and use immediately, no waitlist
@@ -1845,9 +1845,9 @@ Manus AI is ideal if you:
 
 **Reality check:** Most users can't access Manus yet. If you need an AI agent today, Manus isn't an option.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 - Want an AI agent you can **use today** (no waitlist)
 - Work with **documents and files** extensively
 - Need **bulk file operations** (editing hundreds of files at once)
@@ -1865,8 +1865,8 @@ Stash is ideal if you:
 
 **However**, benchmark scores don't tell the whole story:
 
-- **Availability**: Stash ships today; Manus is waitlist-only
-- **Use case fit**: Stash is optimized for file operations; Manus for autonomous research
+- **Availability**: Scheduled ships today; Manus is waitlist-only
+- **Use case fit**: Scheduled is optimized for file operations; Manus for autonomous research
 
 For most knowledge workers, **availability and fit matter more than benchmark scores**. A tool you can use today beats a higher-performing tool you can't access.
 
@@ -1876,33 +1876,33 @@ This comparison comes with an important caveat: **Manus AI isn't publicly availa
 
 **Choose Manus AI if** you can access the closed beta, need absolute cutting-edge autonomous performance, and don't mind proprietary cloud platforms. It's genuinely impressive technology when (if) you can get it.
 
-**Choose Stash if** you need an AI agent today, work with files and documents, or want persistent memory and version control.
+**Choose Scheduled if** you need an AI agent today, work with files and documents, or want persistent memory and version control.
 
-For most users, the decision is simple: **Stash is available now** and purpose-built for document workflows. Manus is impressive on benchmarks but inaccessible to most people.
+For most users, the decision is simple: **Scheduled is available now** and purpose-built for document workflows. Manus is impressive on benchmarks but inaccessible to most people.
 
-We're excited about Manus pushing the boundaries of what AI can do autonomously. But until it's publicly available with transparent pricing, Stash remains the practical choice for knowledge workers who need AI agents today.
+We're excited about Manus pushing the boundaries of what AI can do autonomously. But until it's publicly available with transparent pricing, Scheduled remains the practical choice for knowledge workers who need AI agents today.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop is ready to download. No waitlist, no barriers.
+Scheduled Desktop is ready to download. No waitlist, no barriers.
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [Explore all features](/about) • [Read more comparisons](/blog)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [Explore all features](/about) • [Read more comparisons](/blog)`,
   },
   {
     slug: 'stash-vs-notion',
-    title: 'Stash vs Notion: AI Agents vs Connected Workspace',
+    title: 'Scheduled vs Notion: AI Agents vs Connected Workspace',
     description:
-      'Stash vs Notion comparison - autonomous AI agents for file automation versus connected workspace for knowledge management. Which tool fits your workflow?',
+      'Scheduled vs Notion comparison - autonomous AI agents for file automation versus connected workspace for knowledge management. Which tool fits your workflow?',
     date: '2025-09-01',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs Notion: AI Agents vs Connected Workspace
+    content: `# Scheduled vs Notion: AI Agents vs Connected Workspace
 
-**Notion** revolutionized how teams organize knowledge with its all-in-one workspace. **Stash** represents the next evolution: AI that doesn't just store your information but actively works on it.
+**Notion** revolutionized how teams organize knowledge with its all-in-one workspace. **Scheduled** represents the next evolution: AI that doesn't just store your information but actively works on it.
 
-These tools solve different problems. Notion creates structure for your notes, docs, and databases. Stash brings autonomous AI agents to automate the work you do with those files. Here's how they compare.
+These tools solve different problems. Notion creates structure for your notes, docs, and databases. Scheduled brings autonomous AI agents to automate the work you do with those files. Here's how they compare.
 
-<!-- Screenshot placeholder: Notion workspace interface vs Stash Desktop interface -->
+<!-- Screenshot placeholder: Notion workspace interface vs Scheduled Desktop interface -->
 
 ## What is Notion?
 
@@ -1918,9 +1918,9 @@ These tools solve different problems. Notion creates structure for your notes, d
 
 Notion excels at **organizing and structuring** information. Its AI features help with writing and editing within the Notion environment.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application that brings autonomous AI agents to your existing files - wherever they live.
+[Scheduled](/about) is a desktop application that brings autonomous AI agents to your existing files - wherever they live.
 
 **Key Features:**
 - **Autonomous agents**: AI that executes multi-step tasks without supervision
@@ -1932,13 +1932,13 @@ Notion excels at **organizing and structuring** information. Its AI features hel
 - **MCP extensibility**: Build custom automations
 - **Open source**: Free, MIT-licensed, transparent
 
-Stash excels at **automating work** across your files, regardless of where they're stored or what format they're in.
+Scheduled excels at **automating work** across your files, regardless of where they're stored or what format they're in.
 
-<!-- Screenshot placeholder: Stash bulk file operations -->
+<!-- Screenshot placeholder: Scheduled bulk file operations -->
 
 ## Key Differences
 
-| Feature | Stash | Notion |
+| Feature | Scheduled | Notion |
 |---------|-------|--------|
 | **Core Purpose** | AI automation & bulk operations | Knowledge organization & collaboration |
 | **Works With** | Any files (Drive, OneDrive, local) | Notion databases & docs |
@@ -1969,7 +1969,7 @@ Stash excels at **automating work** across your files, regardless of where they'
 ❌ **Performance at scale** - Large workspaces can become slow
 ❌ **Not for file operations** - Can't bulk edit 100 PowerPoint files
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Works with any files** - Doesn't require migration to a new platform
@@ -1987,7 +1987,7 @@ Stash excels at **automating work** across your files, regardless of where they'
 ❌ **Not for organization** - Doesn't replace Notion's wiki/database structure
 ❌ **Requires local setup** - Download and installation needed
 
-<!-- Screenshot placeholder: Notion AI writing assistant vs Stash autonomous task execution -->
+<!-- Screenshot placeholder: Notion AI writing assistant vs Scheduled autonomous task execution -->
 
 ## Who Should Choose Notion?
 
@@ -2004,9 +2004,9 @@ Notion is ideal if you:
 
 **Limitation:** Notion AI helps you write *within* Notion but doesn't automate work *across* your existing files.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 - Work with **many files across different platforms** (Google Docs, Excel, PowerPoint, PDFs)
 - Need **bulk file operations** (editing hundreds of files at once)
 - Want **autonomous AI** that executes multi-step tasks
@@ -2018,7 +2018,7 @@ Stash is ideal if you:
 
 **Best use cases:** Consultants updating client deliverables, product managers maintaining documentation, researchers organizing papers, analysts working with spreadsheets, anyone with file-heavy workflows. [See PowerPoint automation](/blog/powerpoint-automation) and [bulk file editing](/blog/bulk-file-editing).
 
-**Limitation:** Stash doesn't replace Notion's database and collaboration features.
+**Limitation:** Scheduled doesn't replace Notion's database and collaboration features.
 
 ## Can You Use Both?
 
@@ -2026,54 +2026,54 @@ Absolutely - and many users do.
 
 **Use Notion for:** Organizing knowledge, team wikis, project databases, collaborative note-taking, templates.
 
-**Use Stash for:** Automating work across your files, bulk operations, AI-powered document generation, research synthesis.
+**Use Scheduled for:** Automating work across your files, bulk operations, AI-powered document generation, research synthesis.
 
 **Example workflow:**
 1. Organize your projects and notes in Notion (structure)
-2. Use Stash to automate repetitive work on files in Google Drive (execution)
+2. Use Scheduled to automate repetitive work on files in Google Drive (execution)
 3. Link final deliverables back to Notion for team visibility (collaboration)
 
-They complement each other: Notion structures your knowledge; Stash automates your work.
+They complement each other: Notion structures your knowledge; Scheduled automates your work.
 
-<!-- Screenshot placeholder: Combined workflow using Notion for organization and Stash for automation -->
+<!-- Screenshot placeholder: Combined workflow using Notion for organization and Scheduled for automation -->
 
 ## Final Recommendation
 
 **Choose Notion if** you need a connected workspace for team collaboration, knowledge organization, and project management. Notion excels at structure and collaboration.
 
-**Choose Stash if** you need AI automation for file-heavy work - bulk editing, document generation, research synthesis across many files. Stash excels at execution and automation.
+**Choose Scheduled if** you need AI automation for file-heavy work - bulk editing, document generation, research synthesis across many files. Scheduled excels at execution and automation.
 
 **The honest truth:** These tools solve different problems.
 
 Notion is a **workspace replacement** - it wants to be where you organize everything. Its AI helps you write better content within Notion.
 
-Stash is an **automation tool** - it works with your existing files wherever they are. Its AI executes complex, multi-step tasks autonomously.
+Scheduled is an **automation tool** - it works with your existing files wherever they are. Its AI executes complex, multi-step tasks autonomously.
 
-If you're drowning in documents that need updating, presentations that need creating, or files that need organizing across Google Drive and OneDrive, **Stash is the tool you need**. If you're looking for a better way to organize team knowledge and collaborate on projects, **Notion is excellent**.
+If you're drowning in documents that need updating, presentations that need creating, or files that need organizing across Google Drive and OneDrive, **Scheduled is the tool you need**. If you're looking for a better way to organize team knowledge and collaborate on projects, **Notion is excellent**.
 
-Many knowledge workers use both: Notion for structure, Stash for execution.
+Many knowledge workers use both: Notion for structure, Scheduled for execution.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop works with your existing files - no migration needed.
+Scheduled Desktop works with your existing files - no migration needed.
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [View all use cases](/blog) • [Learn more about Stash](/about)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [View all use cases](/blog) • [Learn more about Scheduled](/about)`,
   },
   {
     slug: 'stash-vs-poke',
-    title: 'Stash vs Poke: Desktop AI Agents vs iMessage AI Assistant',
+    title: 'Scheduled vs Poke: Desktop AI Agents vs iMessage AI Assistant',
     description:
-      'Comparing Stash and Poke AI assistants - desktop file automation vs messaging-based task management. Find which approach fits your workflow.',
+      'Comparing Scheduled and Poke AI assistants - desktop file automation vs messaging-based task management. Find which approach fits your workflow.',
     date: '2025-08-31',
     author: 'Fergana Labs Team',
     category: 'Comparisons',
-    content: `# Stash vs Poke: Desktop AI Agents vs iMessage AI Assistant
+    content: `# Scheduled vs Poke: Desktop AI Agents vs iMessage AI Assistant
 
-AI assistants are evolving beyond simple chatbots. **Stash** and **Poke** represent two distinct philosophies: Stash brings powerful AI agents to your desktop for file-heavy work, while Poke embeds AI directly into your messaging app to anticipate your needs.
+AI assistants are evolving beyond simple chatbots. **Scheduled** and **Poke** represent two distinct philosophies: Scheduled brings powerful AI agents to your desktop for file-heavy work, while Poke embeds AI directly into your messaging app to anticipate your needs.
 
 This comparison helps you understand which approach - desktop automation or messaging-first AI - better fits your workflow.
 
-<!-- Screenshot placeholder: Stash desktop interface vs Poke iMessage interface -->
+<!-- Screenshot placeholder: Scheduled desktop interface vs Poke iMessage interface -->
 
 ## What is Poke?
 
@@ -2089,9 +2089,9 @@ This comparison helps you understand which approach - desktop automation or mess
 
 Poke's philosophy: your phone is already your most-used device, so why not make AI accessible through messaging?
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is a desktop application that brings AI agent capabilities to knowledge workers who live in documents, spreadsheets, and files.
+[Scheduled](/about) is a desktop application that brings AI agent capabilities to knowledge workers who live in documents, spreadsheets, and files.
 
 **Key Features:**
 - **Desktop-first**: Powerful app for file-heavy workflows
@@ -2102,13 +2102,13 @@ Poke's philosophy: your phone is already your most-used device, so why not make 
 - **MCP extensibility**: Connect custom tools and integrations
 - **Open source**: Free, MIT-licensed, fully transparent
 
-Stash's philosophy: knowledge workers need AI that can handle complex document workflows, not just answer quick questions.
+Scheduled's philosophy: knowledge workers need AI that can handle complex document workflows, not just answer quick questions.
 
-<!-- Screenshot placeholder: Stash bulk file operations -->
+<!-- Screenshot placeholder: Scheduled bulk file operations -->
 
 ## Key Differences
 
-| Feature | Stash | Poke |
+| Feature | Scheduled | Poke |
 |---------|-------|------|
 | **Interface** | Desktop application | iMessage/SMS |
 | **Primary Use** | File operations, documents | Quick tasks, messaging-based actions |
@@ -2139,7 +2139,7 @@ Stash's philosophy: knowledge workers need AI that can handle complex document w
 ❌ **No version control** - Can't rollback changes
 ❌ **Messaging-limited** - Interface constrained by SMS/iMessage format
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 ✅ **Powerful file operations** - Bulk edit, rename, organize hundreds of files
@@ -2170,9 +2170,9 @@ Poke is ideal if you:
 
 **Best use cases:** Busy professionals managing inbox on the go, frequent travelers, anyone who lives in their phone rather than laptop, executives delegating quick tasks.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 - Work with **many documents and files** daily
 - Need to **edit hundreds of files** at once
 - Want **persistent AI memory** across projects
@@ -2190,19 +2190,19 @@ These tools serve fundamentally different needs:
 
 **Choose Poke if** you want a mobile-first AI assistant living in your messaging app, perfect for quick tasks, email management, and travel bookings.
 
-**Choose Stash if** you do knowledge work involving documents and files, need bulk editing capabilities, and want persistent AI memory for complex projects.
+**Choose Scheduled if** you do knowledge work involving documents and files, need bulk editing capabilities, and want persistent AI memory for complex projects.
 
-Interestingly, these tools **aren't mutually exclusive**. Poke excels at quick mobile tasks ("Book me a flight to SF next Tuesday"), while Stash handles heavy document work ("Update all 50 client presentations with Q4 numbers").
+Interestingly, these tools **aren't mutually exclusive**. Poke excels at quick mobile tasks ("Book me a flight to SF next Tuesday"), while Scheduled handles heavy document work ("Update all 50 client presentations with Q4 numbers").
 
-For **knowledge workers and document-heavy roles** - consultants, product managers, researchers, analysts - Stash's file-first approach and persistent memory make it essential. For **mobile professionals** managing quick tasks throughout the day, Poke's messaging interface is unbeatable.
+For **knowledge workers and document-heavy roles** - consultants, product managers, researchers, analysts - Scheduled's file-first approach and persistent memory make it essential. For **mobile professionals** managing quick tasks throughout the day, Poke's messaging interface is unbeatable.
 
-If you're deciding between them, ask: "Do I spend more time in documents or in my inbox?" Document-heavy? Choose Stash. Inbox-heavy? Choose Poke.
+If you're deciding between them, ask: "Do I spend more time in documents or in my inbox?" Document-heavy? Choose Scheduled. Inbox-heavy? Choose Poke.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop is perfect for automating your document workflows.
+Scheduled Desktop is perfect for automating your document workflows.
 
-[Download Stash Desktop](${BLOG_DOWNLOAD_URL}) • [View all use cases](/blog) • [Learn more about Stash](/about)`,
+[Download Scheduled Desktop](${BLOG_DOWNLOAD_URL}) • [View all use cases](/blog) • [Learn more about Scheduled](/about)`,
   },
 ];
 

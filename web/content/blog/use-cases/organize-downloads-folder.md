@@ -1,12 +1,12 @@
 ---
 slug: organize-downloads-folder
 title: 'Clean Up Your Downloads Folder Chaos with AI'
-description: 'Stop drowning in disorganized downloads. Use Stash to automatically categorize screenshots, PDFs, and files—turn chaos into an organized file system in minutes.'
+description: 'Stop drowning in disorganized downloads. Use Scheduled to automatically categorize screenshots, PDFs, and files—turn chaos into an organized file system in minutes.'
 date: '2025-10-02'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'organize downloads folder, clean up downloads, ai file organization, stash file management, auto-categorize files'
-metaDescription: 'Your Downloads folder is a mess of screenshots, PDFs, and random files. Let Stash AI automatically organize, tag, and categorize everything in minutes.'
+metaDescription: 'Your Downloads folder is a mess of screenshots, PDFs, and random files. Let Scheduled AI automatically organize, tag, and categorize everything in minutes.'
 ---
 
 # Clean Up Your Downloads Folder Chaos with AI
@@ -33,17 +33,17 @@ Your Downloads folder becomes chaos because:
 
 **Result:** Your Downloads folder is unusable. Finding anything requires scrolling through pages of junk or using vague search terms.
 
-## How Stash Organizes Your Downloads Automatically
+## How Scheduled Organizes Your Downloads Automatically
 
 Instead of manual sorting, let AI do the heavy lifting. Here's how:
 
-### 1. **Import Your Entire Downloads Folder to Stash**
+### 1. **Import Your Entire Downloads Folder to Scheduled**
 
-Just point Stash at your Downloads folder. It ingests everything—PDFs, images, documents, screenshots, whatever's there.
+Just point Scheduled at your Downloads folder. It ingests everything—PDFs, images, documents, screenshots, whatever's there.
 
-### 2. **Stash Analyzes Every File**
+### 2. **Scheduled Analyzes Every File**
 
-This is where the magic happens. Stash doesn't just look at filenames (which are useless). It actually reads each file to understand:
+This is where the magic happens. Scheduled doesn't just look at filenames (which are useless). It actually reads each file to understand:
 
 - **Content type:** Is this a receipt, a contract, a screenshot, a meme, a work document?
 - **Topic/subject:** What is this file about? Taxes? Recipes? Client work?
@@ -54,7 +54,7 @@ All of this happens automatically in the background.
 
 ### 3. **Auto-Categorization and Tagging**
 
-Based on its analysis, Stash:
+Based on its analysis, Scheduled:
 
 - **Creates intelligent categories:**
   - Receipts/Invoices
@@ -78,11 +78,11 @@ Based on its analysis, Stash:
 
 ### 4. **You Review and Confirm**
 
-Stash shows you the organized structure. You can:
+Scheduled shows you the organized structure. You can:
 
 - Accept the categorization (99% of the time it's right)
 - Adjust a few files if needed
-- Delete the junk Stash identified
+- Delete the junk Scheduled identified
 - Export the clean, organized file structure
 
 **What would've taken 3 hours of manual work happens in about 10 minutes.**
@@ -102,10 +102,10 @@ Let's say your Downloads folder has 400 files accumulated over 6 months. Total c
 
 **Time invested:** 30 minutes of frustration, zero progress
 
-**With Stash:**
+**With Scheduled:**
 
 1. Import Downloads folder (30 seconds)
-2. Stash processes all 400 files (5 minutes)
+2. Scheduled processes all 400 files (5 minutes)
 3. Review the auto-generated categories (5 minutes)
 4. Delete suggested junk files (3 minutes)
 5. Export organized structure back to your computer (2 minutes)
@@ -135,7 +135,7 @@ This workflow works for any disorganized file collection:
 
 **Research materials:** Sort PDFs and articles by topic
 
-Basically: if you have a folder full of random files that makes you anxious to open, Stash can fix it.
+Basically: if you have a folder full of random files that makes you anxious to open, Scheduled can fix it.
 
 ## The Time Savings Are Real
 
@@ -158,7 +158,7 @@ The initial cleanup takes 15 minutes. The ongoing time savings compound forever.
 ## Getting Started
 
 1. **Look at your Downloads folder right now** (I know, it's bad)
-2. **Import everything to Stash**
+2. **Import everything to Scheduled**
 3. **Let it auto-categorize** while you grab coffee
 4. **Review the suggestions** and make tweaks
 5. **Export your clean, organized file system**
@@ -168,4 +168,4 @@ You'll wonder why you put up with the chaos for so long.
 
 ---
 
-**Ready to end the Downloads folder nightmare?** [Try Stash](/) and turn file chaos into organized sanity.
+**Ready to end the Downloads folder nightmare?** [Try Scheduled](/) and turn file chaos into organized sanity.

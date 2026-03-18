@@ -19,7 +19,7 @@ class Config:
         )
     )
     stash_calendar_name: str = field(
-        default_factory=lambda: os.environ.get("STASH_CALENDAR_NAME", "Stash Calendar")
+        default_factory=lambda: os.environ.get("STASH_CALENDAR_NAME", "Scheduled Calendar")
     )
     anthropic_api_key: str = field(
         default_factory=lambda: os.environ.get("ANTHROPIC_API_KEY", "")
@@ -79,6 +79,18 @@ class Config:
     )
     e2b_template_id: str = field(
         default_factory=lambda: os.environ.get("E2B_TEMPLATE_ID", "")
+    )
+    auth0_domain: str = field(
+        default_factory=lambda: os.environ.get("AUTH0_DOMAIN", "")
+    )
+    auth0_client_id: str = field(
+        default_factory=lambda: os.environ.get("AUTH0_CLIENT_ID", "")
+    )
+    auth0_client_secret: str = field(
+        default_factory=lambda: os.environ.get("AUTH0_CLIENT_SECRET", "")
+    )
+    auth0_audience: str = field(
+        default_factory=lambda: os.environ.get("AUTH0_AUDIENCE", "")
     )
 
 

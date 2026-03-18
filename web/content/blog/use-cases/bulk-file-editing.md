@@ -1,12 +1,12 @@
 ---
 slug: bulk-file-editing
 title: 'Bulk Edit 100+ Files in Minutes: Excel to PDF, Rename, Convert with AI'
-description: 'Stop editing files one by one. Use Stash to bulk rename, convert formats, and process hundreds of files at once—from Excel to PDF, Word docs, and more.'
+description: 'Stop editing files one by one. Use Scheduled to bulk rename, convert formats, and process hundreds of files at once—from Excel to PDF, Word docs, and more.'
 date: '2025-08-13'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'bulk file editing, batch file conversion, rename multiple files, excel to pdf bulk, stash file processing'
-metaDescription: 'Process hundreds of files at once with Stash bulk editing. Rename, convert formats (Excel to PDF), and organize files in minutes instead of hours of manual work.'
+metaDescription: 'Process hundreds of files at once with Scheduled bulk editing. Rename, convert formats (Excel to PDF), and organize files in minutes instead of hours of manual work.'
 ---
 
 # Bulk Edit 100+ Files in Minutes: Excel to PDF, Rename, Convert with AI
@@ -22,7 +22,7 @@ You need to prepare 50 client documents for distribution. Each one needs to be:
 
 **Time required:** 2-3 hours of soul-crushing repetitive work.
 
-**There's a better way.** Stash handles bulk file operations so you can process hundreds of files in minutes, not hours.
+**There's a better way.** Scheduled handles bulk file operations so you can process hundreds of files in minutes, not hours.
 
 ## The Bulk File Problem
 
@@ -46,7 +46,7 @@ Whenever you have many similar files that need the same treatment, you're stuck 
 
 **Result:** You procrastinate on file organization. Files stay messy. Projects get delayed because "preparing the files" is such a chore.
 
-## How Stash Handles Bulk Operations
+## How Scheduled Handles Bulk Operations
 
 Instead of one-by-one processing, do everything at once:
 
@@ -61,22 +61,22 @@ Import or select the files you need to process:
 
 ### 2. **Define the Operation**
 
-Tell Stash what you want to do:
+Tell Scheduled what you want to do:
 
 **Bulk rename:**
 "Rename all files as: ClientName_Report_Date.pdf"
 
-Stash intelligently extracts relevant info (client name from content, current date) and renames everything consistently.
+Scheduled intelligently extracts relevant info (client name from content, current date) and renames everything consistently.
 
 **Format conversion:**
 "Convert all Excel files to PDF"
 
-Stash processes all files, maintaining formatting and creating clean PDFs.
+Scheduled processes all files, maintaining formatting and creating clean PDFs.
 
 **File organization:**
 "Sort these files into folders by client name"
 
-Stash reads the files, identifies which client each relates to, creates folders, and moves files accordingly.
+Scheduled reads the files, identifies which client each relates to, creates folders, and moves files accordingly.
 
 **Batch processing:**
 "Extract Sheet 1 from all these Excel workbooks and save as separate files"
@@ -85,7 +85,7 @@ Complex operation done across hundreds of files in one command.
 
 ### 3. **Review and Execute**
 
-Stash shows you a preview:
+Scheduled shows you a preview:
 
 - "These 50 files will be renamed like this..."
 - "These 30 files will go in Client A folder..."
@@ -112,7 +112,7 @@ You confirm, and it processes everything in the background.
 
 **Time:** 3-4 hours
 
-**With Stash:**
+**With Scheduled:**
 
 1. Import Excel files
 2. "Create individual PDFs for each client, named as: Q4*Report*[ClientName]\_Dec2025.pdf"
@@ -135,7 +135,7 @@ You confirm, and it processes everything in the background.
 
 **Time:** 2+ hours
 
-**With Stash:**
+**With Scheduled:**
 
 - Import all images
 - "Resize to 1200x800, rename as Campaign*Asset*##, sort by campaign tag"
@@ -155,14 +155,14 @@ You confirm, and it processes everything in the background.
 
 **Time:** 2-3 hours
 
-**With Stash:**
+**With Scheduled:**
 
 - "Extract Summary sheet from all workbooks, save as [OriginalName]\_Summary.xlsx"
 - Done in under 10 minutes
 
 ## Beyond Basic Conversions: Smart Processing
 
-Stash doesn't just do simple transformations—it understands context:
+Scheduled doesn't just do simple transformations—it understands context:
 
 **Intelligent naming:**
 Extract client names from content, not just filenames
@@ -242,7 +242,7 @@ That's almost a full work week you get back every single month.
 ## Getting Started
 
 1. **Identify your next bulk file task** (the one you're dreading)
-2. **Import files to Stash**
+2. **Import files to Scheduled**
 3. **Describe what you need:** rename, convert, organize, extract
 4. **Review the preview** to make sure it's doing what you want
 5. **Execute and watch** hours of work happen in minutes
@@ -251,4 +251,4 @@ The first time you use it, you'll wonder how you ever did bulk operations manual
 
 ---
 
-**Stop editing files one by one like it's 1995.** [Try Stash](/) and process hundreds of files in minutes.
+**Stop editing files one by one like it's 1995.** [Try Scheduled](/) and process hundreds of files in minutes.

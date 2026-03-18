@@ -7,7 +7,7 @@ const upperIcons = [Mail, MailOpen, Inbox, Send, Reply, Forward, Mail, Send, Mai
 const lowerIcons = [Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users, Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users, Calendar, Clock, Bell, CalendarCheck];
 
 const UPPER_PATH = "path('M -200,100 C 50,20 180,200 420,60 C 580,-30 700,150 900,80 C 1080,20 1200,160 1400,70 C 1550,10 1650,130 1750,80')";
-const LOWER_PATH = "path('M -200,680 C 80,630 200,720 380,690 C 560,660 650,750 820,710 C 1000,670 1100,740 1250,700 C 1400,660 1550,730 1750,680')";
+const LOWER_PATH = "path('M -200,760 C 80,710 200,800 380,770 C 560,740 650,830 820,790 C 1000,750 1100,820 1250,780 C 1400,740 1550,810 1750,760')";
 
 const EMAILS = [
   {
@@ -231,7 +231,7 @@ export default function Hero() {
 
           <div className="mt-10">
             <a
-              href={`${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google`}
+              href={`${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/login?signup=1`}
               className="inline-flex items-center gap-2 rounded-full bg-[#43614a] px-7 py-3.5 text-base font-medium text-white transition-all hover:bg-[#527559]"
             >
               Get Started

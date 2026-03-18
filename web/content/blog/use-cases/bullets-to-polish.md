@@ -1,12 +1,12 @@
 ---
 slug: bullets-to-polish
 title: 'Write Bullets, Let AI Polish: The Fastest Way to Create Content'
-description: 'Stop agonizing over every sentence. Write rough bullet points quickly, then let Stash AI polish them into professional prose—10x faster content creation.'
+description: 'Stop agonizing over every sentence. Write rough bullet points quickly, then let Scheduled AI polish them into professional prose—10x faster content creation.'
 date: '2025-09-07'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'bullet points to prose, ai content polishing, fast writing workflow, stash writing assistant, rough draft to polish'
-metaDescription: 'Dump your ideas as bullet points and let Stash transform them into polished prose. The fastest workflow for meeting notes, blog posts, and professional content.'
+metaDescription: 'Dump your ideas as bullet points and let Scheduled transform them into polished prose. The fastest workflow for meeting notes, blog posts, and professional content.'
 ---
 
 # Write Bullets, Let AI Polish: The Fastest Way to Create Content
@@ -19,7 +19,7 @@ You're trying to think "What do I want to say?" while also thinking "How should 
 
 Here's a better way: **Separate the thinking from the polishing.**
 
-Dump your ideas as messy bullet points. Let AI turn them into actual prose. You focus on what to say; Stash handles how to say it.
+Dump your ideas as messy bullet points. Let AI turn them into actual prose. You focus on what to say; Scheduled handles how to say it.
 
 ## The Writing Paralysis Problem
 
@@ -58,11 +58,11 @@ Meeting with client - product feedback session
 
 **No full sentences. No polish. Just raw ideas.** Takes 3 minutes.
 
-### Step 2: Let Stash Polish
+### Step 2: Let Scheduled Polish
 
-Tell Stash: "Turn this into a professional meeting summary."
+Tell Scheduled: "Turn this into a professional meeting summary."
 
-Stash reads your bullets and generates:
+Scheduled reads your bullets and generates:
 
 ```
 Client Product Feedback Session - November 11, 2025
@@ -116,12 +116,12 @@ Blog idea: why most note-taking fails
 - People take notes but never review them
 - No system for organizing
 - Tools don't help you actually USE the notes
-- Stash solves this by making notes searchable/actionable
+- Scheduled solves this by making notes searchable/actionable
 - Example: finding forgotten ideas from old notes
-- CTA: try Stash for free
+- CTA: try Scheduled for free
 ```
 
-**Stash generates:** 800-word blog post with intro, body sections, examples, and conclusion
+**Scheduled generates:** 800-word blog post with intro, body sections, examples, and conclusion
 
 **Your time:** 5 min bullets + 10 min review = 15 min total vs. 60+ min writing from scratch
 
@@ -138,7 +138,7 @@ Response to proposal question
 - Happy to jump on call if needed
 ```
 
-**Stash generates:**
+**Scheduled generates:**
 
 ```
 Hi [Name],
@@ -168,7 +168,7 @@ Team standup
 - Holiday party planning - volunteers needed
 ```
 
-**Stash generates:** Formatted summary with sections, action items highlighted, and shareable format
+**Scheduled generates:** Formatted summary with sections, action items highlighted, and shareable format
 
 ## Beyond Professional: Personal Use Too
 
@@ -177,19 +177,19 @@ This workflow isn't just for work documents:
 **Personal journaling:**
 
 - Bullet your thoughts quickly
-- Stash expands into reflective prose
+- Scheduled expands into reflective prose
 - Easier to maintain daily habit
 
 **Learning notes:**
 
 - Bullet key concepts from article/video
-- Stash creates organized study notes
+- Scheduled creates organized study notes
 - Better for retention and review
 
 **Project planning:**
 
 - Brain dump project ideas as bullets
-- Stash structures into actual plan
+- Scheduled structures into actual plan
 - Faster from "idea" to "execution"
 
 Basically: anywhere you need to get thoughts out of your head and into readable format.
@@ -217,7 +217,7 @@ That's more than a full workday you get back, every single month.
 
 1. **Next time you need to write something, don't start with sentences**
 2. **Brain dump bullet points instead** (capture everything quickly)
-3. **Tell Stash what format you need:** email, meeting notes, blog post, etc.
+3. **Tell Scheduled what format you need:** email, meeting notes, blog post, etc.
 4. **Review the polished output** (light edits only)
 5. **Ship it** or send it
 
@@ -230,11 +230,11 @@ That's more than a full workday you get back, every single month.
 1. Pick something you need to write (email, summary, doc)
 2. Set a timer for 3 minutes
 3. Write ONLY bullets—no complete sentences allowed
-4. Feed bullets to Stash and ask for polish
+4. Feed bullets to Scheduled and ask for polish
 5. Compare the result to how long it usually takes you
 
 You'll never go back to starting with a blank page.
 
 ---
 
-**Stop agonizing over every sentence.** [Try Stash](/) and turn bullet points into polished content in seconds.
+**Stop agonizing over every sentence.** [Try Scheduled](/) and turn bullet points into polished content in seconds.

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, captureSessionFromURL, clearSession } from '@/lib/api';
 import ReadyState from '@/components/onboarding/ReadyState';
 import DisconnectedState from '@/components/onboarding/DisconnectedState';
 
@@ -30,6 +30,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    captureSessionFromURL();
     async function init() {
       try {
         const userInfo = await api<UserInfo>('/auth/me');
@@ -50,8 +51,9 @@ export default function SettingsPage() {
         const s = await api<Settings>('/web/api/v1/settings');
         setSettings(s);
       } catch {
-        // No valid session — redirect to sign-in OAuth
-        window.location.href = `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google?signin=1`;
+        // No valid session — clear stale token and redirect to sign-in
+        clearSession();
+        window.location.href = `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/login`;
         return;
       } finally {
         setLoading(false);
@@ -83,13 +85,13 @@ export default function SettingsPage() {
           <div className="mb-8 flex items-center gap-3">
             <Image
               src="/logo.png"
-              alt="Stash Logo"
+              alt="Scheduled Logo"
               width={40}
               height={40}
               className="h-10 w-10"
             />
             <span className="font-[family-name:var(--font-space-grotesk)] text-2xl font-bold text-gray-900">
-              Stash
+              Scheduled
             </span>
           </div>
 

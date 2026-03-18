@@ -29,7 +29,7 @@ export default function AutopilotToggle({ initialEnabled }: AutopilotToggleProps
       <div>
         <p className="text-sm font-medium text-gray-900">Autopilot</p>
         <p className="mt-1 text-xs text-gray-500">
-          When on, Stash sends replies directly for 1-on-1 meetings. Group
+          When on, Scheduled sends replies directly for 1-on-1 meetings. Group
           meetings (3+ people) are always saved as drafts for your review.
         </p>
       </div>

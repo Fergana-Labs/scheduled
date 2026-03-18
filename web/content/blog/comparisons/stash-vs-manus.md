@@ -1,21 +1,21 @@
 ---
 slug: stash-vs-manus
-title: "Stash vs Manus AI: Open Source vs China's Autonomous AI Agent"
-description: "Stash vs Manus AI comparison - open-source desktop agents versus China's autonomous AI system. Features, performance, and which tool wins for different use cases."
+title: "Scheduled vs Manus AI: Open Source vs China's Autonomous AI Agent"
+description: "Scheduled vs Manus AI comparison - open-source desktop agents versus China's autonomous AI system. Features, performance, and which tool wins for different use cases."
 date: '2025-09-02'
 author: 'Fergana Labs Team'
 category: 'Comparisons'
 keywords: 'stash vs manus, manus ai alternative, autonomous ai agents, ai agent comparison'
-metaDescription: 'Stash vs Manus AI: Compare features, performance, and accessibility. Find the best autonomous AI agent for your workflow.'
+metaDescription: 'Scheduled vs Manus AI: Compare features, performance, and accessibility. Find the best autonomous AI agent for your workflow.'
 ---
 
-# Stash vs Manus AI: Open Source vs China's Autonomous AI Agent
+# Scheduled vs Manus AI: Open Source vs China's Autonomous AI Agent
 
-Autonomous AI agents are having their moment. **Manus AI** made headlines in early 2025 as "the second DeepSeek," scoring 86.5% on GAIA benchmarks - beating OpenAI's Deep Research. Meanwhile, **Stash** has been quietly democratizing AI agent capabilities for non-technical users through open-source desktop software.
+Autonomous AI agents are having their moment. **Manus AI** made headlines in early 2025 as "the second DeepSeek," scoring 86.5% on GAIA benchmarks - beating OpenAI's Deep Research. Meanwhile, **Scheduled** has been quietly democratizing AI agent capabilities for non-technical users through open-source desktop software.
 
 Both promise to autonomously complete complex tasks, but they take radically different approaches. Here's how they compare.
 
-<!-- Screenshot placeholder: Manus AI interface vs Stash Desktop interface -->
+<!-- Screenshot placeholder: Manus AI interface vs Scheduled Desktop interface -->
 
 ## What is Manus AI?
 
@@ -32,9 +32,9 @@ Both promise to autonomously complete complex tasks, but they take radically dif
 
 Manus is currently in **closed beta** with limited access.
 
-## What is Stash?
+## What is Scheduled?
 
-[Stash](/about) is an AI-powered desktop application that combines a persistent file system, long-term memory, and real-time access to your files and information.
+[Scheduled](/about) is an AI-powered desktop application that combines a persistent file system, long-term memory, and real-time access to your files and information.
 
 **Key Features:**
 
@@ -46,13 +46,13 @@ Manus is currently in **closed beta** with limited access.
 - **Version control**: Full change history with instant rollback
 - **Desktop-first**: Works locally, privacy-focused
 
-Stash is **publicly available** and ready to download today.
+Scheduled is **publicly available** and ready to download today.
 
-<!-- Screenshot placeholder: Stash version control feature -->
+<!-- Screenshot placeholder: Scheduled version control feature -->
 
 ## Key Differences
 
-| Feature                   | Stash              | Manus AI                   |
+| Feature                   | Scheduled              | Manus AI                   |
 | ------------------------- | ------------------ | -------------------------- |
 | **Availability**          | Public             | Closed beta                |
 | **Access**                | Download now       | Waitlist                   |
@@ -85,7 +85,7 @@ Stash is **publicly available** and ready to download today.
 ❌ **Limited file operations** - Not optimized for bulk document editing
 ❌ **No version control** - Can't rollback changes
 
-## Stash: Pros and Cons
+## Scheduled: Pros and Cons
 
 ### Pros
 
@@ -123,9 +123,9 @@ Manus AI is ideal if you:
 
 **Reality check:** Most users can't access Manus yet. If you need an AI agent today, Manus isn't an option.
 
-## Who Should Choose Stash?
+## Who Should Choose Scheduled?
 
-Stash is ideal if you:
+Scheduled is ideal if you:
 
 - Want an AI workspace you can **use today** (no waitlist)
 - Deal with **information overload** across multiple systems
@@ -144,8 +144,8 @@ Stash is ideal if you:
 
 **However**, benchmark scores don't tell the whole story:
 
-- **Availability**: Stash ships today; Manus is waitlist-only
-- **Use case fit**: Stash is optimized for file operations; Manus for autonomous research
+- **Availability**: Scheduled ships today; Manus is waitlist-only
+- **Use case fit**: Scheduled is optimized for file operations; Manus for autonomous research
 
 For most knowledge workers, **availability and fit matter more than benchmark scores**. A tool you can use today beats a higher-performing tool you can't access.
 
@@ -155,14 +155,14 @@ This comparison comes with an important caveat: **Manus AI isn't publicly availa
 
 **Choose Manus AI if** you can access the closed beta, need absolute cutting-edge autonomous performance, and don't mind proprietary cloud platforms. It's genuinely impressive technology when (if) you can get it.
 
-**Choose Stash if** you need an AI agent today, work with files and documents, value open source software, or want persistent memory and version control.
+**Choose Scheduled if** you need an AI agent today, work with files and documents, value open source software, or want persistent memory and version control.
 
-For most users, the decision is simple: **Stash is available now** and purpose-built for document workflows. Manus is impressive on benchmarks but inaccessible to most people.
+For most users, the decision is simple: **Scheduled is available now** and purpose-built for document workflows. Manus is impressive on benchmarks but inaccessible to most people.
 
-We're excited about Manus pushing the boundaries of what AI can do autonomously. But until it's publicly available, Stash remains the practical choice for knowledge workers who need AI agents today.
+We're excited about Manus pushing the boundaries of what AI can do autonomously. But until it's publicly available, Scheduled remains the practical choice for knowledge workers who need AI agents today.
 
-## Ready to Try Stash?
+## Ready to Try Scheduled?
 
-Stash Desktop is ready to download. No waitlist, no barriers.
+Scheduled Desktop is ready to download. No waitlist, no barriers.
 
-[Download Stash Desktop]({{STASH_DESKTOP_DOWNLOAD_URL}}) • [Explore all features](/about) • [Read more comparisons](/blog)
+[Download Scheduled Desktop]({{STASH_DESKTOP_DOWNLOAD_URL}}) • [Explore all features](/about) • [Read more comparisons](/blog)

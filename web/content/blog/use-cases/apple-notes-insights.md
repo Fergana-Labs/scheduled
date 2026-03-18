@@ -1,12 +1,12 @@
 ---
 slug: apple-notes-insights
 title: 'Rediscover Your Best Ideas Hidden in Apple Notes'
-description: 'Your Apple Notes are full of forgotten insights and ideas. Use Stash to import, analyze, and extract patterns—find the gold buried in years of notes.'
+description: 'Your Apple Notes are full of forgotten insights and ideas. Use Scheduled to import, analyze, and extract patterns—find the gold buried in years of notes.'
 date: '2025-09-22'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'apple notes export, rediscover old ideas, notes analysis ai, stash apple notes, idea mining'
-metaDescription: 'Export Apple Notes to Stash and uncover forgotten ideas, recurring themes, and hidden insights from years of note-taking. Turn scattered thoughts into actionable knowledge.'
+metaDescription: 'Export Apple Notes to Scheduled and uncover forgotten ideas, recurring themes, and hidden insights from years of note-taking. Turn scattered thoughts into actionable knowledge.'
 ---
 
 # Rediscover Your Best Ideas Hidden in Apple Notes
@@ -41,23 +41,23 @@ You know there's valuable stuff buried in your notes. But finding it requires:
 
 **Result:** Your best ideas stay hidden. You keep recreating work you've already done.
 
-## How Stash Mines Your Apple Notes for Gold
+## How Scheduled Mines Your Apple Notes for Gold
 
 Instead of manual archaeology, let AI analyze everything at once:
 
 ### 1. **Export Your Apple Notes**
 
-Apple lets you export notes as text or HTML. Dump everything into a folder and import it to Stash.
+Apple lets you export notes as text or HTML. Dump everything into a folder and import it to Scheduled.
 
 All your notes—from the brilliant to the mundane—now live in one searchable workspace.
 
-### 2. **Ask Stash for Your Top Ideas**
+### 2. **Ask Scheduled for Your Top Ideas**
 
 Here's where it gets interesting. Instead of reading through hundreds of notes yourself, ask:
 
 **"What are my top ideas from the last year?"**
 
-Stash reads through everything and identifies:
+Scheduled reads through everything and identifies:
 
 - **Recurring themes:** Topics you keep coming back to
 - **Complete ideas:** Thoughts that are well-developed and actionable
@@ -72,7 +72,7 @@ Another powerful query:
 
 **"What have I been thinking about lately?"**
 
-Stash analyzes recent notes and shows you:
+Scheduled analyzes recent notes and shows you:
 
 - **Trending topics** in your thoughts (what's on your mind right now)
 - **Shifts in focus** (how your interests have evolved)
@@ -87,7 +87,7 @@ This is the magic one:
 
 **"What good ideas did I forget about?"**
 
-Stash surfaces:
+Scheduled surfaces:
 
 - **Ideas you wrote down months ago** and never acted on
 - **Insights that seemed minor at the time** but connect to current work
@@ -98,11 +98,11 @@ Suddenly, you have a list of projects and ideas ready to execute—no brainstorm
 
 ## Real Example: Quarterly Idea Review
 
-Let's say you've been taking notes in Apple for the past year. You export everything and import to Stash.
+Let's say you've been taking notes in Apple for the past year. You export everything and import to Scheduled.
 
 **You ask: "What are my top 10 ideas from this year?"**
 
-Stash analyzes all your notes and returns:
+Scheduled analyzes all your notes and returns:
 
 1. **A content strategy framework** you outlined after a marketing webinar (June)
 2. **Product feature idea** from a customer conversation (March)
@@ -119,7 +119,7 @@ Stash analyzes all your notes and returns:
 
 ## Beyond Ideas: Pattern Recognition
 
-Stash doesn't just find individual notes—it finds patterns:
+Scheduled doesn't just find individual notes—it finds patterns:
 
 **"What topics do I keep coming back to?"**
 → Shows you recurring interests you might want to lean into
@@ -163,7 +163,7 @@ This workflow works for any collection of notes:
 - Find quotes and insights to develop further
 - Rediscover angles you wanted to explore
 
-Basically: if you've written it down, Stash can help you find value in it.
+Basically: if you've written it down, Scheduled can help you find value in it.
 
 ## The Compounding Value of Note-Taking
 
@@ -171,7 +171,7 @@ Most people feel like note-taking is pointless because they never review their n
 
 But **notes become exponentially valuable when you can search and analyze them** as a collection, not just individual entries.
 
-With Stash:
+With Scheduled:
 
 - **Past ideas fuel current work** instead of being lost
 - **Patterns emerge** that you'd never notice manually
@@ -183,7 +183,7 @@ Note-taking finally becomes what it's supposed to be: a **system for capturing a
 ## Getting Started
 
 1. **Export your Apple Notes** (File → Export or copy notes into text files)
-2. **Import everything to Stash** in a dedicated workspace
+2. **Import everything to Scheduled** in a dedicated workspace
 3. **Ask your first question:** "What are my top ideas?"
 4. **Explore patterns:** "What topics do I keep thinking about?"
 5. **Act on what you find** instead of letting good ideas stay buried
@@ -192,4 +192,4 @@ Your past self already did a ton of thinking. Time to put it to work.
 
 ---
 
-**Stop letting good ideas rot in Apple Notes.** [Try Stash](/) and rediscover the insights you forgot you had.
+**Stop letting good ideas rot in Apple Notes.** [Try Scheduled](/) and rediscover the insights you forgot you had.

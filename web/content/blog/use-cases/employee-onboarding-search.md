@@ -1,12 +1,12 @@
 ---
 slug: employee-onboarding-search
 title: 'Onboard New Employees 10x Faster with AI-Powered Company Search'
-description: 'Stop bothering your team with questions new hires could answer themselves. Use Stash to give employees instant access to all company materials, docs, and decisions.'
+description: 'Stop bothering your team with questions new hires could answer themselves. Use Scheduled to give employees instant access to all company materials, docs, and decisions.'
 date: '2025-08-18'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'employee onboarding ai, company knowledge base, onboarding automation, stash onboarding, new hire training'
-metaDescription: 'Speed up employee onboarding with Stash AI search. New hires find answers in company materials instantly—no more interrupting the team with every question.'
+metaDescription: 'Speed up employee onboarding with Scheduled AI search. New hires find answers in company materials instantly—no more interrupting the team with every question.'
 ---
 
 # Onboard New Employees 10x Faster with AI-Powered Company Search
@@ -27,7 +27,7 @@ New employee starts Monday. You hand them:
 
 **Onboarding is broken.** Not because the materials don't exist—because finding answers in a pile of documentation is impossible.
 
-**Stash fixes this.** Give new hires AI-powered search across all company materials. They find answers themselves in seconds instead of interrupting people for hours.
+**Scheduled fixes this.** Give new hires AI-powered search across all company materials. They find answers themselves in seconds instead of interrupting people for hours.
 
 ## The Onboarding Documentation Problem
 
@@ -53,13 +53,13 @@ Most companies have tons of great onboarding materials:
 
 **Everyone loses.** The new hire feels dumb. The team gets interrupted. Knowledge doesn't actually transfer.
 
-## How Stash Creates an Instant Knowledge Base
+## How Scheduled Creates an Instant Knowledge Base
 
 Here's the setup:
 
 ### 1. **Import All Company Materials**
 
-One-time effort: Gather everything into Stash:
+One-time effort: Gather everything into Scheduled:
 
 - HR policies and handbook
 - Engineering documentation
@@ -74,7 +74,7 @@ Dump it all into a "Company Knowledge Base" workspace.
 
 ### 2. **New Hires Get Search Access**
 
-Instead of handing them 50 links, give them one link: Stash workspace.
+Instead of handing them 50 links, give them one link: Scheduled workspace.
 
 Now they can ask questions in natural language:
 
@@ -118,11 +118,11 @@ New software engineer joins your team. Day 1, they have questions:
 - Ask for clarification → Another 20 min wait
 - Finally get it working → 3 hours wasted
 
-**With Stash onboarding:**
+**With Scheduled onboarding:**
 
-**New hire asks Stash:** "How do I set up my development environment?"
+**New hire asks Scheduled:** "How do I set up my development environment?"
 
-**Stash returns:**
+**Scheduled returns:**
 
 - Latest setup guide (updated last month)
 - Common troubleshooting issues
@@ -158,9 +158,9 @@ This isn't just for the first week. New employees have questions for months:
 - "How do we handle customer escalations?"
 - "Where are examples of past client proposals?"
 
-**With Stash:** All of these are answered instantly by searching the knowledge base.
+**With Scheduled:** All of these are answered instantly by searching the knowledge base.
 
-**Without Stash:** Each question is an interruption, a delay, or a gap in understanding.
+**Without Scheduled:** Each question is an interruption, a delay, or a gap in understanding.
 
 ## Why This Works So Much Better
 
@@ -179,7 +179,7 @@ Finding the actual doc beats guessing based on incomplete information.
 **Scalable beats manual:**
 Works for 1 new hire or 10. No extra burden on the team.
 
-## Common Onboarding Questions Stash Handles
+## Common Onboarding Questions Scheduled Handles
 
 **HR/Admin:**
 
@@ -225,7 +225,7 @@ Works for 1 new hire or 10. No extra burden on the team.
 - 5-7 hours of team time per week supporting new hire
 - **~25 hours of team productivity lost** in first month
 
-**Stash onboarding:**
+**Scheduled onboarding:**
 
 - Same 20-30 questions
 - Self-serve answers in under 1 minute each
@@ -239,15 +239,15 @@ If you hire 10 people per year? **That's 200+ hours saved.**
 ## Getting Started
 
 1. **Gather all onboarding materials** (docs, policies, guides, examples)
-2. **Import to a Company Knowledge Base** workspace in Stash
+2. **Import to a Company Knowledge Base** workspace in Scheduled
 3. **Add new hire to workspace** on their first day
 4. **Show them how to search** (5 min demo)
 5. **Watch them ramp 3x faster** than previous hires
 
-**Pro tip:** Ask new hires to document questions Stash couldn't answer. That shows you what's missing from the knowledge base.
+**Pro tip:** Ask new hires to document questions Scheduled couldn't answer. That shows you what's missing from the knowledge base.
 
 Over time, you build a comprehensive system that makes every new hire after them even faster.
 
 ---
 
-**Stop slowing your team down with onboarding.** [Try Stash](/) and give new hires self-service knowledge access.
+**Stop slowing your team down with onboarding.** [Try Scheduled](/) and give new hires self-service knowledge access.

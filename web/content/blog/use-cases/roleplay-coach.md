@@ -1,12 +1,12 @@
 ---
 slug: roleplay-coach
 title: 'Practice Anything with AI Roleplay: Sales Calls, Interviews, Dating & More'
-description: 'Get better at real-world situations with Stash AI roleplay. Practice sales calls, case interviews, tough conversations, or even dating—with realistic feedback and coaching.'
+description: 'Get better at real-world situations with Scheduled AI roleplay. Practice sales calls, case interviews, tough conversations, or even dating—with realistic feedback and coaching.'
 date: '2025-08-03'
 author: 'Fergana Labs Team'
 category: 'Use Cases'
 keywords: 'ai roleplay practice, sales call practice, interview prep ai, stash roleplay coach, conversation practice'
-metaDescription: 'Practice sales calls, job interviews, negotiations, and more with Stash AI roleplay. Get realistic scenarios and feedback to improve before the real thing.'
+metaDescription: 'Practice sales calls, job interviews, negotiations, and more with Scheduled AI roleplay. Get realistic scenarios and feedback to improve before the real thing.'
 ---
 
 # Practice Anything with AI Roleplay: Sales Calls, Interviews, Dating & More
@@ -45,17 +45,17 @@ Most people don't practice important conversations enough because:
 
 **Result:** You underperform in important situations because you're essentially doing it for the first time, live.
 
-## How Stash Roleplay Works
+## How Scheduled Roleplay Works
 
 Think of it as having an infinitely patient practice partner who knows your situation and gives you real feedback:
 
 ### 1. **Set Up the Scenario**
 
-Tell Stash what you want to practice:
+Tell Scheduled what you want to practice:
 
 **"I have a discovery call with a SaaS prospect tomorrow. They're a mid-sized company concerned about price. Let's roleplay."**
 
-Stash becomes the prospect and knows:
+Scheduled becomes the prospect and knows:
 
 - Industry context
 - Common objections
@@ -68,17 +68,17 @@ You have a back-and-forth dialogue:
 
 **You:** "Thanks for taking the time today. I'd love to understand your current workflow challenges..."
 
-**Stash (as prospect):** "Sure. Right now we're using a combination of spreadsheets and email. It works, but it's getting messy as we scale. That said, I'm not sure we have budget for a dedicated tool right now."
+**Scheduled (as prospect):** "Sure. Right now we're using a combination of spreadsheets and email. It works, but it's getting messy as we scale. That said, I'm not sure we have budget for a dedicated tool right now."
 
 **You:** "I hear that. When you say budget is tight, is it that the ROI isn't clear, or is it timing?"
 
-**Stash:** "Mostly timing—we just made a big hire. But honestly, if the ROI is compelling enough, I could make the case."
+**Scheduled:** "Mostly timing—we just made a big hire. But honestly, if the ROI is compelling enough, I could make the case."
 
 The AI responds realistically, throws in objections, and adapts based on how you handle things.
 
 ### 3. **Get Actionable Feedback**
 
-After the practice session, Stash provides coaching:
+After the practice session, Scheduled provides coaching:
 
 **What worked well:**
 
@@ -190,12 +190,12 @@ Practice at midnight before your 9 AM interview if you want.
 **Scenario:** You're selling project management software to a COO tomorrow.
 
 **Practice Session 1:**
-You jump straight into features. Stash (as COO) says "I'm not sure we need this. We have systems that work fine."
+You jump straight into features. Scheduled (as COO) says "I'm not sure we need this. We have systems that work fine."
 
 **Feedback:** "You pitched before understanding their problems. Ask more discovery questions."
 
 **Practice Session 2:**
-You ask better questions. Stash reveals pain points around team coordination and deadline tracking.
+You ask better questions. Scheduled reveals pain points around team coordination and deadline tracking.
 
 **Feedback:** "Much better. Now when you present, tie features directly to those pain points."
 
@@ -212,13 +212,13 @@ You've practiced this exact flow 3 times. You're calm, confident, and hit all th
 ## Getting Started
 
 1. **Identify your next high-stakes conversation** (sales call, interview, difficult discussion)
-2. **Set up the roleplay scenario** in Stash with context
+2. **Set up the roleplay scenario** in Scheduled with context
 3. **Run through the conversation** at least 2-3 times
 4. **Review feedback** and adjust your approach
 5. **Show up to the real thing** having already done it multiple times
 
-**Pro tip:** Record your practice sessions (or have Stash save them). Review your progression and see what improved.
+**Pro tip:** Record your practice sessions (or have Scheduled save them). Review your progression and see what improved.
 
 ---
 
-**Stop winging important conversations.** [Try Stash](/) and practice until you're actually ready.
+**Stop winging important conversations.** [Try Scheduled](/) and practice until you're actually ready.
