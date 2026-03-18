@@ -30,7 +30,8 @@ from scheduler.config import config
 
 logger = logging.getLogger(__name__)
 
-_SANDBOX_CMD_TIMEOUT = 300  # 5 minutes
+_SANDBOX_LIFETIME = 600  # 10 minutes — sandbox auto-terminates after this
+_SANDBOX_CMD_TIMEOUT = 600  # 10 minutes — matches sandbox lifetime
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -208,6 +209,7 @@ def _create_sandbox(*, control_plane_url: str, session_token: str, extra_envs: d
     return Sandbox.create(
         template,
         envs=envs,
+        timeout=_SANDBOX_LIFETIME,
     )
 
 
@@ -253,20 +255,22 @@ def launch_onboarding_in_sandbox(user_id: str, control_plane_url: str, lookback_
         if not _prepare_sandbox(sandbox, files):
             return
 
-        # Run the sandbox onboarding agent
+        # Run the sandbox onboarding agent, streaming output to logs
         print("Running onboarding agent...\n")
         result = sandbox.commands.run(
             "cd /home/user/scheduler && python3 -m scheduler.sandbox.onboarding",
             timeout=_SANDBOX_CMD_TIMEOUT,
+            on_stdout=lambda msg: logger.info("e2b[onboarding]: %s", msg.line),
+            on_stderr=lambda msg: logger.warning("e2b[onboarding]: %s", msg.line),
         )
-        print(result.stdout)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr)
         if result.exit_code != 0:
             logger.error("e2b onboarding sandbox exited with code %d", result.exit_code)
 
     finally:
-        sandbox.kill()
+        try:
+            sandbox.kill()
+        except Exception:
+            pass  # sandbox may have already expired
         print("\nSandbox terminated.")
 
 
@@ -302,11 +306,9 @@ def launch_draft_composer_in_sandbox(
         result = sandbox.commands.run(
             "cd /home/user/scheduler && python3 -m scheduler.sandbox.drafting",
             timeout=_SANDBOX_CMD_TIMEOUT,
+            on_stdout=lambda msg: logger.info("e2b[drafting]: %s", msg.line),
+            on_stderr=lambda msg: logger.warning("e2b[drafting]: %s", msg.line),
         )
-        if result.stdout:
-            print(result.stdout)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr)
         if result.exit_code != 0:
             logger.error("e2b drafting sandbox exited with code %d", result.exit_code)
             raise RuntimeError(f"e2b drafting sandbox failed (exit code {result.exit_code})")
@@ -318,7 +320,10 @@ def launch_draft_composer_in_sandbox(
                 return draft_id or None
         return None
     finally:
-        sandbox.kill()
+        try:
+            sandbox.kill()
+        except Exception:
+            pass  # sandbox may have already expired
         print("\nSandbox terminated.")
 
 
