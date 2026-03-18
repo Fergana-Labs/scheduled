@@ -14,6 +14,7 @@ Requires:
     - Google OAuth token.json (used by the control plane, never sent to sandbox)
 """
 
+import logging
 import os
 import json
 import secrets
@@ -26,6 +27,10 @@ import uvicorn
 from e2b_code_interpreter import Sandbox
 
 from scheduler.config import config
+
+logger = logging.getLogger(__name__)
+
+_SANDBOX_CMD_TIMEOUT = 300  # 5 minutes
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -222,10 +227,13 @@ def launch_onboarding_in_sandbox(user_id: str, control_plane_url: str, lookback_
         print("Running onboarding agent...\n")
         result = sandbox.commands.run(
             "cd /home/user/scheduler && python3 -m scheduler.sandbox.onboarding",
+            timeout=_SANDBOX_CMD_TIMEOUT,
         )
         print(result.stdout)
         if result.stderr:
             print(result.stderr, file=sys.stderr)
+        if result.exit_code != 0:
+            logger.error("e2b onboarding sandbox exited with code %d", result.exit_code)
 
     finally:
         sandbox.kill()
@@ -258,13 +266,22 @@ def launch_draft_composer_in_sandbox(
         print("Running draft composer agent...\n")
         result = sandbox.commands.run(
             "cd /home/user/scheduler && python3 -m scheduler.sandbox.drafting",
+            timeout=_SANDBOX_CMD_TIMEOUT,
         )
         if result.stdout:
             print(result.stdout)
         if result.stderr:
             print(result.stderr, file=sys.stderr)
-        draft_id = result.stdout.strip()
-        return draft_id or None
+        if result.exit_code != 0:
+            logger.error("e2b drafting sandbox exited with code %d", result.exit_code)
+            raise RuntimeError(f"e2b drafting sandbox failed (exit code {result.exit_code})")
+
+        # Parse structured output: "DRAFT_RESULT:<draft_id>"
+        for line in reversed(result.stdout.strip().splitlines()):
+            if line.startswith("DRAFT_RESULT:"):
+                draft_id = line.removeprefix("DRAFT_RESULT:")
+                return draft_id or None
+        return None
     finally:
         sandbox.kill()
         print("\nSandbox terminated.")

@@ -275,6 +275,8 @@ def auth_me(session: dict = Depends(get_web_session)):
 
 sessions: dict[str, dict] = {}
 
+_SESSION_TTL = 600  # 10 minutes — e2b sandboxes default to 5 min max
+
 
 def register_session(session_token: str, user_id: str) -> None:
     """Register a session with Google credentials for a user.
@@ -282,6 +284,8 @@ def register_session(session_token: str, user_id: str) -> None:
     Loads credentials from the database if DATABASE_URL is set and the user
     exists. Falls back to local OAuth flow (token.json) for development.
     """
+    _cleanup_expired_sessions()
+
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.stash_calendar_name)
@@ -295,6 +299,13 @@ def register_session(session_token: str, user_id: str) -> None:
     }
 
 
+def _cleanup_expired_sessions() -> None:
+    """Remove sessions older than _SESSION_TTL."""
+    now = time.time()
+    expired = [tok for tok, s in sessions.items() if now - s["created_at"] > _SESSION_TTL]
+    for tok in expired:
+        del sessions[tok]
+
 
 def get_session(authorization: str = Header()) -> dict:
     """Validate the session token from the Authorization header."""
@@ -304,6 +315,10 @@ def get_session(authorization: str = Header()) -> dict:
     token = authorization.removeprefix("Bearer ")
     session = sessions.get(token)
     if not session:
+        raise HTTPException(status_code=401, detail="Invalid or expired session token")
+
+    if time.time() - session["created_at"] > _SESSION_TTL:
+        del sessions[token]
         raise HTTPException(status_code=401, detail="Invalid or expired session token")
 
     return session

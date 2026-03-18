@@ -53,7 +53,7 @@ def run_drafting() -> None:
     backend = ControlPlaneDraftBackend(ControlPlaneClient(control_plane_url, session_token))
     composer = DraftComposer(backend, user_id="sandbox", autopilot=autopilot)
     result = composer.compose_and_create_draft(email, classification)
-    print(result or "")
+    print(f"DRAFT_RESULT:{result or ''}")
 
 
 if __name__ == "__main__":
