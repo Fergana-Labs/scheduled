@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle, Loader2 } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, captureSessionFromURL } from '@/lib/api';
 import PendingState from '@/components/onboarding/PendingState';
 
 interface UserInfo {
@@ -19,6 +19,7 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    captureSessionFromURL();
     api<UserInfo>('/auth/me')
       .then((data) => {
         setUser(data);

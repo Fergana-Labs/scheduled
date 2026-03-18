@@ -260,26 +260,22 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
 
     # Create signed session and redirect to web app
     session_token = _sign_session(str(user.id), email)
-    response = RedirectResponse(redirect_url, background=background)
-    is_production = config.web_app_url.startswith("https")
-    response.set_cookie(
-        key="session",
-        value=session_token,
-        httponly=True,
-        secure=is_production,
-        samesite="none" if is_production else "lax",
-        max_age=60 * 60 * 24 * 365 * 10,  # ~10 years
-        path="/",
-    )
-    return response
+    separator = "&" if "?" in redirect_url else "?"
+    redirect_url_with_token = f"{redirect_url}{separator}session={session_token}"
+    return RedirectResponse(redirect_url_with_token, background=background)
 
 
 def get_web_session(request: Request) -> dict:
-    """Validate the session cookie from the web app."""
-    session_cookie = request.cookies.get("session")
-    if not session_cookie:
+    """Validate the session from Authorization header or cookie."""
+    token = None
+    auth_header = request.headers.get("authorization", "")
+    if auth_header.startswith("Bearer "):
+        token = auth_header[7:]
+    if not token:
+        token = request.cookies.get("session")
+    if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    payload = _verify_session(session_cookie)
+    payload = _verify_session(token)
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid session")
     return payload
