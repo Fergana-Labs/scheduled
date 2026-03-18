@@ -105,10 +105,20 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Scheduler Control Plane", lifespan=lifespan)
 
-# Allow the web frontend to call the control plane
+# Allow the web frontend to call the control plane (with and without www.)
+_cors_origins = [config.web_app_url]
+_url = config.web_app_url.rstrip("/")
+if _url.startswith("https://www."):
+    _cors_origins.append(_url.replace("https://www.", "https://", 1))
+elif _url.startswith("http://www."):
+    _cors_origins.append(_url.replace("http://www.", "http://", 1))
+elif "://" in _url:
+    scheme, rest = _url.split("://", 1)
+    _cors_origins.append(f"{scheme}://www.{rest}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[config.web_app_url],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
