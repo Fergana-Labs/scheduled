@@ -448,7 +448,7 @@ def gmail_draft(req: CreateDraftRequest, session: dict = Depends(get_session)):
     content_type = "plain"
     if user and user.stash_branding_enabled:
         html_body = html.escape(body).replace("\n", "<br>")
-        html_body += '<br><br>sent by <a href="https://stash.ac">Stash</a>'
+        html_body += '<br><br>sent by <a href="https://stash.ac">Scheduled.</a>'
         body = html_body
         content_type = "html"
 
@@ -488,7 +488,7 @@ def gmail_send(req: SendEmailRequest, session: dict = Depends(get_session)):
     content_type = "plain"
     if user and user.stash_branding_enabled:
         html_body = html.escape(body).replace("\n", "<br>")
-        html_body += '<br><br>sent by <a href="https://stash.ac">Stash</a>'
+        html_body += '<br><br>sent by <a href="https://stash.ac">Scheduled.</a>'
         body = html_body
         content_type = "html"
 
