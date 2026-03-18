@@ -387,6 +387,7 @@ def disconnect_user(user_id: str) -> None:
                 google_access_token = NULL,
                 access_token_expires_at = NULL,
                 gmail_history_id = NULL,
+                stash_calendar_id = NULL,
                 updated_at = now()
             WHERE id = %s
             """,

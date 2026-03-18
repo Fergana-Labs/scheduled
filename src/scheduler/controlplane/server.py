@@ -18,6 +18,7 @@ import hmac
 import json
 import logging
 import secrets
+import threading
 import time
 import urllib.parse
 from contextlib import asynccontextmanager
@@ -40,6 +41,7 @@ logger = logging.getLogger(__name__)
 
 _WATCH_RENEWAL_INTERVAL = 12 * 3600  # 12 hours
 _onboarding_status: dict[str, dict] = {}  # user_id -> {"status": ..., "error": ...}
+_onboarding_lock = threading.Lock()
 _UNKNOWN_GMAIL_WEBHOOK_TTL = 300  # 5 minutes
 _unknown_gmail_webhook_emails: dict[str, float] = {}
 
@@ -197,6 +199,14 @@ def auth0_login(signup: str | None = None):
     return RedirectResponse(url)
 
 
+def _is_onboarded(user_id: str, *, stash_calendar_id: str | None = None) -> bool:
+    from scheduler.db import get_guides_for_user
+    guides = get_guides_for_user(user_id)
+    guide_names = {g.name for g in guides}
+    has_guides = "scheduling_preferences" in guide_names and "email_style" in guide_names
+    return has_guides and stash_calendar_id is not None
+
+
 @app.get("/auth/callback")
 def auth0_callback(code: str | None = None, error: str | None = None):
     """Handle Auth0 callback — exchange code for tokens, create/match user."""
@@ -238,7 +248,6 @@ def auth0_callback(code: str | None = None, error: str | None = None):
 
     from scheduler.db import (
         create_user_from_auth0,
-        get_guides_for_user,
         get_user_by_auth0_sub,
         get_user_by_email,
         set_auth0_sub,
@@ -261,12 +270,7 @@ def auth0_callback(code: str | None = None, error: str | None = None):
 
     # Check if user has Google tokens and onboarding status
     has_google = user.google_refresh_token is not None
-    if has_google:
-        guides = get_guides_for_user(str(user.id))
-        guide_names = {g.name for g in guides}
-        is_onboarded = "scheduling_preferences" in guide_names and "email_style" in guide_names
-    else:
-        is_onboarded = False
+    is_onboarded = has_google and _is_onboarded(str(user.id), stash_calendar_id=user.stash_calendar_id)
 
     if has_google and is_onboarded:
         logger.info("auth0_callback: returning user=%s, renewing gmail watch", user.id)
@@ -274,7 +278,12 @@ def auth0_callback(code: str | None = None, error: str | None = None):
         redirect_url = f"{config.web_app_url}/settings?token={access_token}"
     elif has_google and not is_onboarded:
         logger.info("auth0_callback: user=%s has google but not onboarded, starting onboarding", user.id)
-        background = BackgroundTask(_run_onboarding_for_runtime, str(user.id))
+        with _onboarding_lock:
+            if _onboarding_status.get(str(user.id), {}).get("status") == "running":
+                logger.info("auth0_callback: onboarding already running for user=%s", user.id)
+                background = None
+            else:
+                background = BackgroundTask(_run_onboarding_for_runtime, str(user.id))
         redirect_url = f"{config.web_app_url}/onboarding?token={access_token}"
     else:
         logger.info("auth0_callback: user=%s needs google connect", user.id)
@@ -394,7 +403,7 @@ def auth_google_connect_callback(
     if not google_refresh_token:
         return RedirectResponse(f"{config.web_app_url}?error=no_refresh_token")
 
-    from scheduler.db import get_guides_for_user, update_google_tokens
+    from scheduler.db import update_google_tokens
 
     expires_in = tokens.get("expires_in")
     expires_at = None
@@ -410,9 +419,9 @@ def auth_google_connect_callback(
     )
 
     # Check onboarding status
-    guides = get_guides_for_user(user_id)
-    guide_names = {g.name for g in guides}
-    is_onboarded = "scheduling_preferences" in guide_names and "email_style" in guide_names
+    from scheduler.db import get_user_by_id as _get_user
+    db_user = _get_user(user_id)
+    is_onboarded = _is_onboarded(user_id, stash_calendar_id=db_user.stash_calendar_id if db_user else None)
 
     from starlette.background import BackgroundTask
 
@@ -424,7 +433,12 @@ def auth_google_connect_callback(
         redirect_url = f"{config.web_app_url}/settings?{token_param}"
     else:
         logger.info("google_connect: starting onboarding for user=%s", user_id)
-        background = BackgroundTask(_run_onboarding_for_runtime, user_id)
+        with _onboarding_lock:
+            if _onboarding_status.get(user_id, {}).get("status") == "running":
+                logger.info("google_connect: onboarding already running for user=%s", user_id)
+                background = None
+            else:
+                background = BackgroundTask(_run_onboarding_for_runtime, user_id)
         redirect_url = f"{config.web_app_url}/onboarding?{token_param}"
 
     return RedirectResponse(redirect_url, background=background)
@@ -526,7 +540,7 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
     if not email:
         return RedirectResponse(f"{config.web_app_url}?error=no_email")
 
-    from scheduler.db import get_guides_for_user, get_user_by_email, upsert_user
+    from scheduler.db import get_user_by_email, upsert_user
 
     if refresh_token:
         # Sign-up flow (or sign-in that happened to return a refresh token)
@@ -550,9 +564,7 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
             return RedirectResponse(f"{config.web_app_url}?error=account_not_found")
 
     # Determine if user is already onboarded
-    guides = get_guides_for_user(str(user.id))
-    guide_names = {g.name for g in guides}
-    is_onboarded = "scheduling_preferences" in guide_names and "email_style" in guide_names
+    is_onboarded = _is_onboarded(str(user.id), stash_calendar_id=user.stash_calendar_id)
 
     from starlette.background import BackgroundTask
 
@@ -564,7 +576,12 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
     else:
         # New user: run full onboarding, redirect to onboarding
         logger.info("onboarding: starting all agents for user=%s after OAuth", user.id)
-        background = BackgroundTask(_run_onboarding_for_runtime, str(user.id))
+        with _onboarding_lock:
+            if _onboarding_status.get(str(user.id), {}).get("status") == "running":
+                logger.info("onboarding: already running for user=%s", user.id)
+                background = None
+            else:
+                background = BackgroundTask(_run_onboarding_for_runtime, str(user.id))
         redirect_url = f"{config.web_app_url}/onboarding"
 
     # Create signed session and redirect to web app
@@ -998,7 +1015,10 @@ def _run_onboarding_all(user_id: str) -> None:
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.stash_calendar_name)
-    calendar.get_or_create_stash_calendar()
+    cal_id = calendar.get_or_create_stash_calendar()
+    if cal_id:
+        from scheduler.db import update_stash_calendar_id
+        update_stash_calendar_id(user_id, cal_id)
 
     guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
     onboarding_backend = LocalBackend(gmail, calendar)
@@ -1021,12 +1041,17 @@ def _run_onboarding_all(user_id: str) -> None:
 
 def _run_onboarding_for_runtime(user_id: str) -> None:
     """Dispatch onboarding to the configured runtime."""
-    _onboarding_status[user_id] = {"status": "running"}
+    with _onboarding_lock:
+        if _onboarding_status.get(user_id, {}).get("status") == "running":
+            logger.info("onboarding: already running for user=%s, skipping", user_id)
+            return
+        _onboarding_status[user_id] = {"status": "running"}
     try:
         runtime = config.agent_runtime.strip().lower()
         if runtime == "local":
             _run_onboarding_all(user_id)
-            _onboarding_status.pop(user_id, None)
+            with _onboarding_lock:
+                _onboarding_status.pop(user_id, None)
             return
 
         if runtime == "e2b":
@@ -1037,7 +1062,10 @@ def _run_onboarding_for_runtime(user_id: str) -> None:
             # Ensure Stash calendar exists before sandbox launch (agents need it)
             creds = load_credentials(user_id)
             calendar = CalendarClient(creds, config.stash_calendar_name)
-            calendar.get_or_create_stash_calendar()
+            cal_id = calendar.get_or_create_stash_calendar()
+            if cal_id:
+                from scheduler.db import update_stash_calendar_id
+                update_stash_calendar_id(user_id, cal_id)
 
             from scheduler.run_e2b import launch_onboarding_in_sandbox
 
@@ -1056,13 +1084,15 @@ def _run_onboarding_for_runtime(user_id: str) -> None:
             except Exception:
                 logger.exception("onboarding[e2b]: failed to set up gmail watch for user=%s", user_id)
 
-            _onboarding_status.pop(user_id, None)
+            with _onboarding_lock:
+                _onboarding_status.pop(user_id, None)
             return
 
         raise RuntimeError(f"Unsupported AGENT_RUNTIME: {config.agent_runtime}")
     except Exception as e:
         logger.exception("onboarding: failed for user=%s", user_id)
-        _onboarding_status[user_id] = {"status": "failed", "error": str(e)}
+        with _onboarding_lock:
+            _onboarding_status[user_id] = {"status": "failed", "error": str(e)}
 
 
 def _compose_draft_for_runtime(
@@ -1112,6 +1142,10 @@ def onboarding_run(request: Request, background_tasks: BackgroundTasks):
     """Kick off the style + preferences guide agents for this user."""
     session = get_web_session(request)
     user_id = session["user_id"]
+    with _onboarding_lock:
+        if _onboarding_status.get(user_id, {}).get("status") == "running":
+            logger.info("onboarding: already running for user=%s", user_id)
+            return {"status": "already_running"}
     logger.info("onboarding: starting all agents for user=%s", user_id)
     background_tasks.add_task(_run_onboarding_for_runtime, user_id)
     return {"status": "started"}
@@ -1313,15 +1347,13 @@ async def gmail_webhook(request: Request, background_tasks: BackgroundTasks):
 
 @app.get("/web/api/v1/onboarding/status")
 def web_onboarding_status(user: dict = Depends(get_authenticated_user)):
-    from scheduler.db import get_guides_for_user, get_user_by_id
+    from scheduler.db import get_user_by_id
 
     db_user = get_user_by_id(user["user_id"])
     connected = db_user is not None and db_user.google_refresh_token is not None
 
     if connected:
-        guides = get_guides_for_user(user["user_id"])
-        guide_names = {g.name for g in guides}
-        ready = "scheduling_preferences" in guide_names and "email_style" in guide_names
+        ready = _is_onboarded(user["user_id"], stash_calendar_id=db_user.stash_calendar_id if db_user else None)
     else:
         ready = False
 
