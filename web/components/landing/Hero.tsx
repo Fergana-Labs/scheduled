@@ -170,8 +170,9 @@ export default function Hero() {
           {EMAILS.map((email, i) => {
             const progress = cardStates[i] ?? 0;
             const isGone = progress >= 1;
-            const stackOffset = (EMAILS.length - 1 - i) * 4;
-            const stackScale = 1 - (EMAILS.length - 1 - i) * 0.02;
+            const stackIndex = EMAILS.length - 1 - i;
+            const stackOffsetY = stackIndex * 4;
+            const stackOffsetX = stackIndex * -3;
 
             const ease = progress * progress * (3 - 2 * progress);
 
@@ -179,11 +180,10 @@ export default function Hero() {
             const translateY = ease * -150;
             const rotate = ease * 28;
             const opacity = 1 - ease * 0.5;
-            const scale = stackScale + ease * 0.05;
 
             const transform = progress > 0
-              ? `translate(${translateX}px, ${translateY}px) rotate(${rotate}deg) scale(${scale})`
-              : `translateY(${stackOffset}px) scale(${stackScale})`;
+              ? `translate(${translateX}px, ${translateY}px) rotate(${rotate}deg)`
+              : `translate(${stackOffsetX}px, ${stackOffsetY}px)`;
 
             return (
               <div
