@@ -93,3 +93,9 @@
   from { offset-distance: 100%; }
   to { offset-distance: 0%; }
 }
+
+@keyframes combo-pop {
+  0% { transform: scale(1.4); opacity: 0.5; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}

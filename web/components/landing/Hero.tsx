@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { ArrowRight, Check, Mail, MailOpen, Inbox, Send, Reply, Forward, Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users } from 'lucide-react';
+import { ArrowRight, Mail, MailOpen, Inbox, Send, Reply, Forward, Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users } from 'lucide-react';
 
 const upperIcons = [Mail, MailOpen, Inbox, Send, Reply, Forward, Mail, Send, MailOpen, Inbox, Reply, Forward, Mail, MailOpen, Send, Reply, Forward, Inbox, Mail, Send];
 const lowerIcons = [Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users, Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users, Calendar, Clock, Bell, CalendarCheck];
@@ -221,18 +221,34 @@ export default function Hero() {
                     {email.draft}
                   </div>
                 </div>
+              </div>
+            );
+          })}
 
-                {/* Sent badge */}
-                <div
-                  className="absolute -right-3 -top-3 flex items-center gap-1.5 rounded-full bg-[#43614a] px-4 py-2 shadow-lg"
-                  style={{
-                    opacity: Math.min(1, progress * 4),
-                    transform: `scale(${0.5 + Math.min(1, progress * 3) * 0.5})`,
-                  }}
-                >
-                  <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
-                  <span className="text-sm font-semibold text-white">Sent</span>
-                </div>
+          {/* "Sent!" floaters — one per card, rises from top of stack like +10xp */}
+          {EMAILS.map((_, i) => {
+            const progress = cardStates[i] ?? 0;
+            if (progress < 0.1) return null;
+
+            const t = Math.min(1, (progress - 0.1) / 0.9);
+            const fadeIn = Math.min(1, t * 6);
+            const fadeOut = t > 0.4 ? Math.max(0, 1 - (t - 0.4) / 0.6) : 1;
+            const rise = t * 120;
+            const popScale = t < 0.2 ? 0.5 + t * 4 : (t < 0.35 ? 1.3 - (t - 0.2) * 2 : 1);
+
+            return (
+              <div
+                key={`sent-${i}`}
+                className="pointer-events-none absolute left-1/2 top-0"
+                style={{
+                  opacity: fadeIn * fadeOut,
+                  transform: `translate(-50%, ${-20 - rise}px) scale(${popScale})`,
+                  zIndex: 50 + i,
+                }}
+              >
+                <span className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-2xl font-black uppercase tracking-widest text-[#43614a] drop-shadow-md">
+                  SENT!
+                </span>
               </div>
             );
           })}
