@@ -291,6 +291,34 @@ def delete_user(user_id: str) -> None:
         conn.commit()
 
 
+def mark_message_processed(user_id: str, message_id: str) -> bool:
+    """Mark a message as processed. Returns True if it was already processed."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO processed_messages (user_id, message_id)
+            VALUES (%s, %s)
+            ON CONFLICT (user_id, message_id) DO NOTHING
+            """,
+            (user_id, message_id),
+        )
+        already_processed = cur.rowcount == 0
+        conn.commit()
+        return already_processed
+
+
+def cleanup_processed_messages(days: int = 7) -> int:
+    """Delete processed message records older than the given number of days."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "DELETE FROM processed_messages WHERE processed_at < now() - make_interval(days => %s)",
+            (days,),
+        )
+        count = cur.rowcount
+        conn.commit()
+        return count
+
+
 def disconnect_user(user_id: str) -> None:
     """Revoke Google tokens and delete guides, but keep the user row."""
     with _conn() as conn, conn.cursor() as cur:
