@@ -1,102 +1,67 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Mail, MailOpen, Inbox, Send, Reply, Forward, Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users } from 'lucide-react';
 
-const incomingText =
-  "Hey are you free this week? I'd love to grab coffee and catch up, maybe Thursday or Friday works? Let me know what times are good for you, I'm pretty flexible...   ";
+// Email-related icons for the upper ribbon
+const upperIcons = [Mail, MailOpen, Inbox, Send, Reply, Forward, Mail, Send, MailOpen, Inbox, Reply, Forward];
+// Integration/calendar icons for the lower ribbon
+const lowerIcons = [Calendar, Clock, Bell, CalendarCheck, CalendarDays, Timer, Video, Users, Calendar, Clock, Bell, CalendarCheck];
 
-const draftText =
-  "Hey! Thursday works great — how about 2pm at Blue Bottle on Market St? I'm also free Friday morning if that's easier. Looking forward to it!   ";
-
-function MarqueeText({
-  pathId,
-  text,
-  fill,
-  fontSize,
-  fontWeight,
-  dur,
-  startFrom,
-  startTo,
+function ScrollingIconStrip({
+  icons,
+  direction,
+  duration,
+  yPosition,
+  opacity,
+  rotation,
 }: {
-  pathId: string;
-  text: string;
-  fill: string;
-  fontSize: number;
-  fontWeight?: number;
-  dur: string;
-  startFrom: string;
-  startTo: string;
+  icons: typeof upperIcons;
+  direction: 'left' | 'right';
+  duration: number;
+  yPosition: string;
+  opacity: number;
+  rotation: number;
 }) {
-  // Repeat text to fill the gap
-  const repeated = `${text}${text}${text}`;
+  const iconSet = [...icons, ...icons]; // duplicate for seamless loop
+  const animClass = direction === 'left' ? 'animate-scroll-left' : 'animate-scroll-right';
+
   return (
-    <text
-      fill={fill}
-      fontSize={fontSize}
-      fontWeight={fontWeight}
-      fontFamily="var(--font-geist-sans), system-ui, sans-serif"
+    <div
+      className="absolute left-0 right-0 overflow-hidden"
+      style={{ top: yPosition, transform: `rotate(${rotation}deg)`, opacity }}
     >
-      <textPath href={`#${pathId}`} startOffset={startFrom}>
-        <animate
-          attributeName="startOffset"
-          from={startFrom}
-          to={startTo}
-          dur={dur}
-          repeatCount="indefinite"
-        />
-        {repeated}
-      </textPath>
-    </text>
+      <div className={`flex w-max gap-12 ${animClass}`} style={{ animationDuration: `${duration}s` }}>
+        {iconSet.map((Icon, i) => (
+          <div key={i} className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
+            <Icon className="h-7 w-7 text-gray-900" strokeWidth={1.2} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
 export default function Hero() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6">
-      {/* Flowing text ribbon - behind content */}
+      {/* Scrolling icon ribbons - behind content */}
       <div className="pointer-events-none absolute inset-0">
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 1400 900"
-          preserveAspectRatio="xMidYMid slice"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <path
-              id="curve-upper"
-              d="M -400,190 C 0,40 300,280 700,130 C 1100,-20 1300,250 1800,110"
-              fill="none"
-            />
-            <path
-              id="curve-lower"
-              d="M -400,780 C 50,640 300,830 700,730 C 1100,630 1250,810 1800,710"
-              fill="none"
-            />
-          </defs>
-
-          {/* Incoming email - upper curve, flowing right to left */}
-          <MarqueeText
-            pathId="curve-upper"
-            text={incomingText}
-            fill="#00000012"
-            fontSize={21}
-            dur="45s"
-            startFrom="100%"
-            startTo="-100%"
-          />
-
-          {/* Draft reply - lower curve, flowing left to right */}
-          <MarqueeText
-            pathId="curve-lower"
-            text={draftText}
-            fill="#00000010"
-            fontSize={23}
-            fontWeight={600}
-            dur="40s"
-            startFrom="-100%"
-            startTo="100%"
-          />
-        </svg>
+        <ScrollingIconStrip
+          icons={upperIcons}
+          direction="left"
+          duration={30}
+          yPosition="14%"
+          opacity={0.07}
+          rotation={-3}
+        />
+        <ScrollingIconStrip
+          icons={lowerIcons}
+          direction="right"
+          duration={35}
+          yPosition="78%"
+          opacity={0.06}
+          rotation={2}
+        />
       </div>
 
       {/* Main content */}
