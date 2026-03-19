@@ -6,6 +6,7 @@ import SalesEmailToggle from './SalesEmailToggle';
 import GuideEditor from './GuideEditor';
 import CalendarLink from './CalendarLink';
 import BrandingToggle from './BrandingToggle';
+import ReasoningEmailToggle from './ReasoningEmailToggle';
 import DisconnectButton from './DisconnectButton';
 
 interface Guide {
@@ -19,6 +20,7 @@ interface ReadyStateProps {
   autopilotEnabled: boolean;
   processSalesEmails: boolean;
   brandingEnabled: boolean;
+  reasoningEmailsEnabled: boolean;
   calendarId: string | null;
   guides: Guide[];
   onDisconnected: () => void;
@@ -29,6 +31,7 @@ export default function ReadyState({
   autopilotEnabled,
   processSalesEmails,
   brandingEnabled,
+  reasoningEmailsEnabled,
   calendarId,
   guides,
   onDisconnected,
@@ -39,6 +42,7 @@ export default function ReadyState({
   return (
     <div className="space-y-3">
       <SystemToggle initialEnabled={systemEnabled} />
+      <ReasoningEmailToggle initialEnabled={reasoningEmailsEnabled} />
       <AutopilotToggle initialEnabled={autopilotEnabled} />
       <SalesEmailToggle initialEnabled={processSalesEmails} />
 

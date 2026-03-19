@@ -24,6 +24,7 @@ class UserRow:
     stash_branding_enabled: bool
     autopilot_enabled: bool
     process_sales_emails: bool
+    reasoning_emails_enabled: bool
     created_at: datetime
     updated_at: datetime
     auth0_sub: str | None = None
@@ -202,6 +203,15 @@ def update_process_sales_emails(user_id: str, enabled: bool) -> None:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             "UPDATE users SET process_sales_emails = %s, updated_at = now() WHERE id = %s",
+            (enabled, user_id),
+        )
+        conn.commit()
+
+
+def update_reasoning_emails_enabled(user_id: str, enabled: bool) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET reasoning_emails_enabled = %s, updated_at = now() WHERE id = %s",
             (enabled, user_id),
         )
         conn.commit()

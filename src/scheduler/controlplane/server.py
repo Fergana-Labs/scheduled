@@ -1365,18 +1365,19 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 logger.info("gmail_webhook: thread for message %s already resolved, no draft created", message_id)
             else:
                 logger.info("gmail_webhook: created draft %s for message %s", draft_id, message_id)
-                try:
-                    from scheduler.lifecycle.reasoning import send_reasoning_email
-                    send_reasoning_email(
-                        user_email=email_address,
-                        thread_id=email.thread_id,
-                        subject=email.subject,
-                        classification=classification,
-                        gmail=gmail,
-                        calendar=calendar,
-                    )
-                except Exception:
-                    logger.exception("gmail_webhook: failed to send reasoning email for message %s", message_id)
+                if user.reasoning_emails_enabled:
+                    try:
+                        from scheduler.lifecycle.reasoning import send_reasoning_email
+                        send_reasoning_email(
+                            user_email=email_address,
+                            thread_id=email.thread_id,
+                            subject=email.subject,
+                            classification=classification,
+                            gmail=gmail,
+                            calendar=calendar,
+                        )
+                    except Exception:
+                        logger.exception("gmail_webhook: failed to send reasoning email for message %s", message_id)
             mark_message_processed(user_id, message_id)
 
         except Exception:
@@ -1477,6 +1478,7 @@ def web_settings_get(user: dict = Depends(get_authenticated_user)):
         "autopilot_enabled": db_user.autopilot_enabled,
         "process_sales_emails": db_user.process_sales_emails,
         "stash_branding_enabled": db_user.stash_branding_enabled,
+        "reasoning_emails_enabled": db_user.reasoning_emails_enabled,
         "stash_calendar_id": db_user.stash_calendar_id,
         "guides": [
             {"name": g.name, "content": g.content, "updated_at": g.updated_at.isoformat()}
@@ -1531,6 +1533,18 @@ def web_settings_branding(req: WebUpdateBrandingRequest, user: dict = Depends(ge
 
     update_stash_branding(user["user_id"], req.enabled)
     return {"stash_branding_enabled": req.enabled}
+
+
+class WebUpdateReasoningEmailsRequest(BaseModel):
+    enabled: bool
+
+
+@app.put("/web/api/v1/settings/reasoning-emails")
+def web_settings_reasoning_emails(req: WebUpdateReasoningEmailsRequest, user: dict = Depends(get_authenticated_user)):
+    from scheduler.db import update_reasoning_emails_enabled
+
+    update_reasoning_emails_enabled(user["user_id"], req.enabled)
+    return {"reasoning_emails_enabled": req.enabled}
 
 
 class WebUpdateGuideRequest(BaseModel):
