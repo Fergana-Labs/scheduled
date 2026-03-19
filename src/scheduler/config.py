@@ -97,6 +97,19 @@ class Config:
     auth0_audience: str = field(
         default_factory=lambda: os.environ.get("AUTH0_AUDIENCE", "")
     )
+    postmark_server_token: str = field(
+        default_factory=lambda: os.environ.get("POSTMARK_SERVER_TOKEN", "")
+    )
+    postmark_from_email: str = field(
+        default_factory=lambda: os.environ.get(
+            "POSTMARK_FROM_EMAIL", "sam@tryscheduled.com"
+        )
+    )
+    postmark_bot_email: str = field(
+        default_factory=lambda: os.environ.get(
+            "POSTMARK_BOT_EMAIL", "bot@tryscheduled.com"
+        )
+    )
 
 
 config = Config()

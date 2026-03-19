@@ -1069,6 +1069,14 @@ def _run_onboarding_all(user_id: str) -> None:
 
     anyio.run(_run)
 
+    # Send lifecycle welcome email (non-blocking — failure never stops onboarding)
+    try:
+        from scheduler.lifecycle.welcome import send_lifecycle_email
+
+        send_lifecycle_email(user_id)
+    except Exception:
+        logger.exception("onboarding: lifecycle email failed for user=%s", user_id)
+
     # Set up Gmail watch so incoming emails are processed
     try:
         setup_gmail_watch(user_id)
@@ -1126,6 +1134,14 @@ def _run_onboarding_for_runtime(user_id: str) -> None:
                 lookback_days=config.onboarding_lookback_days,
                 on_agent_done=_on_agent_done,
             )
+
+            # Send lifecycle welcome email (runs on control plane, not in sandbox)
+            try:
+                from scheduler.lifecycle.welcome import send_lifecycle_email
+
+                send_lifecycle_email(user_id)
+            except Exception:
+                logger.exception("onboarding[e2b]: lifecycle email failed for user=%s", user_id)
 
             # Set up Gmail watch so incoming emails are processed
             from scheduler.gmail.watch import setup_gmail_watch
@@ -1303,6 +1319,14 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 mark_message_processed(user_id, message_id)
                 continue
 
+            # Skip emails from Scheduled's own sending addresses (e.g. reasoning emails)
+            sender_str = email.sender or ""
+            if (config.postmark_from_email and config.postmark_from_email in sender_str) or \
+               (config.postmark_bot_email and config.postmark_bot_email in sender_str):
+                logger.info("gmail_webhook: message %s is from Scheduled, skipping", message_id)
+                mark_message_processed(user_id, message_id)
+                continue
+
             # Skip newsletters / mass emails (before classifier, saves API cost)
             if is_mass_email(email.headers, email.sender):
                 logger.info("gmail_webhook: message %s is a mass email/newsletter, skipping", message_id)
@@ -1341,6 +1365,18 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 logger.info("gmail_webhook: thread for message %s already resolved, no draft created", message_id)
             else:
                 logger.info("gmail_webhook: created draft %s for message %s", draft_id, message_id)
+                try:
+                    from scheduler.lifecycle.reasoning import send_reasoning_email
+                    send_reasoning_email(
+                        user_email=email_address,
+                        thread_id=email.thread_id,
+                        subject=email.subject,
+                        classification=classification,
+                        gmail=gmail,
+                        calendar=calendar,
+                    )
+                except Exception:
+                    logger.exception("gmail_webhook: failed to send reasoning email for message %s", message_id)
             mark_message_processed(user_id, message_id)
 
         except Exception:
