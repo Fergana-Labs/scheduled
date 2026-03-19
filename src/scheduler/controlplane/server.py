@@ -1251,12 +1251,12 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
 
     from scheduler.classifier.intent import SchedulingIntent, classify_email
     from scheduler.classifier.newsletter import is_mass_email
-    from scheduler.db import mark_message_processed
+    from scheduler.db import is_message_processed, mark_message_processed
 
     calendar = CalendarClient(creds, config.stash_calendar_name)
 
     for message_id in new_message_ids:
-        if mark_message_processed(user_id, message_id):
+        if is_message_processed(user_id, message_id):
             logger.info("gmail_webhook: message %s already processed, skipping", message_id)
             continue
 
@@ -1300,22 +1300,26 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                             logger.exception("gmail_webhook: failed to create invite event for thread %s", email.thread_id)
                 else:
                     logger.info("gmail_webhook: message %s is from the user, skipping", message_id)
+                mark_message_processed(user_id, message_id)
                 continue
 
             # Skip newsletters / mass emails (before classifier, saves API cost)
             if is_mass_email(email.headers, email.sender):
                 logger.info("gmail_webhook: message %s is a mass email/newsletter, skipping", message_id)
+                mark_message_processed(user_id, message_id)
                 continue
 
             classification = classify_email(email.subject, email.body, email.sender)
 
             if classification.intent == SchedulingIntent.NOT_SCHEDULING:
                 logger.info("gmail_webhook: message %s is not scheduling-related, skipping", message_id)
+                mark_message_processed(user_id, message_id)
                 continue
 
             # Skip sales emails unless user opted in
             if classification.is_sales_email and not user.process_sales_emails:
                 logger.info("gmail_webhook: message %s is a sales email, skipping", message_id)
+                mark_message_processed(user_id, message_id)
                 continue
 
             logger.info(
@@ -1335,8 +1339,9 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
             )
             if draft_id is None:
                 logger.info("gmail_webhook: thread for message %s already resolved, no draft created", message_id)
-                continue
-            logger.info("gmail_webhook: created draft %s for message %s", draft_id, message_id)
+            else:
+                logger.info("gmail_webhook: created draft %s for message %s", draft_id, message_id)
+            mark_message_processed(user_id, message_id)
 
         except Exception:
             logger.exception("gmail_webhook: failed to process message %s for user=%s", message_id, email_address)

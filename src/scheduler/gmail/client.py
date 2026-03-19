@@ -165,16 +165,30 @@ class GmailClient:
         stubs = self._list_message_stubs(query, max_results)
         return self._fetch_messages(stubs)
 
-    def get_email(self, message_id: str) -> Email:
-        """Fetch a single email by ID."""
-        service = self._get_service()
-        msg_data = (
-            service.users()
-            .messages()
-            .get(userId="me", id=message_id, format="full")
-            .execute()
-        )
-        return self._parse_message(msg_data)
+    def get_email(self, message_id: str, retries: int = 3, delay: float = 2.0) -> Email:
+        """Fetch a single email by ID.
+
+        Retries on 404 errors because Gmail's history sync can report
+        message IDs before they're available via messages.get.
+        """
+        import time
+        from googleapiclient.errors import HttpError
+
+        for attempt in range(retries):
+            try:
+                service = self._get_service()
+                msg_data = (
+                    service.users()
+                    .messages()
+                    .get(userId="me", id=message_id, format="full")
+                    .execute()
+                )
+                return self._parse_message(msg_data)
+            except HttpError as e:
+                if e.resp.status == 404 and attempt < retries - 1:
+                    time.sleep(delay * (attempt + 1))
+                    continue
+                raise
 
     def get_thread(self, thread_id: str) -> list[Email]:
         """Fetch all messages in a thread."""

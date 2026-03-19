@@ -348,8 +348,18 @@ def delete_user(user_id: str) -> None:
         conn.commit()
 
 
-def mark_message_processed(user_id: str, message_id: str) -> bool:
-    """Mark a message as processed. Returns True if it was already processed."""
+def is_message_processed(user_id: str, message_id: str) -> bool:
+    """Check if a message has already been processed (without marking it)."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT 1 FROM processed_messages WHERE user_id = %s AND message_id = %s",
+            (user_id, message_id),
+        )
+        return cur.fetchone() is not None
+
+
+def mark_message_processed(user_id: str, message_id: str) -> None:
+    """Mark a message as processed."""
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
@@ -359,9 +369,7 @@ def mark_message_processed(user_id: str, message_id: str) -> bool:
             """,
             (user_id, message_id),
         )
-        already_processed = cur.rowcount == 0
         conn.commit()
-        return already_processed
 
 
 def cleanup_processed_messages(days: int = 7) -> int:
