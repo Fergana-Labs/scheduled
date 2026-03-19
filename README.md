@@ -2,7 +2,7 @@
 
 **Open source Calendly, but AI.**
 
-Scheduled is an AI scheduling agent that lives in your Gmail. When someone emails you to set up a meeting, Scheduled reads the thread, checks your calendar for availability, and drafts a reply with proposed times — all without you lifting a finger. You review the draft and hit send. That's it.
+Scheduled is an AI scheduling agent that lives in your Gmail. When someone emails you to set up a meeting, Scheduled reads the thread, checks your calendar for availability, and drafts a reply with proposed times, all without you lifting a finger. You review the draft and hit send. That's it.
 
 No new app to learn. No link to paste into emails. No configuration to maintain. Just one fewer thing on your plate.
 
@@ -12,7 +12,7 @@ Read our blog post about why we built this [here](https://x.com/samzliu/status/2
 
 **Scheduling is the laundry of knowledge work.** Each email is trivial on its own, but in aggregate they create dozens of open threads that weigh on your mind and generate friction wildly disproportionate to the time they'd take to complete.
 
-Existing tools like Calendly assume you work a certain way — inbox-zero, structured availability blocks, consistent meeting types. If that's not you, they fall flat. Scheduled doesn't impose a workflow. It reads your actual calendar and email history, understands your preferences, and drafts replies the way you would.
+Existing tools like Calendly assume you work a certain way: impersonal mass meeting scheduling, structured availability blocks, consistent meeting types. If that's not you, they fall flat. Scheduled doesn't impose a workflow. It reads your actual calendar and email history, understands your preferences, and drafts replies the way you would.
 
 ## Features
 
@@ -23,6 +23,7 @@ Existing tools like Calendly assume you work a certain way — inbox-zero, struc
 - **Learns your writing style** — Analyzes your past emails so drafts sound like you, not a robot.
 - **Remembers your preferences** — Knows you prefer mornings, avoid Fridays, or always buffer 30 minutes between calls — without you having to set rules.
 - **Autopilot mode** — For the brave: let Scheduled send replies automatically so scheduling happens entirely in the background.
+- **Privacy minded** — Besides your email preferences, we store no data (no emails, no calendar events) on our servers. Everything stays on Google in its existing ecosystem.
 - **Open source and self-hostable** — Run it on your own infrastructure with your own API keys. Your data stays yours.
 
 ## Self-Hosted Setup
