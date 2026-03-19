@@ -205,7 +205,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden px-4 pt-24 pb-14 sm:px-6 sm:pt-28"
+      className="relative overflow-hidden px-4 pt-20 pb-20 sm:px-6 sm:pt-24"
     >
       {/* Flowing icon streams - behind everything */}
       <div className="pointer-events-none absolute inset-0">
@@ -216,7 +216,7 @@ export default function Hero() {
       </div>
 
       {/* Two-column hero — scrolls naturally with the page */}
-      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-6rem)] w-full max-w-6xl flex-col gap-10 sm:gap-11 lg:min-h-screen lg:flex-row lg:items-center lg:gap-20">
+      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-6rem)] w-full max-w-6xl flex-col gap-10 sm:gap-11 lg:min-h-screen lg:flex-row lg:items-center lg:gap-20 lg:pb-28">
         {/* Left: headline + CTA */}
         <div className="flex-1">
           <h1 className="font-[family-name:var(--font-playfair)] text-[clamp(2.5rem,10vw,4.5rem)] font-normal italic leading-[1.05] tracking-tight text-gray-900 sm:text-5xl lg:text-7xl xl:text-8xl">
