@@ -45,6 +45,12 @@ export default function Header() {
             </svg>
           </a>
           <a
+            href="/blog"
+            className="text-sm text-gray-500 transition-colors hover:text-gray-900"
+          >
+            Blog
+          </a>
+          <a
             href="mailto:henry@ferganalabs.com"
             className="text-sm text-gray-500 transition-colors hover:text-gray-900"
           >

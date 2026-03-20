@@ -1,7 +1,5 @@
 import type { BlogPost } from './blog-posts';
 
-const STASH_DESKTOP_DOWNLOAD_URL = 'https://stash.ac';
-
 /**
  * Read all blog posts from markdown files (server-side only)
  * This function uses Node.js fs module and should only be called at build time or on the server
@@ -73,14 +71,6 @@ export function readMarkdownPosts(): BlogPost[] {
           return;
         }
 
-        // Replace placeholder with actual download URL
-        const processedContent = content
-          .trim()
-          .replace(
-            /\{\{STASH_DESKTOP_DOWNLOAD_URL\}\}/g,
-            STASH_DESKTOP_DOWNLOAD_URL
-          );
-
         posts.push({
           slug: data.slug,
           title: data.title,
@@ -90,7 +80,7 @@ export function readMarkdownPosts(): BlogPost[] {
           category: data.category,
           keywords: data.keywords,
           metaDescription: data.metaDescription,
-          content: processedContent,
+          content: content.trim(),
         });
       } catch (error) {
         console.error(`Error reading ${filePath}:`, error);
