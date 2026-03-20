@@ -29,9 +29,9 @@ const otherPosts = [
   },
   {
     slug: 'scheduled-case-study',
-    title: 'How a Startup CEO Reclaimed 5 Hours a Week',
+    title: 'How I Stopped Dreading the Scheduling Email',
     description:
-      'With 40+ meetings a week, the scheduling back-and-forth was eating her alive. Here is how Scheduled changed that.',
+      'Scheduling is the laundry of startup life. It barely takes any time, but the mental friction is enormous. Here is how we built Scheduled to make it disappear.',
     category: 'Case Studies',
   },
 ];
