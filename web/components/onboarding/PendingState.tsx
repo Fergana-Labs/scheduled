@@ -65,7 +65,7 @@ export default function PendingState({ agents }: PendingStateProps) {
         )}
 
         <p className="mt-4 text-center text-xs text-gray-400">
-          This runs in the background and typically takes a few minutes.
+          This typically takes a couple of minutes. You can close this tab — we&apos;ll send you an email when it&apos;s ready.
         </p>
       </div>
 
