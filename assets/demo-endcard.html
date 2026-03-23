@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scheduled — Demo End Card</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #fafaf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  /* ── Pixelated S icon ── */
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 20px);
+    grid-template-rows: repeat(5, 20px);
+    gap: 5px;
+  }
+
+  .pixel {
+    width: 20px;
+    height: 20px;
+    background: #111;
+    border-radius: 2px;
+    opacity: 0;
+    transform: scale(0) rotate(-90deg);
+    animation: pixelIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .pixel.empty { background: transparent; animation: none; }
+
+  /* Stagger each pixel — trace the S path */
+  .pixel:nth-child(1)  { animation-delay: 0.1s; }   /* row1 left */
+  .pixel:nth-child(2)  { animation-delay: 0.15s; }  /* row1 mid */
+  .pixel:nth-child(3)  { animation-delay: 0.2s; }   /* row1 right */
+  .pixel:nth-child(4)  { animation-delay: 0.3s; }   /* row2 left */
+  .pixel:nth-child(5)  { animation-delay: 0.35s; }  /* row2 mid (empty) */
+  .pixel:nth-child(6)  { animation-delay: 0.4s; }   /* row2 right (empty) */
+  .pixel:nth-child(7)  { animation-delay: 0.45s; }  /* row3 left (empty) */
+  .pixel:nth-child(8)  { animation-delay: 0.5s; }   /* row3 mid */
+  .pixel:nth-child(9)  { animation-delay: 0.55s; }  /* row3 right (empty) */
+  .pixel:nth-child(10) { animation-delay: 0.6s; }   /* row4 left (empty) */
+  .pixel:nth-child(11) { animation-delay: 0.65s; }  /* row4 mid (empty) */
+  .pixel:nth-child(12) { animation-delay: 0.7s; }   /* row4 right */
+  .pixel:nth-child(13) { animation-delay: 0.8s; }   /* row5 left */
+  .pixel:nth-child(14) { animation-delay: 0.85s; }  /* row5 mid */
+  .pixel:nth-child(15) { animation-delay: 0.9s; }   /* row5 right */
+
+  @keyframes pixelIn {
+    to {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
+  /* ── Logo text ── */
+  .logo {
+    font-family: 'Futura', 'Gill Sans', 'Trebuchet MS', sans-serif;
+    font-weight: 900;
+    font-size: 72px;
+    letter-spacing: -3px;
+    color: #111;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.3s forwards;
+  }
+
+  /* ── Tagline ── */
+  .tagline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 28px;
+    color: #43614a;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.8s forwards;
+  }
+
+  /* ── Divider line ── */
+  .divider {
+    width: 0;
+    height: 1px;
+    background: #43614a;
+    animation: lineGrow 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.6s forwards;
+  }
+
+  @keyframes fadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes lineGrow {
+    to {
+      width: 80px;
+    }
+  }
+
+  /* ── URL at bottom ── */
+  .url {
+    font-family: 'Futura', 'Gill Sans', 'Trebuchet MS', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 2.3s forwards;
+  }
+
+  /* ── Subtle background pulse ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(67, 97, 74, 0.03) 100%);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Pixelated S: 3 columns × 5 rows (matches scheduled_icon.svg) -->
+  <div class="icon-grid">
+    <!-- Row 1: X X X -->
+    <div class="pixel"></div>
+    <div class="pixel"></div>
+    <div class="pixel"></div>
+    <!-- Row 2: X . . -->
+    <div class="pixel"></div>
+    <div class="pixel empty"></div>
+    <div class="pixel empty"></div>
+    <!-- Row 3: . X . -->
+    <div class="pixel empty"></div>
+    <div class="pixel"></div>
+    <div class="pixel empty"></div>
+    <!-- Row 4: . . X -->
+    <div class="pixel empty"></div>
+    <div class="pixel empty"></div>
+    <div class="pixel"></div>
+    <!-- Row 5: X X X -->
+    <div class="pixel"></div>
+    <div class="pixel"></div>
+    <div class="pixel"></div>
+  </div>
+
+  <div class="logo">scheduled</div>
+
+  <div class="divider"></div>
+
+  <div class="tagline">Just hit send.</div>
+
+  <div class="url">tryscheduled.com</div>
+</div>
+
+</body>
+</html>
