@@ -17,6 +17,23 @@ import json
 import sys
 
 
+def _resolve_thread_ids(args) -> list[str]:
+    """Resolve thread IDs: CLI flag > eval config > empty."""
+    if args.thread_ids:
+        return args.thread_ids
+    from scheduler.eval.config import EVAL_CASES
+    return [c.thread_id for c in EVAL_CASES]
+
+
+def _get_eval_case(thread_id: str):
+    """Look up the EvalCase for a thread ID, or None."""
+    from scheduler.eval.config import EVAL_CASES
+    for case in EVAL_CASES:
+        if case.thread_id == thread_id:
+            return case
+    return None
+
+
 def cmd_record(args):
     """Dump the last 1000 emails + calendar + guides to a fixture. No LLM calls."""
     from datetime import datetime, timedelta
@@ -37,31 +54,39 @@ def cmd_record(args):
     print(f"Fetching emails from the last {lookback_days} days (up to 1000)...", file=sys.stderr)
     emails = gmail.search(query=query, max_results=1000)
     messages = [_serialize_email(e) for e in emails]
+    seen_message_ids = {m["id"] for m in messages}
     print(f"  {len(messages)} emails fetched", file=sys.stderr)
 
-    # 2. Read full threads for every email we found
-    thread_ids = list({m["thread_id"] for m in messages})
-    print(f"Reading {len(thread_ids)} unique threads...", file=sys.stderr)
-    seen_message_ids = {m["id"] for m in messages}
-    for tid in thread_ids:
-        thread_messages = gmail.get_thread(tid)
-        for m in thread_messages:
-            if m.id not in seen_message_ids:
-                messages.append(_serialize_email(m))
-                seen_message_ids.add(m.id)
+    # 2. Fetch full threads so read_thread replays are complete
+    import time
+    from scheduler.eval.config import EVAL_CASES
 
-    # 3. Also fetch any extra threads passed via --thread-ids
-    extra_thread_ids = set(args.thread_ids or []) - set(thread_ids)
-    if extra_thread_ids:
-        print(f"Reading {len(extra_thread_ids)} additional thread(s)...", file=sys.stderr)
-        for tid in extra_thread_ids:
-            thread_messages = gmail.get_thread(tid)
-            for m in thread_messages:
-                if m.id not in seen_message_ids:
-                    messages.append(_serialize_email(m))
-                    seen_message_ids.add(m.id)
+    seen_thread_ids = {m["thread_id"] for m in messages}
+    all_thread_ids = list(seen_thread_ids)
+    for tid in (args.thread_ids or []) + [c.thread_id for c in EVAL_CASES]:
+        if tid not in seen_thread_ids:
+            all_thread_ids.append(tid)
+            seen_thread_ids.add(tid)
 
-    print(f"  {len(messages)} total messages across {len(thread_ids) + len(extra_thread_ids)} threads", file=sys.stderr)
+    print(f"Reading {len(all_thread_ids)} threads...", file=sys.stderr)
+    for i, tid in enumerate(all_thread_ids):
+        for attempt in range(3):
+            try:
+                thread_messages = gmail.get_thread(tid)
+                for m in thread_messages:
+                    if m.id not in seen_message_ids:
+                        messages.append(_serialize_email(m))
+                        seen_message_ids.add(m.id)
+                break
+            except Exception as e:
+                print(f"  Thread {tid} attempt {attempt + 1} failed: {type(e).__name__}: {e}", file=sys.stderr)
+                if attempt < 2:
+                    time.sleep(2)
+
+        if (i + 1) % 100 == 0:
+            print(f"  {i + 1}/{len(all_thread_ids)} threads...", file=sys.stderr)
+
+    print(f"  {len(messages)} total messages", file=sys.stderr)
 
     # 4. Calendar: lookback + 30 days ahead
     now = datetime.now()
@@ -83,10 +108,9 @@ def cmd_record(args):
 
     # 7. Save
     metadata = {
-        "thread_ids": args.thread_ids or [],
+        "thread_ids": [c.thread_id for c in EVAL_CASES] + (args.thread_ids or []),
         "lookback_days": lookback_days,
         "n_messages": len(messages),
-        "n_threads": len(thread_ids) + len(extra_thread_ids),
         "n_events": len(events),
         "calendar_window": {"start": cal_start.isoformat(), "end": cal_end.isoformat()},
     }
@@ -106,9 +130,9 @@ def cmd_classify(args):
     for msg in fixture["messages"]:
         threads.setdefault(msg["thread_id"], []).append(msg)
 
-    thread_ids = args.thread_ids or fixture.get("metadata", {}).get("thread_ids", [])
+    thread_ids = _resolve_thread_ids(args)
     if not thread_ids:
-        print("No thread IDs specified and none found in fixture metadata", file=sys.stderr)
+        print("No thread IDs specified. Add them to eval/config.py or pass --thread-ids.", file=sys.stderr)
         sys.exit(1)
 
     results = []
@@ -120,8 +144,11 @@ def cmd_classify(args):
 
         latest = messages[-1]
         c = classify_email(latest["subject"], latest["body"], latest["sender"])
-        results.append({
+        case = _get_eval_case(tid)
+
+        result = {
             "thread_id": tid,
+            "description": case.description if case else "",
             "intent": c.intent.value,
             "confidence": c.confidence,
             "summary": c.summary,
@@ -129,9 +156,28 @@ def cmd_classify(args):
             "participants": c.participants,
             "duration_minutes": c.duration_minutes,
             "is_sales_email": c.is_sales_email,
-        })
+        }
 
+        if case:
+            result["expected_intent"] = case.expected_intent
+            result["intent_match"] = c.intent.value == case.expected_intent
+            result["expected_is_sales"] = case.expected_is_sales
+            result["is_sales_match"] = c.is_sales_email == case.expected_is_sales
+
+        results.append(result)
+
+    # Print results
     print(json.dumps(results, indent=2))
+
+    # Print summary
+    cases_with_expected = [r for r in results if "intent_match" in r]
+    if cases_with_expected:
+        passed = sum(1 for r in cases_with_expected if r["intent_match"])
+        total = len(cases_with_expected)
+        print(f"\n--- Classifier: {passed}/{total} intent matches ---", file=sys.stderr)
+        for r in cases_with_expected:
+            status = "PASS" if r["intent_match"] else "FAIL"
+            print(f"  {status}  {r['description']:40s}  got={r['intent']:25s}  expected={r['expected_intent']}", file=sys.stderr)
 
 
 def cmd_draft(args):
@@ -147,9 +193,9 @@ def cmd_draft(args):
     for msg in fixture["messages"]:
         threads.setdefault(msg["thread_id"], []).append(msg)
 
-    thread_ids = args.thread_ids or fixture.get("metadata", {}).get("thread_ids", [])
+    thread_ids = _resolve_thread_ids(args)
     if not thread_ids:
-        print("No thread IDs specified and none found in fixture metadata", file=sys.stderr)
+        print("No thread IDs specified. Add them to eval/config.py or pass --thread-ids.", file=sys.stderr)
         sys.exit(1)
 
     results = []
@@ -174,15 +220,38 @@ def cmd_draft(args):
         composer = DraftComposer(backend, user_id="eval", user_email="eval@test.com")
         composer.compose_and_create_draft(latest, classification)
 
-        results.append({
+        case = _get_eval_case(tid)
+
+        result = {
             "thread_id": tid,
+            "description": case.description if case else "",
             "classification": classification,
             "draft": backend.captured_draft,
             "sent": backend.captured_sent,
             "calendar_events": backend.captured_events,
-        })
+        }
 
+        if case:
+            result["expected_draft"] = case.expected_draft
+
+        results.append(result)
+
+    # Print results
     print(json.dumps(results, indent=2))
+
+    # Print summary
+    cases_with_expected = [r for r in results if "expected_draft" in r]
+    if cases_with_expected:
+        print("\n--- Draft eval summary ---", file=sys.stderr)
+        for r in cases_with_expected:
+            desc = r.get("description") or r["thread_id"]
+            draft_body = (r.get("draft") or {}).get("body")
+            print(f"\n  {desc}:", file=sys.stderr)
+            print(f"    Expected: {r['expected_draft']}", file=sys.stderr)
+            print(f"    Got:      {draft_body}", file=sys.stderr)
+            for check in r["checks"]:
+                status = "PASS" if check["passed"] else "FAIL"
+                print(f"    {status}: {check['check']}", file=sys.stderr)
 
 
 def cmd_guides(args):
@@ -205,6 +274,32 @@ def cmd_guides(args):
     print(json.dumps(backend.captured_guides, indent=2))
 
 
+def cmd_list(args):
+    """List all threads in a fixture so you can pick eval thread IDs."""
+    from scheduler.eval.backends import load_fixture
+
+    fixture = load_fixture(args.fixture)
+
+    threads: dict[str, list[dict]] = {}
+    for msg in fixture["messages"]:
+        threads.setdefault(msg["thread_id"], []).append(msg)
+
+    # Sort threads by latest message date (newest first)
+    sorted_threads = sorted(
+        threads.items(),
+        key=lambda item: item[1][-1].get("date", ""),
+        reverse=True,
+    )
+
+    for tid, msgs in sorted_threads:
+        latest = msgs[-1]
+        subject = (latest.get("subject") or "(no subject)")[:60]
+        sender = (latest.get("sender") or "")[:40]
+        date = (latest.get("date") or "")[:10]
+        n = len(msgs)
+        print(f"  {tid}  {date}  {n:2d} msgs  {sender:40s}  {subject}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Eval CLI for scheduler agents")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -214,14 +309,18 @@ def main():
     rec.add_argument("--thread-ids", nargs="*", help="Extra thread IDs to include for draft eval")
     rec.set_defaults(func=cmd_record)
 
+    lst = sub.add_parser("list", help="List all threads in a fixture")
+    lst.add_argument("--fixture", required=True, help="Fixture file")
+    lst.set_defaults(func=cmd_list)
+
     cls = sub.add_parser("classify", help="Run classifier on thread(s) from a fixture")
     cls.add_argument("--fixture", required=True, help="Fixture file")
-    cls.add_argument("--thread-ids", nargs="*", help="Thread IDs to classify (default: all from metadata)")
+    cls.add_argument("--thread-ids", nargs="*", help="Thread IDs (default: EVAL_THREADS from config)")
     cls.set_defaults(func=cmd_classify)
 
     dft = sub.add_parser("draft", help="Run draft composer on thread(s) from a fixture")
     dft.add_argument("--fixture", required=True, help="Fixture file")
-    dft.add_argument("--thread-ids", nargs="*", help="Thread IDs to draft (default: all from metadata)")
+    dft.add_argument("--thread-ids", nargs="*", help="Thread IDs (default: EVAL_THREADS from config)")
     dft.set_defaults(func=cmd_draft)
 
     gd = sub.add_parser("guides", help="Run guide-writer agents against a fixture")
