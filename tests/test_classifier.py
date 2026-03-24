@@ -16,6 +16,7 @@ class TestClassifyEmail:
             subject="Coffee next week?",
             body="Hey! Would love to catch up over coffee next week. When works for you?",
             sender="alice@example.com",
+            thread_messages=[],
         )
         assert result.intent == SchedulingIntent.REQUESTING_MEETING
 
@@ -24,6 +25,7 @@ class TestClassifyEmail:
             subject="Q4 Report",
             body="Please find attached the Q4 report. Let me know if you have questions.",
             sender="bob@example.com",
+            thread_messages=[],
         )
         assert result.intent == SchedulingIntent.NOT_SCHEDULING
 
@@ -32,6 +34,7 @@ class TestClassifyEmail:
             subject="Re: Meeting",
             body="How about Tuesday at 2pm or Wednesday at 10am?",
             sender="carol@example.com",
+            thread_messages=[],
         )
         assert result.intent == SchedulingIntent.PROPOSING_TIMES
         assert len(result.proposed_times) >= 1

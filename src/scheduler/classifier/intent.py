@@ -80,7 +80,7 @@ def classify_email(
     subject: str,
     body: str,
     sender: str,
-    thread_messages: list[dict] | None = None,
+    thread_messages: list[dict],
     recipient: str = "",
     cc: str = "",
 ) -> ClassificationResult:
