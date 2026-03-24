@@ -18,22 +18,6 @@ import os
 import sys
 
 
-def _resolve_thread_ids(args) -> list[str]:
-    """Resolve thread IDs: CLI flag > eval config > empty."""
-    if args.thread_ids:
-        return args.thread_ids
-    from scheduler.eval.config import EVAL_CASES
-    return [c.thread_id for c in EVAL_CASES]
-
-
-def _get_eval_case(thread_id: str):
-    """Look up the EvalCase for a thread ID, or None."""
-    from scheduler.eval.config import EVAL_CASES
-    for case in EVAL_CASES:
-        if case.thread_id == thread_id:
-            return case
-    return None
-
 
 def cmd_record(args):
     """Dump the last 1000 emails + calendar + guides to a fixture. No LLM calls."""
@@ -213,8 +197,18 @@ def cmd_classify(args):
             print(f"  {status}  {r['description']:40s}  got={r['intent']:25s}  expected={r['expected_intent']}", file=sys.stderr)
 
 
+def _load_canonical_draft_evals() -> list[dict]:
+    """Load canonical draft eval cases from the JSON file."""
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "evals", "draft_canonical_evals.json")
+    path = os.path.normpath(path)
+    if not os.path.exists(path):
+        return []
+    with open(path) as f:
+        return json.load(f)
+
+
 def cmd_draft(args):
-    """Run the draft composer against a thread from the fixture."""
+    """Run the draft composer against specific messages from the fixture."""
     from scheduler.classifier.intent import classify_email
     from scheduler.drafts.composer import DraftComposer
     from scheduler.eval.backends import ReplayDraftBackend, load_fixture
@@ -226,20 +220,35 @@ def cmd_draft(args):
     for msg in fixture["messages"]:
         threads.setdefault(msg["thread_id"], []).append(msg)
 
-    thread_ids = _resolve_thread_ids(args)
-    if not thread_ids:
-        print("No thread IDs specified. Add them to eval/config.py or pass --thread-ids.", file=sys.stderr)
-        sys.exit(1)
+    # Build list of (trigger_message, thread_messages, eval_case) tuples
+    eval_targets: list[tuple[dict, list[dict], dict | None]] = []
+
+    if args.thread_ids:
+        # Ad-hoc mode: classify latest message in each thread
+        for tid in args.thread_ids:
+            thread_msgs = threads.get(tid, [])
+            if not thread_msgs:
+                print(f"Thread {tid} not found in fixture, skipping", file=sys.stderr)
+                continue
+            eval_targets.append((thread_msgs[-1], thread_msgs, None))
+    else:
+        # Canonical mode: load draft eval cases with trigger_message_index
+        canonical = _load_canonical_draft_evals()
+        if not canonical:
+            print("No canonical draft evals found and no --thread-ids specified.", file=sys.stderr)
+            sys.exit(1)
+        for case in canonical:
+            trigger_idx = case["trigger_message_index"]
+            case_msgs = case["messages"]
+            if trigger_idx >= len(case_msgs):
+                print(f"Trigger index {trigger_idx} out of range for {case['eval_id']}, skipping", file=sys.stderr)
+                continue
+            trigger = case_msgs[trigger_idx]
+            eval_targets.append((trigger, case_msgs, case))
 
     results = []
-    for tid in thread_ids:
-        messages = threads.get(tid, [])
-        if not messages:
-            print(f"Thread {tid} not found in fixture, skipping", file=sys.stderr)
-            continue
-
-        latest = messages[-1]
-        c = classify_email(latest["subject"], latest["body"], latest["sender"])
+    for trigger, _, case in eval_targets:
+        c = classify_email(trigger["subject"], trigger["body"], trigger["sender"])
         classification = {
             "intent": c.intent.value,
             "confidence": c.confidence,
@@ -249,24 +258,23 @@ def cmd_draft(args):
             "duration_minutes": c.duration_minutes,
         }
 
-        case = _get_eval_case(tid)
-        user_email = case.user_email if case else "henry@ferganalabs.com"
+        user_email = case["user_email"] if case and "user_email" in case else "henry@ferganalabs.com"
 
         backend = ReplayDraftBackend(fixture)
         composer = DraftComposer(backend, user_id="eval", user_email=user_email)
-        composer.compose_and_create_draft(latest, classification, current_datetime=latest["date"])
+        composer.compose_and_create_draft(trigger, classification, current_datetime=trigger["date"])
 
         result = {
-            "thread_id": tid,
-            "description": case.description if case else "",
+            "eval_id": case["eval_id"] if case else trigger.get("thread_id", ""),
+            "thread_id": trigger.get("thread_id", ""),
             "classification": classification,
             "draft": backend.captured_draft,
             "sent": backend.captured_sent,
             "calendar_events": backend.captured_events,
         }
 
-        if case:
-            result["expected_draft"] = case.expected_draft
+        if case and "golden_response" in case:
+            result["golden_response"] = case["golden_response"]
 
         results.append(result)
 
@@ -274,18 +282,16 @@ def cmd_draft(args):
     print(json.dumps(results, indent=2))
 
     # Print summary
-    cases_with_expected = [r for r in results if "expected_draft" in r]
-    if cases_with_expected:
-        print("\n--- Draft eval summary ---", file=sys.stderr)
-        for r in cases_with_expected:
-            desc = r.get("description") or r["thread_id"]
-            draft_body = (r.get("draft") or {}).get("body")
-            print(f"\n  {desc}:", file=sys.stderr)
-            print(f"    Expected: {r['expected_draft']}", file=sys.stderr)
-            print(f"    Got:      {draft_body}", file=sys.stderr)
-            for check in r["checks"]:
-                status = "PASS" if check["passed"] else "FAIL"
-                print(f"    {status}: {check['check']}", file=sys.stderr)
+    cases_with_golden = [r for r in results if "golden_response" in r]
+    if cases_with_golden:
+        print(f"\n--- Draft eval summary ({len(cases_with_golden)} cases) ---", file=sys.stderr)
+        for r in cases_with_golden:
+            eval_id = r["eval_id"]
+            draft_body = (r.get("draft") or {}).get("body", "(no draft)")
+            golden_body = r["golden_response"].get("body", "")
+            print(f"\n  {eval_id}:", file=sys.stderr)
+            print(f"    Golden:  {golden_body[:120]}", file=sys.stderr)
+            print(f"    Got:     {draft_body[:120]}", file=sys.stderr)
 
 
 def cmd_guides(args):

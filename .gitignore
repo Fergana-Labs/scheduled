@@ -36,7 +36,6 @@ agents.md
 eval/fixtures/
 evals/classifier_canonical_evals.json
 evals/draft_canonical_evals.json
-evals/golden_responses.json
 
 # Temp files
 temp/
