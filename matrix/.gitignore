@@ -1,0 +1,12 @@
+# Secrets
+.env
+
+# Generated Synapse data (signing keys, logs, etc.)
+synapse/
+
+# Bridge data (configs with credentials, registration files, databases)
+bridges/
+
+# Caddy TLS certificates
+caddy_data/
+caddy_config/
