@@ -40,6 +40,9 @@ evals/draft_canonical_evals.json
 # Temp files
 temp/
 
+# Eval fixtures
+/eval/
+
 # Dev screenshots (root-level PNGs)
 /*.png
 

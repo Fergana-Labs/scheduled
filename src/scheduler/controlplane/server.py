@@ -1104,6 +1104,8 @@ def _run_onboarding_all(user_id: str) -> None:
 
 def _run_onboarding_for_runtime(user_id: str) -> None:
     """Dispatch onboarding to the configured runtime."""
+    from scheduler.db import update_system_enabled
+
     with _onboarding_lock:
         if _onboarding_status.get(user_id, {}).get("status") == "running":
             logger.info("onboarding: already running for user=%s, skipping", user_id)
@@ -1120,6 +1122,8 @@ def _run_onboarding_for_runtime(user_id: str) -> None:
         runtime = config.agent_runtime.strip().lower()
         if runtime == "local":
             _run_onboarding_all(user_id)
+            update_system_enabled(user_id, True)
+            logger.info("onboarding: system enabled for user=%s", user_id)
             with _onboarding_lock:
                 _onboarding_status.pop(user_id, None)
             return
@@ -1168,6 +1172,9 @@ def _run_onboarding_for_runtime(user_id: str) -> None:
                 logger.info("onboarding[e2b]: gmail watch set up for user=%s", user_id)
             except Exception:
                 logger.exception("onboarding[e2b]: failed to set up gmail watch for user=%s", user_id)
+
+            update_system_enabled(user_id, True)
+            logger.info("onboarding[e2b]: system enabled for user=%s", user_id)
 
             with _onboarding_lock:
                 _onboarding_status.pop(user_id, None)
