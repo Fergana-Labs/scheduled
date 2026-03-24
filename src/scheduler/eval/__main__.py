@@ -8,6 +8,7 @@ Usage:
     python -m scheduler.eval guides --fixture fixture.json
     python -m scheduler.eval draft --fixture fixture.json --thread-ids t1
     python -m scheduler.eval classify --fixture fixture.json --thread-ids t1
+    python -m scheduler.eval onboard --fixture fixture.json
 """
 
 from __future__ import annotations
@@ -324,6 +325,23 @@ def cmd_guides(args):
     print(json.dumps(backend.captured_guides, indent=2))
 
 
+def cmd_onboard(args):
+    """Run the onboarding (calendar populator) agent against the fixture."""
+    from scheduler.eval.backends import ReplayBackfillBackend, load_fixture
+    from scheduler.onboarding.agent import run_backfill_agent
+
+    fixture = load_fixture(args.fixture)
+    backend = ReplayBackfillBackend(fixture)
+
+    lookback_days = args.lookback_days or 60
+    run_backfill_agent(backend, lookback_days)
+
+    print(json.dumps(backend.captured_events, indent=2))
+    print(f"\n--- Onboarding eval: {len(backend.captured_events)} events added ---", file=sys.stderr)
+    for ev in backend.captured_events:
+        print(f"  {ev['start'][:16]}  {ev['summary']}", file=sys.stderr)
+
+
 def cmd_list(args):
     """List all threads in a fixture so you can pick eval thread IDs."""
     from scheduler.eval.backends import load_fixture
@@ -376,6 +394,11 @@ def main():
     gd = sub.add_parser("guides", help="Run guide-writer agents against a fixture")
     gd.add_argument("--fixture", required=True, help="Fixture file")
     gd.set_defaults(func=cmd_guides)
+
+    ob = sub.add_parser("onboard", help="Run onboarding (calendar populator) agent against a fixture")
+    ob.add_argument("--fixture", required=True, help="Fixture file")
+    ob.add_argument("--lookback-days", type=int, help="Lookback window in days (default: 60)")
+    ob.set_defaults(func=cmd_onboard)
 
     parsed = parser.parse_args()
     parsed.func(parsed)

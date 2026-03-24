@@ -235,3 +235,51 @@ class ReplayDraftBackend:
     def add_calendar_event(self, args: dict) -> dict:
         self.captured_events.append(args)
         return {"event_id": "dry-run-event"}
+
+
+class ReplayBackfillBackend:
+    """Replays from a fixture for the calendar backfill agent."""
+
+    def __init__(self, fixture: dict):
+        self._messages = fixture.get("messages", [])
+        self._events = fixture.get("events", [])
+        self._threads: dict[str, list[dict]] = {}
+        for msg in self._messages:
+            tid = msg.get("thread_id", "")
+            self._threads.setdefault(tid, []).append(msg)
+
+        self.captured_events: list[dict] = []
+
+    def search_emails(self, query: str, max_results: int = 50) -> dict:
+        results = _search_messages(self._messages, query, max_results)
+        return {"emails": results}
+
+    def read_thread(self, thread_id: str) -> dict:
+        messages = self._threads.get(thread_id, [])
+        return {"messages": messages}
+
+    def find_event(self, summary: str, start_date: str, end_date: str) -> dict:
+        start = datetime.fromisoformat(start_date)
+        end = datetime.fromisoformat(end_date)
+        for event in self._events + self.captured_events:
+            event_start = datetime.fromisoformat(event["start"])
+            if start <= event_start <= end and summary.lower() in event["summary"].lower():
+                return {"exists": True, "event": event}
+        return {"exists": False, "event": None}
+
+    def get_calendar_events(self, start_date: str, end_date: str) -> dict:
+        all_events = self._events + self.captured_events
+        results = _filter_events(all_events, start_date, end_date)
+        return {"events": results}
+
+    def add_event(self, summary: str, start: str, end: str, description: str = "") -> dict:
+        event = {
+            "id": f"eval-event-{len(self.captured_events)}",
+            "summary": summary,
+            "start": start,
+            "end": end,
+            "description": description,
+            "source": "onboarding-eval",
+        }
+        self.captured_events.append(event)
+        return {"event_id": event["id"], "status": "captured"}
