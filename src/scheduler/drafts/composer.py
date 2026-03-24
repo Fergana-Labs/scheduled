@@ -235,8 +235,9 @@ class DraftComposer:
 
         return "\n".join(parts)
 
-    def _build_tools(self) -> tuple[list, dict]:
+    def _build_tools(self) -> tuple[list, dict, dict]:
         draft_result: dict = {"draft_id": None}
+        invite_proposal: dict = {"proposal": None}
 
         @tool(
             "get_calendar_events",
@@ -284,7 +285,25 @@ class DraftComposer:
             result = self._backend.add_calendar_event(args)
             return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
-        all_tools = [get_calendar_events, read_thread, create_draft, add_calendar_event]
+        @tool(
+            "propose_invite",
+            "Propose a calendar invite to be sent when the user sends this draft. "
+            "Use this for meetings with other people — the invite will only be created "
+            "after the user sends the draft and an agent verifies the sent message still "
+            "confirms the meeting. Use add_calendar_event only for personal reminders/holds.",
+            {
+                "attendee_email": str,
+                "event_summary": str,
+                "event_start": str,
+                "event_end": str,
+                "add_google_meet": bool,
+            },
+        )
+        async def propose_invite(args):
+            invite_proposal["proposal"] = args
+            return {"content": [{"type": "text", "text": json.dumps({"status": "invite_proposed", **args})}]}
+
+        all_tools = [get_calendar_events, read_thread, create_draft, add_calendar_event, propose_invite]
 
         if self._autopilot:
 
@@ -302,11 +321,11 @@ class DraftComposer:
 
             all_tools.append(send_email)
 
-        return all_tools, draft_result
+        return all_tools, draft_result, invite_proposal
 
-    def compose_and_create_draft(self, email: Any, classification: "ClassificationResult" | dict, current_datetime: str | None = None) -> str | None:
+    def compose_and_create_draft(self, email: Any, classification: "ClassificationResult" | dict, current_datetime: str | None = None) -> dict:
         system_prompt = self._build_system_prompt()
-        tools, draft_result = self._build_tools()
+        tools, draft_result, invite_proposal = self._build_tools()
         server = create_sdk_mcp_server("draft-tools", tools=tools)
         classification_dict = _classification_dict(classification)
 
@@ -343,10 +362,15 @@ class DraftComposer:
             "Note if the user's calendar still has the old event that should be removed.\n"
             "   - If someone is confirming a time: draft a brief confirmation. Verify there is no "
             "calendar conflict at the confirmed time.\n"
-            "5. Consider location preferences when drafting replies. If the thread mentions an in-person "
+            "5. When your reply confirms or proposes a specific meeting time with another person, "
+            "call propose_invite to attach a calendar invite proposal. The invite will NOT be sent "
+            "immediately — it will only be created after the user sends the draft and an agent verifies "
+            "the final sent message still confirms the meeting. Use propose_invite for meetings with "
+            "other people. Only use add_calendar_event for personal calendar holds.\n"
+            "6. Consider location preferences when drafting replies. If the thread mentions an in-person "
             "meeting but no location, suggest one based on any observed location preferences. "
             "If a location is mentioned in the thread, acknowledge it in the reply.\n"
-            "6. Create a natural-sounding reply. Do not use passive-aggressive phrases like "
+            "7. Create a natural-sounding reply. Do not use passive-aggressive phrases like "
             "\"as I mentioned\", \"per my last email\", or \"let's try this again\". "
             "Be warm and accommodating, not impatient. "
             + (
@@ -406,4 +430,7 @@ class DraftComposer:
                 await client.disconnect()
 
         asyncio.run(_run_agent())
-        return draft_result.get("draft_id") or None
+        return {
+            "draft_id": draft_result.get("draft_id") or None,
+            "invite_proposal": invite_proposal.get("proposal"),
+        }

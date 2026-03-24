@@ -45,6 +45,7 @@ def send_reasoning_email(
     classification: ClassificationResult,
     gmail: GmailClient,
     calendar: CalendarClient,
+    invite_proposal: dict | None = None,
 ) -> None:
     """Insert a reasoning message into the thread (no notification)."""
     # Determine relevant dates from proposed_times
@@ -68,6 +69,28 @@ def send_reasoning_email(
     else:
         events_lines = "  No other meetings"
 
+    invite_section = ""
+    if invite_proposal:
+        start_str = invite_proposal.get("event_start", "")
+        end_str = invite_proposal.get("event_end", "")
+        try:
+            start_dt = dateutil_parser.parse(start_str)
+            end_dt = dateutil_parser.parse(end_str)
+            time_label = f"{_format_time(start_dt)} – {_format_time(end_dt)} on {start_dt.strftime('%B %-d')}"
+        except (ValueError, OverflowError):
+            time_label = f"{start_str} – {end_str}"
+        meet_line = " (with Google Meet)" if invite_proposal.get("add_google_meet") else ""
+        invite_section = (
+            f"\n"
+            f"Calendar invite:\n"
+            f"  When you send this draft, Scheduled will create a calendar invite:\n"
+            f"  - What: {invite_proposal.get('event_summary', '')}\n"
+            f"  - With: {invite_proposal.get('attendee_email', '')}\n"
+            f"  - When: {time_label}{meet_line}\n"
+            f"  An agent will verify your sent message still confirms the meeting\n"
+            f"  before sending the invite.\n"
+        )
+
     body = (
         f"Scheduled drafted a reply in this thread.\n"
         f"\n"
@@ -75,6 +98,7 @@ def send_reasoning_email(
         f"\n"
         f"Your meetings on {date_label}:\n"
         f"{events_lines}\n"
+        f"{invite_section}"
         f"\n"
         f"— Scheduled"
     )

@@ -341,6 +341,107 @@ def cleanup_processed_messages(days: int = 7) -> int:
         return count
 
 
+# --- Pending Invites ---
+
+
+@dataclass
+class PendingInviteRow:
+    id: str
+    user_id: str
+    thread_id: str
+    attendee_email: str
+    event_summary: str
+    event_start: datetime
+    event_end: datetime
+    add_google_meet: bool
+    created_at: datetime
+
+
+def create_pending_invite(
+    user_id: str,
+    thread_id: str,
+    attendee_email: str,
+    event_summary: str,
+    event_start: datetime,
+    event_end: datetime,
+    add_google_meet: bool = False,
+) -> PendingInviteRow:
+    """Create or overwrite a pending invite for a thread."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO pending_invites (user_id, thread_id, attendee_email, event_summary,
+                                         event_start, event_end, add_google_meet)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (user_id, thread_id) DO UPDATE SET
+                attendee_email = EXCLUDED.attendee_email,
+                event_summary = EXCLUDED.event_summary,
+                event_start = EXCLUDED.event_start,
+                event_end = EXCLUDED.event_end,
+                add_google_meet = EXCLUDED.add_google_meet
+            RETURNING *
+            """,
+            (user_id, thread_id, attendee_email, event_summary, event_start, event_end, add_google_meet),
+        )
+        row = cur.fetchone()
+        cols = [desc[0] for desc in cur.description]
+        conn.commit()
+        return PendingInviteRow(**dict(zip(cols, row)))
+
+
+def get_pending_invite_by_thread(user_id: str, thread_id: str) -> PendingInviteRow | None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT * FROM pending_invites WHERE user_id = %s AND thread_id = %s",
+            (user_id, thread_id),
+        )
+        row = cur.fetchone()
+        if not row:
+            return None
+        cols = [desc[0] for desc in cur.description]
+        return PendingInviteRow(**dict(zip(cols, row)))
+
+
+def update_pending_invite(
+    invite_id: str,
+    attendee_email: str | None = None,
+    event_summary: str | None = None,
+    event_start: datetime | None = None,
+    event_end: datetime | None = None,
+    add_google_meet: bool | None = None,
+) -> None:
+    """Update only the provided fields on a pending invite."""
+    sets: list[str] = []
+    vals: list = []
+    if attendee_email is not None:
+        sets.append("attendee_email = %s")
+        vals.append(attendee_email)
+    if event_summary is not None:
+        sets.append("event_summary = %s")
+        vals.append(event_summary)
+    if event_start is not None:
+        sets.append("event_start = %s")
+        vals.append(event_start)
+    if event_end is not None:
+        sets.append("event_end = %s")
+        vals.append(event_end)
+    if add_google_meet is not None:
+        sets.append("add_google_meet = %s")
+        vals.append(add_google_meet)
+    if not sets:
+        return
+    vals.append(invite_id)
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(f"UPDATE pending_invites SET {', '.join(sets)} WHERE id = %s", vals)
+        conn.commit()
+
+
+def delete_pending_invite(invite_id: str) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM pending_invites WHERE id = %s", (invite_id,))
+        conn.commit()
+
+
 def update_calendar_ids(user_id: str, calendar_ids: list[str]) -> None:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
