@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { track } from '@/lib/analytics';
 
 interface BrandingToggleProps {
   initialEnabled: boolean;
@@ -20,6 +21,7 @@ export default function BrandingToggle({ initialEnabled }: BrandingToggleProps) 
         method: 'PUT',
         body: JSON.stringify({ enabled: next }),
       });
+      track('setting_changed', { setting: 'scheduled_branding_enabled', new_value: next });
     } catch {
       setEnabled(!next);
     } finally {

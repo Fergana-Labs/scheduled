@@ -476,6 +476,99 @@ def update_onboarding_status(user_id: str, status: str | None) -> None:
         conn.commit()
 
 
+def insert_analytics_event(user_id: str, event: str, properties: dict | None = None) -> None:
+    """Insert a row into analytics_events."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO analytics_events (user_id, event, properties) VALUES (%s, %s, %s)",
+            (user_id, event, json.dumps(properties or {})),
+        )
+        conn.commit()
+
+
+def store_composed_draft(
+    user_id: str,
+    thread_id: str,
+    draft_id: str,
+    thread_context: list[dict],
+    subject: str,
+    body: str,
+    was_autopilot: bool = False,
+) -> None:
+    """Insert a row into composed_drafts with anonymized content."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO composed_drafts
+                (user_id, thread_id, draft_id, thread_context, original_subject, original_body, was_autopilot)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (user_id, thread_id, draft_id, json.dumps(thread_context), subject, body, was_autopilot),
+        )
+        conn.commit()
+
+
+def get_composed_draft_by_thread(user_id: str, thread_id: str) -> dict | None:
+    """Get the most recent composed draft for a user+thread pair."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT * FROM composed_drafts WHERE user_id = %s AND thread_id = %s ORDER BY composed_at DESC LIMIT 1",
+            (user_id, thread_id),
+        )
+        row = cur.fetchone()
+        if not row:
+            return None
+        cols = [desc[0] for desc in cur.description]
+        return dict(zip(cols, row))
+
+
+def update_composed_draft_sent(
+    draft_id: str,
+    sent_body: str,
+    was_edited: bool,
+    edit_distance_ratio: float,
+    chars_added: int,
+    chars_removed: int,
+    sent_at,
+) -> None:
+    """Update a composed_drafts row with sent-time diff metrics."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE composed_drafts
+            SET sent_body = %s, was_edited = %s, edit_distance_ratio = %s,
+                chars_added = %s, chars_removed = %s, sent_at = %s
+            WHERE id = %s
+            """,
+            (sent_body, was_edited, edit_distance_ratio, chars_added, chars_removed, sent_at, draft_id),
+        )
+        conn.commit()
+
+
+def cleanup_old_analytics(days: int = 90) -> int:
+    """Delete analytics_events older than the given number of days."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "DELETE FROM analytics_events WHERE created_at < now() - make_interval(days => %s)",
+            (days,),
+        )
+        count = cur.rowcount
+        conn.commit()
+        return count
+
+
+def cleanup_composed_drafts(days: int = 90) -> int:
+    """Delete composed_drafts older than the given number of days."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "DELETE FROM composed_drafts WHERE composed_at < now() - make_interval(days => %s)",
+            (days,),
+        )
+        count = cur.rowcount
+        conn.commit()
+        return count
+
+
 def disconnect_user(user_id: str) -> None:
     """Revoke Google tokens and delete guides, but keep the user row."""
     with _conn() as conn, conn.cursor() as cur:

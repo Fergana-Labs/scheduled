@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { api, captureSessionFromURL, getSession } from '@/lib/api';
+import { track } from '@/lib/analytics';
 import PendingState from '@/components/onboarding/PendingState';
 import FailedState from '@/components/onboarding/FailedState';
 
@@ -33,6 +34,7 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
     api<UserInfo>('/auth/me')
       .then((data) => {
         setUser(data);
+        track('page_view', { page: 'onboarding' });
         setLoading(false);
       })
       .catch(() => {
@@ -48,8 +50,10 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
         setAgents(status.agents);
       }
       if (status.ready) {
+        track('onboarding_completed');
         router.push('/settings');
       } else if (status.failed) {
+        track('onboarding_failed', { error: status.error });
         setFailed(true);
         setFailedError(status.error || null);
       }

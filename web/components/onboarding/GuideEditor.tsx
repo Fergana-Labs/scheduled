@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Maximize2, X, Pencil, Eye, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { api } from '@/lib/api';
+import { track } from '@/lib/analytics';
 
 interface GuideEditorProps {
   name: string;
@@ -72,6 +73,7 @@ export default function GuideEditor({ name, label, initialContent, updatedAt }: 
       lastSavedRef.current = currentDraft;
       setContent(currentDraft);
       setSaveStatus('saved');
+      track('guide_edited', { guide_name: name });
       if (savedFadeRef.current) clearTimeout(savedFadeRef.current);
       savedFadeRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
     } catch {

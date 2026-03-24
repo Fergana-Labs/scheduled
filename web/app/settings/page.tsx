@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Loader2, LogOut } from 'lucide-react';
 import { api, captureSessionFromURL, clearSession } from '@/lib/api';
+import { track } from '@/lib/analytics';
 import ReadyState from '@/components/onboarding/ReadyState';
 import DisconnectedState from '@/components/onboarding/DisconnectedState';
 
@@ -36,6 +37,7 @@ export default function SettingsPage() {
       try {
         const userInfo = await api<UserInfo>('/auth/me');
         setUser(userInfo);
+        track('page_view', { page: 'settings' });
 
         const status = await api<{ ready: boolean; connected: boolean }>('/web/api/v1/onboarding/status');
         if (!status.connected) {

@@ -98,6 +98,13 @@ async def _watch_renewal_loop():
             deleted = await asyncio.to_thread(cleanup_processed_messages)
             if deleted:
                 logger.info("watch_renewal_loop: cleaned up %d old processed_messages rows", deleted)
+            from scheduler.db import cleanup_composed_drafts, cleanup_old_analytics
+            draft_deleted = await asyncio.to_thread(cleanup_composed_drafts)
+            if draft_deleted:
+                logger.info("watch_renewal_loop: cleaned up %d old composed_drafts rows", draft_deleted)
+            analytics_deleted = await asyncio.to_thread(cleanup_old_analytics)
+            if analytics_deleted:
+                logger.info("watch_renewal_loop: cleaned up %d old analytics_events rows", analytics_deleted)
         except Exception:
             logger.exception("watch_renewal_loop: failed")
         await asyncio.sleep(_WATCH_RENEWAL_INTERVAL)
@@ -741,6 +748,12 @@ class CreateDraftRequest(BaseModel):
     cc: str = ""
     subject: str
     body: str
+    thread_context: list[dict] | None = None
+
+
+class TrackEventRequest(BaseModel):
+    event: str
+    properties: dict = {}
 
 
 class SendEmailRequest(BaseModel):
@@ -827,6 +840,16 @@ def gmail_draft(req: CreateDraftRequest, session: dict = Depends(get_session)):
 
     draft_id = gmail.create_draft(
         thread_id=req.thread_id, to=req.to, subject=req.subject, body=body, content_type=content_type, cc=req.cc
+    )
+
+    from scheduler import analytics
+    analytics.record_draft_composed(
+        user_id=session["user_id"],
+        thread_id=req.thread_id,
+        draft_id=draft_id,
+        thread_messages=req.thread_context or [],
+        subject=req.subject,
+        body=req.body,
     )
 
     return {"draft_id": draft_id}
@@ -1181,13 +1204,14 @@ def _compose_draft_for_runtime(
     calendar: CalendarClient,
     autopilot: bool,
     user_email: str = "",
+    thread_messages: list[dict] | None = None,
 ) -> dict | None:
     runtime = config.agent_runtime.strip().lower()
 
     if runtime == "local":
         from scheduler.drafts.composer import DraftComposer, LocalDraftBackend
 
-        backend = LocalDraftBackend(gmail, calendar, user_id=user_id)
+        backend = LocalDraftBackend(gmail, calendar, user_id=user_id, thread_messages=thread_messages)
         composer = DraftComposer(backend, user_id, autopilot=autopilot, user_email=user_email)
         return composer.compose_and_create_draft(email, classification)
 
@@ -1371,6 +1395,12 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
             # User-sent messages: check if there's a pending invite for this thread
             if email.sender and email_address in email.sender:
                 _handle_sent_message_for_invite(user_id, email, gmail, calendar)
+                try:
+                    from scheduler import analytics
+                    analytics.record_draft_sent(user_id, email.thread_id, email.body, email.date)
+                except Exception:
+                    logger.debug("analytics: failed to check sent draft for message %s", message_id, exc_info=True)
+                logger.info("gmail_webhook: message %s is from the user, skipping", message_id)
                 continue
 
             # Skip emails from Scheduled's own sending addresses (e.g. reasoning emails)
@@ -1408,6 +1438,14 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 recipient=email.recipient, cc=email.cc,
             )
 
+            from scheduler import analytics
+            analytics.track(user_id, "email_classified", {
+                "intent": classification.intent.value,
+                "confidence": classification.confidence,
+                "is_sales_email": classification.is_sales_email,
+                "message_id": message_id,
+            })
+
             if classification.intent == SchedulingIntent.DOESNT_NEED_DRAFT:
                 logger.info("gmail_webhook: message %s is not scheduling-related, skipping", message_id)
                 continue
@@ -1432,6 +1470,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 calendar=calendar,
                 autopilot=user.autopilot_enabled,
                 user_email=email_address,
+                thread_messages=thread_messages,
             )
 
             compose_result = compose_result or {}
@@ -1461,6 +1500,11 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                     except Exception:
                         logger.exception("gmail_webhook: failed to create pending invite for thread %s", email.thread_id)
 
+                analytics.track(user_id, "draft_composed", {
+                    "thread_id": email.thread_id,
+                    "draft_id": draft_id,
+                    "was_autopilot": draft_id.startswith("sent:") if isinstance(draft_id, str) else False,
+                })
                 if user.reasoning_emails_enabled:
                     try:
                         from scheduler.lifecycle.reasoning import send_reasoning_email
@@ -1539,6 +1583,14 @@ async def gmail_webhook(request: Request, background_tasks: BackgroundTasks):
 # --- Web API routes ---
 
 
+@app.post("/web/api/v1/events/track")
+def web_track_event(req: TrackEventRequest, request: Request):
+    session = get_web_session(request)
+    from scheduler import analytics
+    analytics.track(session["user_id"], req.event, req.properties)
+    return {"status": "ok"}
+
+
 @app.get("/web/api/v1/onboarding/status")
 def web_onboarding_status(
     user: dict = Depends(get_authenticated_user),
@@ -1612,6 +1664,8 @@ def web_settings_system(req: WebUpdateSystemEnabledRequest, user: dict = Depends
     from scheduler.db import update_system_enabled
 
     update_system_enabled(user["user_id"], req.enabled)
+    from scheduler import analytics
+    analytics.track(user["user_id"], "setting_changed", {"setting": "system_enabled", "new_value": req.enabled})
     return {"system_enabled": req.enabled}
 
 
@@ -1624,6 +1678,8 @@ def web_settings_autopilot(req: WebUpdateAutopilotRequest, user: dict = Depends(
     from scheduler.db import update_autopilot
 
     update_autopilot(user["user_id"], req.enabled)
+    from scheduler import analytics
+    analytics.track(user["user_id"], "setting_changed", {"setting": "autopilot_enabled", "new_value": req.enabled})
     return {"autopilot_enabled": req.enabled}
 
 
@@ -1636,6 +1692,8 @@ def web_settings_sales_emails(req: WebUpdateSalesEmailRequest, user: dict = Depe
     from scheduler.db import update_process_sales_emails
 
     update_process_sales_emails(user["user_id"], req.enabled)
+    from scheduler import analytics
+    analytics.track(user["user_id"], "setting_changed", {"setting": "process_sales_emails", "new_value": req.enabled})
     return {"process_sales_emails": req.enabled}
 
 
@@ -1648,6 +1706,8 @@ def web_settings_branding(req: WebUpdateBrandingRequest, user: dict = Depends(ge
     from scheduler.db import update_scheduled_branding
 
     update_scheduled_branding(user["user_id"], req.enabled)
+    from scheduler import analytics
+    analytics.track(user["user_id"], "setting_changed", {"setting": "scheduled_branding_enabled", "new_value": req.enabled})
     return {"scheduled_branding_enabled": req.enabled}
 
 
@@ -1660,6 +1720,8 @@ def web_settings_reasoning_emails(req: WebUpdateReasoningEmailsRequest, user: di
     from scheduler.db import update_reasoning_emails_enabled
 
     update_reasoning_emails_enabled(user["user_id"], req.enabled)
+    from scheduler import analytics
+    analytics.track(user["user_id"], "setting_changed", {"setting": "reasoning_emails_enabled", "new_value": req.enabled})
     return {"reasoning_emails_enabled": req.enabled}
 
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { track } from '@/lib/analytics';
 
 interface SalesEmailToggleProps {
   initialEnabled: boolean;
@@ -20,6 +21,7 @@ export default function SalesEmailToggle({ initialEnabled }: SalesEmailTogglePro
         method: 'PUT',
         body: JSON.stringify({ enabled: next }),
       });
+      track('setting_changed', { setting: 'process_sales_emails', new_value: next });
     } catch {
       setEnabled(!next);
     } finally {

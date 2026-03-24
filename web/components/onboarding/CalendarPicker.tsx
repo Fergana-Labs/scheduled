@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { track } from '@/lib/analytics';
 
 interface CalendarEntry {
   id: string;
@@ -36,6 +37,8 @@ export default function CalendarPicker() {
         method: 'PUT',
         body: JSON.stringify({ calendar_ids: selectedIds }),
       });
+      const cal = calendars.find((c) => c.id === id);
+      track('calendar_selection_changed', { calendar_id: id, selected: !cal?.selected });
     } catch {
       // Revert on failure
       setCalendars(calendars);

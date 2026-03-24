@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { track } from '@/lib/analytics';
 
 interface ReasoningEmailToggleProps {
   initialEnabled: boolean;
@@ -20,6 +21,7 @@ export default function ReasoningEmailToggle({ initialEnabled }: ReasoningEmailT
         method: 'PUT',
         body: JSON.stringify({ enabled: next }),
       });
+      track('setting_changed', { setting: 'reasoning_emails_enabled', new_value: next });
     } catch {
       setEnabled(!next);
     } finally {

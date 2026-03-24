@@ -380,7 +380,8 @@ class GmailClient:
                 userId="me",
                 body={
                     "topicName": topic_name,
-                    "labelIds": ["INBOX"],
+                    "labelFilterBehavior": "include",
+                    "labelIds": ["INBOX", "SENT"],
                 },
             )
             .execute()

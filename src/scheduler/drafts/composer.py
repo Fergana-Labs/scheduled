@@ -46,10 +46,11 @@ class DraftBackend(Protocol):
 class LocalDraftBackend:
     """Draft backend that talks directly to Gmail/Calendar and local DB state."""
 
-    def __init__(self, gmail_client: GmailClient, calendar_client: CalendarClient, user_id: str):
+    def __init__(self, gmail_client: GmailClient, calendar_client: CalendarClient, user_id: str, thread_messages: list[dict] | None = None):
         self._gmail = gmail_client
         self._calendar = calendar_client
         self._user_id = user_id
+        self._thread_messages = thread_messages or []
 
     def load_guide(self, name: str) -> str | None:
         from scheduler.guides import load_guide
@@ -114,6 +115,16 @@ class LocalDraftBackend:
             cc=args.get("cc", ""),
         )
 
+        from scheduler import analytics
+        analytics.record_draft_composed(
+            user_id=self._user_id,
+            thread_id=args["thread_id"],
+            draft_id=draft_id,
+            thread_messages=self._thread_messages,
+            subject=args["subject"],
+            body=args["body"],
+        )
+
         return {"draft_id": draft_id}
 
     def send_email(self, args: dict) -> dict:
@@ -137,6 +148,18 @@ class LocalDraftBackend:
             content_type=content_type,
             cc=args.get("cc", ""),
         )
+
+        from scheduler import analytics
+        analytics.record_draft_composed(
+            user_id=self._user_id,
+            thread_id=args["thread_id"],
+            draft_id=f"sent:{message_id}",
+            thread_messages=self._thread_messages,
+            subject=args["subject"],
+            body=args["body"],
+            was_autopilot=True,
+        )
+
         return {"message_id": message_id, "status": "sent"}
 
 
