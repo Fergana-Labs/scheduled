@@ -1,18 +1,22 @@
-"""Send a mid-thread reasoning email via Postmark explaining why a draft was created."""
+"""Send a mid-thread reasoning message explaining why a draft was created.
+
+Uses Gmail API insert (not send) so the message appears in the thread
+without triggering a notification in the user's Gmail app.
+"""
 
 import logging
 from datetime import datetime, timedelta
 
-import httpx
 from dateutil import parser as dateutil_parser
 
 from scheduler.calendar.client import CalendarClient
 from scheduler.classifier.intent import ClassificationResult
 from scheduler.config import config
 from scheduler.gmail.client import GmailClient
-from scheduler.lifecycle.welcome import POSTMARK_SEND_URL
 
 logger = logging.getLogger(__name__)
+
+REASONING_FROM = "Scheduled <scheduled@ferganalabs.com>"
 
 
 def _parse_dates(proposed_times: list[str]) -> list[datetime]:
@@ -42,21 +46,7 @@ def send_reasoning_email(
     gmail: GmailClient,
     calendar: CalendarClient,
 ) -> None:
-    """Send a reasoning email into the thread explaining why a draft was created."""
-    if not config.postmark_server_token:
-        logger.info("reasoning: no POSTMARK_SERVER_TOKEN, skipping")
-        return
-
-    # Get Message-Id header of the last message in the thread
-    thread = gmail.get_thread(thread_id)
-    if not thread:
-        logger.warning("reasoning: empty thread %s, skipping", thread_id)
-        return
-    message_id_header = thread[-1].headers.get("message-id", "")
-    if not message_id_header:
-        logger.warning("reasoning: no Message-Id header on last message in thread %s", thread_id)
-        return
-
+    """Insert a reasoning message into the thread (no notification)."""
     # Determine relevant dates from proposed_times
     dates = _parse_dates(classification.proposed_times)
     day_start = min(dates).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -89,27 +79,12 @@ def send_reasoning_email(
         f"— Scheduled"
     )
 
-    # Send via Postmark with threading headers
-    reply_subject = f"Re: {subject}" if not subject.startswith("Re:") else subject
-
-    resp = httpx.post(
-        POSTMARK_SEND_URL,
-        headers={
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "X-Postmark-Server-Token": config.postmark_server_token,
-        },
-        json={
-            "From": config.postmark_bot_email,
-            "To": user_email,
-            "Subject": reply_subject,
-            "TextBody": body,
-            "Headers": [
-                {"Name": "In-Reply-To", "Value": message_id_header},
-                {"Name": "References", "Value": message_id_header},
-            ],
-        },
-        timeout=15,
+    # Insert directly into Gmail — no notification triggered
+    msg_id = gmail.insert_message(
+        thread_id=thread_id,
+        to=user_email,
+        from_addr=REASONING_FROM,
+        subject=subject,
+        body=body,
     )
-    resp.raise_for_status()
-    logger.info("reasoning: sent reasoning email to %s in thread %s", user_email, thread_id)
+    logger.info("reasoning: inserted reasoning message %s in thread %s", msg_id, thread_id)

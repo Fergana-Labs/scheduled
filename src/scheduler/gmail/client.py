@@ -318,6 +318,48 @@ class GmailClient:
         )
         return sent["id"]
 
+    def insert_message(self, thread_id: str, to: str, from_addr: str, subject: str, body: str) -> str:
+        """Insert a message into the thread without sending or triggering a notification."""
+        service = self._get_service()
+
+        # Get Message-Id of last message for threading headers
+        thread_data = (
+            service.users()
+            .threads()
+            .get(userId="me", id=thread_id, format="metadata", metadataHeaders=["Message-Id"])
+            .execute()
+        )
+        messages = thread_data.get("messages", [])
+        message_id_header = ""
+        if messages:
+            last_msg = messages[-1]
+            for header in last_msg.get("payload", {}).get("headers", []):
+                if header["name"].lower() == "message-id":
+                    message_id_header = header["value"]
+                    break
+
+        mime_msg = MIMEText(body.strip())
+        mime_msg["To"] = to
+        mime_msg["From"] = from_addr
+        mime_msg["Subject"] = subject if subject.lower().startswith("re:") else f"Re: {subject}"
+        if message_id_header:
+            mime_msg["In-Reply-To"] = message_id_header
+            mime_msg["References"] = message_id_header
+
+        raw = base64.urlsafe_b64encode(mime_msg.as_bytes()).decode("ascii")
+
+        result = (
+            service.users()
+            .messages()
+            .insert(
+                userId="me",
+                body={"raw": raw, "threadId": thread_id, "labelIds": []},
+                internalDateSource="receivedTime",
+            )
+            .execute()
+        )
+        return result["id"]
+
     def watch(self, topic_name: str) -> dict:
         """Start receiving push notifications for new emails.
 
