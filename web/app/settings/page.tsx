@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
 import { api, captureSessionFromURL, clearSession } from '@/lib/api';
 import ReadyState from '@/components/onboarding/ReadyState';
 import DisconnectedState from '@/components/onboarding/DisconnectedState';
@@ -96,10 +96,22 @@ export default function SettingsPage() {
             </span>
           </div>
 
-          <p className="mb-6 text-sm text-gray-500">
-            Signed in as{' '}
-            <span className="font-medium text-gray-700">{user.email}</span>
-          </p>
+          <div className="mb-6 flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Signed in as{' '}
+              <span className="font-medium text-gray-700">{user.email}</span>
+            </p>
+            <button
+              onClick={() => {
+                clearSession();
+                window.location.href = `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/logout`;
+              }}
+              className="flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sign out
+            </button>
+          </div>
 
           {disconnected ? (
             <>
