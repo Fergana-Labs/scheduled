@@ -207,8 +207,8 @@ export default function Hero() {
       ref={sectionRef}
       className="relative overflow-hidden px-4 pt-20 pb-20 sm:px-6 sm:pt-24"
     >
-      {/* Flowing icon streams - behind everything */}
-      <div className="pointer-events-none absolute inset-0">
+      {/* Flowing icon streams - behind everything, hidden below lg */}
+      <div className="pointer-events-none absolute inset-0 hidden lg:block">
         <div className="relative h-full w-full" style={{ transform: 'scale(1)', transformOrigin: 'top left' }}>
           <IconStream icons={upperIcons} offsetPath={UPPER_PATH} duration={40} opacity={0.14} />
           <IconStream icons={lowerIcons} offsetPath={LOWER_PATH} duration={45} opacity={0.12} reverse />
@@ -216,7 +216,7 @@ export default function Hero() {
       </div>
 
       {/* Two-column hero — scrolls naturally with the page */}
-      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-6rem)] w-full max-w-6xl flex-col gap-10 sm:gap-11 lg:min-h-screen lg:flex-row lg:items-center lg:gap-20 lg:pb-28">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-10 sm:gap-11 lg:min-h-screen lg:flex-row lg:items-center lg:gap-20 lg:pb-28">
         {/* Left: headline + CTA */}
         <div className="flex-1">
           <h1 className="font-[family-name:var(--font-playfair)] text-[clamp(2.5rem,10vw,4.5rem)] font-normal italic leading-[1.05] tracking-tight text-gray-900 sm:text-5xl lg:text-7xl xl:text-8xl">
@@ -225,11 +225,15 @@ export default function Hero() {
             send
           </h1>
 
-          <p className="mt-8 max-w-sm text-base leading-relaxed text-gray-500 sm:max-w-md sm:text-lg">
+          <p className="mt-6 max-w-sm text-base leading-relaxed text-gray-500 sm:mt-8 sm:max-w-md sm:text-lg">
             Scheduled is an open-source agent that lives in your email and automatically drafts responses.
           </p>
 
-          <div className="mt-10">
+          <p className="mt-4 max-w-sm text-base leading-relaxed text-gray-500 sm:max-w-md sm:text-lg">
+            Whenever you receive a scheduling email, a draft will be waiting in your inbox suggesting a time that matches your availability and preferences.
+          </p>
+
+          <div className="mt-8 sm:mt-10">
             <a
               href={`${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/login?signup=1`}
               className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-[#43614a] px-7 py-3.5 text-base font-medium text-white transition-all hover:bg-[#527559] sm:w-auto"
@@ -240,7 +244,36 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: email card stack */}
+        {/* Mobile: single email card preview */}
+        <div className="relative mx-auto w-full max-w-sm lg:hidden">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-lg">
+            <div className="mb-3 flex items-start justify-between">
+              <div>
+                <div className="text-sm font-semibold text-gray-900">{EMAILS[0].from}</div>
+                <div className="text-sm font-medium text-gray-700">{EMAILS[0].subject}</div>
+              </div>
+              <div className="text-xs text-gray-400">2m ago</div>
+            </div>
+
+            <div className="mb-4 rounded-lg bg-gray-50 px-4 py-3 text-sm leading-relaxed text-gray-600">
+              {EMAILS[0].preview}
+            </div>
+
+            <div className="mb-3 flex items-center gap-3">
+              <div className="h-px flex-1 bg-gray-200" />
+              <span className="text-xs font-medium tracking-wide text-[#43614a]">
+                DRAFT RESPONSE
+              </span>
+              <div className="h-px flex-1 bg-gray-200" />
+            </div>
+
+            <div className="text-sm leading-relaxed text-gray-800">
+              {EMAILS[0].draft}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: email card stack */}
         <div ref={cardContainerRef} className="relative hidden h-[420px] w-[440px] flex-shrink-0 lg:block">
           {EMAILS.map((email, i) => {
             const progress = cardStates[i] ?? 0;
