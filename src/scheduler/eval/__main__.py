@@ -220,8 +220,8 @@ def cmd_draft(args):
     for msg in fixture["messages"]:
         threads.setdefault(msg["thread_id"], []).append(msg)
 
-    # Build list of (trigger_message, thread_messages, eval_case) tuples
-    eval_targets: list[tuple[dict, list[dict], dict | None]] = []
+    # Build list of (trigger_message, thread_messages, trigger_idx, eval_case) tuples
+    eval_targets: list[tuple[dict, list[dict], int, dict | None]] = []
 
     if args.thread_ids:
         # Ad-hoc mode: classify latest message in each thread
@@ -230,7 +230,7 @@ def cmd_draft(args):
             if not thread_msgs:
                 print(f"Thread {tid} not found in fixture, skipping", file=sys.stderr)
                 continue
-            eval_targets.append((thread_msgs[-1], thread_msgs, None))
+            eval_targets.append((thread_msgs[-1], thread_msgs, len(thread_msgs) - 1, None))
     else:
         # Canonical mode: load draft eval cases with trigger_message_index
         canonical = _load_canonical_draft_evals()
@@ -244,10 +244,10 @@ def cmd_draft(args):
                 print(f"Trigger index {trigger_idx} out of range for {case['eval_id']}, skipping", file=sys.stderr)
                 continue
             trigger = case_msgs[trigger_idx]
-            eval_targets.append((trigger, case_msgs, case))
+            eval_targets.append((trigger, case_msgs, trigger_idx, case))
 
     results = []
-    for trigger, _, case in eval_targets:
+    for trigger, thread_msgs, trigger_idx, case in eval_targets:
         c = classify_email(trigger["subject"], trigger["body"], trigger["sender"])
         classification = {
             "intent": c.intent.value,
@@ -260,7 +260,17 @@ def cmd_draft(args):
 
         user_email = case["user_email"] if case and "user_email" in case else "henry@ferganalabs.com"
 
-        backend = ReplayDraftBackend(fixture)
+        # Scope the fixture to messages up to and including the trigger,
+        # so the agent doesn't see future replies and think the thread is resolved.
+        scoped_messages = thread_msgs[: trigger_idx + 1]
+        scoped_fixture = {
+            "messages": scoped_messages,
+            "events": fixture.get("events", []),
+            "timezone": fixture.get("timezone", "UTC"),
+            "guides": fixture.get("guides", {}),
+        }
+
+        backend = ReplayDraftBackend(scoped_fixture)
         composer = DraftComposer(backend, user_id="eval", user_email=user_email)
         composer.compose_and_create_draft(trigger, classification, current_datetime=trigger["date"])
 
