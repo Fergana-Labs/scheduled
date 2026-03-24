@@ -59,7 +59,7 @@ def _build_tools(backend: GuideBackend):
 
     @tool(
         "get_calendar_events",
-        "Get all events from the user's calendars (primary + stash) in a date range.",
+        "Get all events from the user's calendars (primary + scheduled) in a date range.",
         {"start_date": str, "end_date": str},
     )
     async def get_calendar_events(args):

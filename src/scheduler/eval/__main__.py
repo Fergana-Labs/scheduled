@@ -333,7 +333,7 @@ def cmd_record(args):
 
     creds = get_credentials()
     gmail = GmailClient(creds)
-    calendar = CalendarClient(creds, config.stash_calendar_name)
+    calendar = CalendarClient(creds, config.scheduled_calendar_name)
 
     lookback_days = config.onboarding_lookback_days
     query = f"newer_than:{lookback_days}d"

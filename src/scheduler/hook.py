@@ -1,9 +1,9 @@
-"""Message hook — classifies new messages and updates the stash calendar.
+"""Message hook — classifies new messages and updates the scheduled calendar.
 
 Runs on every new incoming message (email, text, Slack) to determine:
 1. Is this message about scheduling?
 2. If so, does it create a new event or modify an existing one?
-3. Update the stash calendar accordingly.
+3. Update the scheduled calendar accordingly.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from scheduler.classifier.intent import classify_message_for_event
 def _get_calendar_client() -> CalendarClient:
     """Helper to construct a CalendarClient from stored credentials."""
     creds = get_credentials()
-    # Use default stash calendar name; CalendarClient will create if missing.
+    # Use default scheduled calendar name; CalendarClient will create if missing.
     return CalendarClient(creds)
 
 
@@ -32,7 +32,7 @@ def process_new_message(message: str, sender: str, source: str = "email") -> boo
         source: Where it came from (email, text, slack, etc.).
 
     Returns:
-        True if a stash calendar event was created/updated.
+        True if a scheduled calendar event was created/updated.
     """
     event_data = classify_message_for_event(message, sender)
     if event_data is None:
@@ -51,7 +51,7 @@ def process_new_message(message: str, sender: str, source: str = "email") -> boo
 
     calendar = _get_calendar_client()
 
-    # Simple deduplication: look for an existing stash event with a matching
+    # Simple deduplication: look for an existing scheduled calendar event with a matching
     # summary in a small window around the proposed time.
     window_start = start - timedelta(minutes=15)
     window_end = end + timedelta(minutes=15)

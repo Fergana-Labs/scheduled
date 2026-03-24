@@ -101,7 +101,7 @@ class LocalDraftBackend:
         from scheduler.db import get_user_by_id
 
         user = get_user_by_id(self._user_id)
-        if user and user.stash_branding_enabled:
+        if user and user.scheduled_branding_enabled:
             html_body = html.escape(body).replace("\n", "<br>")
             html_body += '<br><br>sent by <a href="https://tryscheduled.com">Scheduled.</a>'
             body = html_body
@@ -125,7 +125,7 @@ class LocalDraftBackend:
         from scheduler.db import get_user_by_id
 
         user = get_user_by_id(self._user_id)
-        if user and user.stash_branding_enabled:
+        if user and user.scheduled_branding_enabled:
             html_body = html.escape(body).replace("\n", "<br>")
             html_body += '<br><br>sent by <a href="https://tryscheduled.com">Scheduled.</a>'
             body = html_body
@@ -240,7 +240,7 @@ class DraftComposer:
 
         @tool(
             "get_calendar_events",
-            "Get all events from the user's calendars (primary + stash) in a date range. "
+            "Get all events from the user's calendars (primary + scheduled) in a date range. "
             "Use this to see what the user already has scheduled and figure out when they're free.",
             {"start_date": str, "end_date": str},
         )
@@ -275,7 +275,7 @@ class DraftComposer:
 
         @tool(
             "add_calendar_event",
-            "Add an event to the user's stash calendar (e.g. when a time is confirmed but no invite exists). "
+            "Add an event to the user's scheduled calendar (e.g. when a time is confirmed but no invite exists). "
             "IMPORTANT: start and end must include the timezone offset (e.g. '2026-04-01T14:00:00-07:00'), "
             "not bare UTC times.",
             {"summary": str, "start": str, "end": str, "description": str},

@@ -30,10 +30,10 @@ class UserRow:
     google_refresh_token: str | None
     google_access_token: str | None
     access_token_expires_at: datetime | None
-    stash_calendar_id: str | None
+    scheduled_calendar_id: str | None
     gmail_history_id: str | None
     system_enabled: bool
-    stash_branding_enabled: bool
+    scheduled_branding_enabled: bool
     autopilot_enabled: bool
     process_sales_emails: bool
     created_at: datetime
@@ -76,24 +76,24 @@ def upsert_user(
     google_refresh_token: str,
     google_access_token: str | None = None,
     access_token_expires_at: datetime | None = None,
-    stash_calendar_id: str | None = None,
+    scheduled_calendar_id: str | None = None,
 ) -> UserRow:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
             INSERT INTO users (email, google_refresh_token, google_access_token,
-                               access_token_expires_at, stash_calendar_id)
+                               access_token_expires_at, scheduled_calendar_id)
             VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (email) DO UPDATE SET
                 google_refresh_token = EXCLUDED.google_refresh_token,
                 google_access_token = EXCLUDED.google_access_token,
                 access_token_expires_at = EXCLUDED.access_token_expires_at,
-                stash_calendar_id = COALESCE(EXCLUDED.stash_calendar_id, users.stash_calendar_id),
+                scheduled_calendar_id = COALESCE(EXCLUDED.scheduled_calendar_id, users.scheduled_calendar_id),
                 updated_at = now()
             RETURNING *
             """,
             (email, google_refresh_token, google_access_token,
-             access_token_expires_at, stash_calendar_id),
+             access_token_expires_at, scheduled_calendar_id),
         )
         row = cur.fetchone()
         cols = [desc[0] for desc in cur.description]
@@ -189,10 +189,10 @@ def get_all_user_ids() -> list[str]:
         return [str(row[0]) for row in cur.fetchall()]
 
 
-def update_stash_branding(user_id: str, enabled: bool) -> None:
+def update_scheduled_branding(user_id: str, enabled: bool) -> None:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
-            "UPDATE users SET stash_branding_enabled = %s, updated_at = now() WHERE id = %s",
+            "UPDATE users SET scheduled_branding_enabled = %s, updated_at = now() WHERE id = %s",
             (enabled, user_id),
         )
         conn.commit()
@@ -234,11 +234,11 @@ def update_reasoning_emails_enabled(user_id: str, enabled: bool) -> None:
         conn.commit()
 
 
-def update_stash_calendar_id(user_id: str, stash_calendar_id: str) -> None:
+def update_scheduled_calendar_id(user_id: str, scheduled_calendar_id: str) -> None:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
-            "UPDATE users SET stash_calendar_id = %s, updated_at = now() WHERE id = %s",
-            (stash_calendar_id, user_id),
+            "UPDATE users SET scheduled_calendar_id = %s, updated_at = now() WHERE id = %s",
+            (scheduled_calendar_id, user_id),
         )
         conn.commit()
 
@@ -370,7 +370,7 @@ def disconnect_user(user_id: str) -> None:
                 google_access_token = NULL,
                 access_token_expires_at = NULL,
                 gmail_history_id = NULL,
-                stash_calendar_id = NULL,
+                scheduled_calendar_id = NULL,
                 onboarding_status = NULL,
                 updated_at = now()
             WHERE id = %s

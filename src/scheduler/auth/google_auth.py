@@ -6,7 +6,7 @@ Stores credentials in token.json for reuse.
 Scopes needed:
 - gmail.readonly: Read emails to detect scheduling intent
 - gmail.compose: Create draft replies
-- calendar: Read/write to the stash calendar and user's primary calendar
+- calendar: Read/write to the scheduled calendar and user's primary calendar
 """
 
 import json

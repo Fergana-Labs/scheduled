@@ -17,9 +17,9 @@ interface Settings {
   system_enabled: boolean;
   autopilot_enabled: boolean;
   process_sales_emails: boolean;
-  stash_branding_enabled: boolean;
+  scheduled_branding_enabled: boolean;
   reasoning_emails_enabled: boolean;
-  stash_calendar_id: string | null;
+  scheduled_calendar_id: string | null;
   guides: { name: string; content: string; updated_at: string }[];
 }
 
@@ -125,9 +125,9 @@ export default function SettingsPage() {
               systemEnabled={readySettings.system_enabled}
               autopilotEnabled={readySettings.autopilot_enabled}
               processSalesEmails={readySettings.process_sales_emails}
-              brandingEnabled={readySettings.stash_branding_enabled}
+              brandingEnabled={readySettings.scheduled_branding_enabled}
               reasoningEmailsEnabled={readySettings.reasoning_emails_enabled}
-              calendarId={readySettings.stash_calendar_id}
+              calendarId={readySettings.scheduled_calendar_id}
               guides={readySettings.guides}
               onDisconnected={handleDisconnected}
             />

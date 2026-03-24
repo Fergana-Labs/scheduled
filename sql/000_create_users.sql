@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     google_refresh_token    TEXT NOT NULL,
     google_access_token     TEXT,
     access_token_expires_at TIMESTAMP,
-    stash_calendar_id       TEXT,
+    scheduled_calendar_id       TEXT,
     created_at              TIMESTAMP NOT NULL DEFAULT now(),
     updated_at              TIMESTAMP NOT NULL DEFAULT now()
 );

@@ -35,7 +35,7 @@ cp .env.example .env
 | `GMAIL_PUBSUB_TOPIC` | | Pub/Sub topic for Gmail push notifications |
 | `GMAIL_WEBHOOK_TOKEN` | | Shared secret for webhook verification |
 | `WEB_APP_URL` | `http://localhost:3000` | Frontend URL for CORS/redirects |
-| `STASH_CALENDAR_NAME` | `Scheduled Calendar` | Name of the Google Calendar to create |
+| `SCHEDULED_CALENDAR_NAME` | `Scheduled Calendar` | Name of the Google Calendar to create |
 | `ONBOARDING_LOOKBACK_DAYS` | `60` | How far back onboarding scans Gmail |
 | `WATCHER_POLL_INTERVAL` | `60` | Email watcher polling interval (seconds) |
 | `AGENT_RUNTIME` | `local` | `local` or `e2b` (cloud sandbox) |
@@ -79,7 +79,7 @@ Run the SQL migrations in order:
 psql $DATABASE_URL -f sql/000_create_users.sql
 psql $DATABASE_URL -f sql/001_create_guides.sql
 psql $DATABASE_URL -f sql/002_add_gmail_history_id.sql
-psql $DATABASE_URL -f sql/003_add_stash_branding.sql
+psql $DATABASE_URL -f sql/003_add_scheduled_branding.sql
 psql $DATABASE_URL -f sql/004_add_autopilot.sql
 psql $DATABASE_URL -f sql/004_create_pending_invites.sql
 psql $DATABASE_URL -f sql/005_add_google_meet.sql

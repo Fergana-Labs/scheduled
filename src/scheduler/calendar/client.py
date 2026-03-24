@@ -1,4 +1,4 @@
-"""Google Calendar API client for the stash calendar."""
+"""Google Calendar API client for the scheduled calendar."""
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -46,17 +46,17 @@ def _event_from_api(event_data: dict) -> Event:
 class CalendarClient:
     """Wrapper around the Google Calendar API.
 
-    Manages the "stash calendar" — a real Google Calendar that serves as the
+    Manages the "scheduled calendar" — a real Google Calendar that serves as the
     single source of truth for all commitments, whether or not they have
     formal calendar invites.
     """
 
-    def __init__(self, credentials, stash_calendar_name: str = "Scheduled Calendar", extra_calendar_ids: list[str] | None = None):
+    def __init__(self, credentials, scheduled_calendar_name: str = "Scheduled Calendar", extra_calendar_ids: list[str] | None = None):
         self._credentials = credentials
-        self._stash_calendar_name = stash_calendar_name
+        self._scheduled_calendar_name = scheduled_calendar_name
         self._extra_calendar_ids = extra_calendar_ids or []
         self._service = None
-        self._stash_calendar_id = None
+        self._scheduled_calendar_id = None
         self._user_timezone = None
 
     def _get_service(self):
@@ -85,30 +85,30 @@ class CalendarClient:
             return {"dateTime": dt.isoformat()}
         return {"dateTime": dt.isoformat(), "timeZone": self.get_user_timezone()}
 
-    def get_or_create_stash_calendar(self) -> str:
-        """Get the stash calendar ID, creating it if it doesn't exist.
+    def get_or_create_scheduled_calendar(self) -> str:
+        """Get the scheduled calendar ID, creating it if it doesn't exist.
 
         Returns:
-            The calendar ID of the stash calendar.
+            The calendar ID of the scheduled calendar.
         """
-        if self._stash_calendar_id:
-            return self._stash_calendar_id
+        if self._scheduled_calendar_id:
+            return self._scheduled_calendar_id
 
         service = self._get_service()
         calendar_list = service.calendarList().list().execute()
 
         for cal in calendar_list.get("items", []):
-            if cal.get("summary") == self._stash_calendar_name:
-                self._stash_calendar_id = cal["id"]
-                return self._stash_calendar_id
+            if cal.get("summary") == self._scheduled_calendar_name:
+                self._scheduled_calendar_id = cal["id"]
+                return self._scheduled_calendar_id
 
         # Not found — create it
         new_cal = service.calendars().insert(body={
-            "summary": self._stash_calendar_name,
+            "summary": self._scheduled_calendar_name,
             "description": "Scheduled Calendar",
         }).execute()
-        self._stash_calendar_id = new_cal["id"]
-        return self._stash_calendar_id
+        self._scheduled_calendar_id = new_cal["id"]
+        return self._scheduled_calendar_id
 
     def list_calendars(self) -> list[dict]:
         """Return all calendars visible to the user.
@@ -163,10 +163,10 @@ class CalendarClient:
     def get_all_events(
         self, time_min: datetime, time_max: datetime, include_primary: bool = True
     ) -> list[Event]:
-        """Get all events across primary calendar and stash calendar.
+        """Get all events across primary calendar and scheduled calendar.
 
         This is the main availability check — it combines the user's real
-        calendar with the stash calendar to get a complete picture.
+        calendar with the scheduled calendar to get a complete picture.
 
         Args:
             time_min: Start of the time range.
@@ -176,15 +176,15 @@ class CalendarClient:
         Returns:
             All events in the time range, from both calendars, sorted by start time.
         """
-        stash_id = self.get_or_create_stash_calendar()
-        events = self._list_events(stash_id, time_min, time_max)
+        scheduled_id = self.get_or_create_scheduled_calendar()
+        events = self._list_events(scheduled_id, time_min, time_max)
 
         if include_primary:
             primary_events = self._list_events("primary", time_min, time_max)
             events.extend(primary_events)
 
         for cal_id in self._extra_calendar_ids:
-            if cal_id == "primary" or cal_id == stash_id:
+            if cal_id == "primary" or cal_id == scheduled_id:
                 continue
             events.extend(self._list_events(cal_id, time_min, time_max))
 
@@ -192,7 +192,7 @@ class CalendarClient:
         return events
 
     def add_event(self, event: Event) -> str:
-        """Add an event to the stash calendar.
+        """Add an event to the scheduled calendar.
 
         Args:
             event: The event to add.
@@ -201,7 +201,7 @@ class CalendarClient:
             The ID of the created event.
         """
         service = self._get_service()
-        stash_id = self.get_or_create_stash_calendar()
+        scheduled_id = self.get_or_create_scheduled_calendar()
 
         body = {
             "summary": event.summary,
@@ -212,13 +212,13 @@ class CalendarClient:
         if event.source:
             body["description"] = f"[source: {event.source}]\n{event.description}"
 
-        result = service.events().insert(calendarId=stash_id, body=body).execute()
+        result = service.events().insert(calendarId=scheduled_id, body=body).execute()
         return result["id"]
 
     def update_event(self, event_id: str, event: Event) -> None:
-        """Update an existing event on the stash calendar."""
+        """Update an existing event on the scheduled calendar."""
         service = self._get_service()
-        stash_id = self.get_or_create_stash_calendar()
+        scheduled_id = self.get_or_create_scheduled_calendar()
 
         body = {
             "summary": event.summary,
@@ -227,7 +227,7 @@ class CalendarClient:
             "description": event.description,
         }
         service.events().update(
-            calendarId=stash_id, eventId=event_id, body=body
+            calendarId=scheduled_id, eventId=event_id, body=body
         ).execute()
 
     def find_event(self, summary: str, time_min: datetime, time_max: datetime) -> Event | None:
@@ -235,8 +235,8 @@ class CalendarClient:
 
         Useful for deduplication — checking if we already have this commitment.
         """
-        stash_id = self.get_or_create_stash_calendar()
-        events = self._list_events(stash_id, time_min, time_max)
+        scheduled_id = self.get_or_create_scheduled_calendar()
+        events = self._list_events(scheduled_id, time_min, time_max)
 
         summary_lower = summary.lower()
         for event in events:

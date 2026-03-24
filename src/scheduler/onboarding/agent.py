@@ -1,4 +1,4 @@
-"""Calendar backfill agent — searches Gmail history and populates the stash calendar."""
+"""Calendar backfill agent — searches Gmail history and populates the scheduled calendar."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ You are an onboarding agent for a scheduling assistant. Your job is to search \
 through the user's Gmail history from the last {lookback_days} days and find \
 commitments — meetings, calls, dinners, events, etc. — that the user has \
 agreed to. For each real commitment you find, check if it already exists on \
-the calendar, and if not, add it to the stash calendar.
+the calendar, and if not, add it to the scheduled calendar.
 
 Today's date: {today}
 Search window: {window_start} to {today}
@@ -102,7 +102,7 @@ def _build_tools(backend: BackfillBackend):
 
     @tool(
         "get_calendar_events",
-        "Get all events from the user's calendars (primary + stash) in a date range. "
+        "Get all events from the user's calendars (primary + scheduled) in a date range. "
         "Use this to see what's already on the calendar.",
         {"start_date": str, "end_date": str},
     )
@@ -114,11 +114,11 @@ def _build_tools(backend: BackfillBackend):
         return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     @tool(
-        "add_to_stash_calendar",
-        "Add a commitment to the stash calendar.",
+        "add_to_scheduled_calendar",
+        "Add a commitment to the scheduled calendar.",
         {"summary": str, "start": str, "end": str, "description": str},
     )
-    async def add_to_stash_calendar(args):
+    async def add_to_scheduled_calendar(args):
         result = backend.add_event(
             summary=args["summary"],
             start=args["start"],
@@ -130,7 +130,7 @@ def _build_tools(backend: BackfillBackend):
         return {"content": [{"type": "text", "text": json.dumps(result)}]}
 
     return (
-        [search_emails, read_thread, check_calendar, get_calendar_events, add_to_stash_calendar],
+        [search_emails, read_thread, check_calendar, get_calendar_events, add_to_scheduled_calendar],
         events_added,
     )
 
@@ -152,7 +152,7 @@ async def _run_backfill_async(backend: BackfillBackend, lookback_days: int):
     prompt = (
         f"Please search through my Gmail from the last "
         f"{lookback_days} days and add any "
-        f"commitments you find to my stash calendar. Be thorough."
+        f"commitments you find to my scheduled calendar. Be thorough."
     )
 
     options = ClaudeAgentOptions(

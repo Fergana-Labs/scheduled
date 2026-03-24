@@ -1,4 +1,4 @@
-"""Onboarding agent — backfills the stash calendar from Gmail history.
+"""Onboarding agent — backfills the scheduled calendar from Gmail history.
 
 Entry point for the local (CLI) onboarding mode. For sandbox mode,
 see scheduler.sandbox.onboarding.
@@ -23,8 +23,8 @@ async def _run_onboarding_all():
 
     creds = get_credentials()
     gmail = GmailClient(creds)
-    calendar = CalendarClient(creds, config.stash_calendar_name)
-    calendar.get_or_create_stash_calendar()
+    calendar = CalendarClient(creds, config.scheduled_calendar_name)
+    calendar.get_or_create_scheduled_calendar()
 
     onboarding_backend = LocalBackend(gmail, calendar)
     guide_backend = LocalGuideBackend(gmail, calendar)
@@ -36,10 +36,10 @@ async def _run_onboarding_all():
 
 
 def run_onboarding():
-    """Run onboarding: backfill stash calendar + generate guide files.
+    """Run onboarding: backfill scheduled calendar + generate guide files.
 
     Launches three agents in parallel:
-    1. Backfill agent — searches Gmail and adds commitments to the stash calendar
+    1. Backfill agent — searches Gmail and adds commitments to the scheduled calendar
     2. Preferences agent — analyzes scheduling patterns and writes a guide
     3. Style agent — analyzes email writing style and writes a guide
     """

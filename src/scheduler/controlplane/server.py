@@ -238,12 +238,12 @@ def auth0_login(signup: str | None = None):
     return RedirectResponse(url)
 
 
-def _is_onboarded(user_id: str, *, stash_calendar_id: str | None = None) -> bool:
+def _is_onboarded(user_id: str, *, scheduled_calendar_id: str | None = None) -> bool:
     from scheduler.db import get_guides_for_user
     guides = get_guides_for_user(user_id)
     guide_names = {g.name for g in guides}
     has_guides = "scheduling_preferences" in guide_names and "email_style" in guide_names
-    return has_guides and stash_calendar_id is not None
+    return has_guides and scheduled_calendar_id is not None
 
 
 @app.get("/auth/callback")
@@ -312,7 +312,7 @@ def auth0_callback(code: str | None = None, error: str | None = None):
 
     # Check if user has Google tokens and onboarding status
     has_google = user.google_refresh_token is not None
-    is_onboarded = has_google and _is_onboarded(str(user.id), stash_calendar_id=user.stash_calendar_id)
+    is_onboarded = has_google and _is_onboarded(str(user.id), scheduled_calendar_id=user.scheduled_calendar_id)
 
     if has_google and is_onboarded:
         logger.info("auth0_callback: returning user=%s, renewing gmail watch", user.id)
@@ -466,7 +466,7 @@ def auth_google_connect_callback(
     # Check onboarding status
     from scheduler.db import get_user_by_id as _get_user
     db_user = _get_user(user_id)
-    is_onboarded = _is_onboarded(user_id, stash_calendar_id=db_user.stash_calendar_id if db_user else None)
+    is_onboarded = _is_onboarded(user_id, scheduled_calendar_id=db_user.scheduled_calendar_id if db_user else None)
 
     from starlette.background import BackgroundTask
 
@@ -609,7 +609,7 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
             return RedirectResponse(f"{config.web_app_url}?error=account_not_found")
 
     # Determine if user is already onboarded
-    is_onboarded = _is_onboarded(str(user.id), stash_calendar_id=user.stash_calendar_id)
+    is_onboarded = _is_onboarded(str(user.id), scheduled_calendar_id=user.scheduled_calendar_id)
 
     from starlette.background import BackgroundTask
 
@@ -664,8 +664,8 @@ def register_session(session_token: str, user_id: str) -> None:
 
     db_user = get_user_by_id(user_id)
     extra_ids = (db_user.calendar_ids or []) if db_user else []
-    calendar = CalendarClient(creds, config.stash_calendar_name, extra_calendar_ids=extra_ids)
-    calendar.get_or_create_stash_calendar()
+    calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=extra_ids)
+    calendar.get_or_create_scheduled_calendar()
 
     sessions[session_token] = {
         "user_id": user_id,
@@ -819,7 +819,7 @@ def gmail_draft(req: CreateDraftRequest, session: dict = Depends(get_session)):
     user = get_user_by_id(session["user_id"])
     body = req.body
     content_type = "plain"
-    if user and user.stash_branding_enabled:
+    if user and user.scheduled_branding_enabled:
         html_body = html.escape(body).replace("\n", "<br>")
         html_body += '<br><br>sent by <a href="https://tryscheduled.com">Scheduled.</a>'
         body = html_body
@@ -840,7 +840,7 @@ def gmail_send(req: SendEmailRequest, session: dict = Depends(get_session)):
     user = get_user_by_id(session["user_id"])
     body = req.body
     content_type = "plain"
-    if user and user.stash_branding_enabled:
+    if user and user.scheduled_branding_enabled:
         html_body = html.escape(body).replace("\n", "<br>")
         html_body += '<br><br>sent by <a href="https://tryscheduled.com">Scheduled.</a>'
         body = html_body
@@ -915,18 +915,18 @@ def settings_branding_get(session: dict = Depends(get_session)):
     user = get_user_by_id(session["user_id"])
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"stash_branding_enabled": user.stash_branding_enabled}
+    return {"scheduled_branding_enabled": user.scheduled_branding_enabled}
 
 
 @app.put("/api/v1/settings/branding")
 def settings_branding_put(req: UpdateBrandingRequest, session: dict = Depends(get_session)):
-    from scheduler.db import get_user_by_id, update_stash_branding
+    from scheduler.db import get_user_by_id, update_scheduled_branding
 
     user = get_user_by_id(session["user_id"])
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    update_stash_branding(session["user_id"], req.enabled)
-    return {"stash_branding_enabled": req.enabled}
+    update_scheduled_branding(session["user_id"], req.enabled)
+    return {"scheduled_branding_enabled": req.enabled}
 
 
 @app.get("/api/v1/settings/autopilot")
@@ -1049,11 +1049,11 @@ def _run_onboarding_all(user_id: str) -> None:
 
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
-    calendar = CalendarClient(creds, config.stash_calendar_name)
-    cal_id = calendar.get_or_create_stash_calendar()
+    calendar = CalendarClient(creds, config.scheduled_calendar_name)
+    cal_id = calendar.get_or_create_scheduled_calendar()
     if cal_id:
-        from scheduler.db import update_stash_calendar_id
-        update_stash_calendar_id(user_id, cal_id)
+        from scheduler.db import update_scheduled_calendar_id
+        update_scheduled_calendar_id(user_id, cal_id)
 
     guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
     onboarding_backend = LocalBackend(gmail, calendar)
@@ -1117,13 +1117,13 @@ def _run_onboarding_for_runtime(user_id: str) -> None:
             if not control_plane_url:
                 raise RuntimeError("CONTROL_PLANE_PUBLIC_URL must be set when AGENT_RUNTIME=e2b")
 
-            # Ensure Stash calendar exists before sandbox launch (agents need it)
+            # Ensure Scheduled calendar exists before sandbox launch (agents need it)
             creds = load_credentials(user_id)
-            calendar = CalendarClient(creds, config.stash_calendar_name)
-            cal_id = calendar.get_or_create_stash_calendar()
+            calendar = CalendarClient(creds, config.scheduled_calendar_name)
+            cal_id = calendar.get_or_create_scheduled_calendar()
             if cal_id:
-                from scheduler.db import update_stash_calendar_id
-                update_stash_calendar_id(user_id, cal_id)
+                from scheduler.db import update_scheduled_calendar_id
+                update_scheduled_calendar_id(user_id, cal_id)
 
             def _on_agent_done(agent_name: str, success: bool) -> None:
                 with _onboarding_lock:
@@ -1281,7 +1281,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
     from scheduler.classifier.newsletter import is_mass_email
     from scheduler.db import try_claim_message
 
-    calendar = CalendarClient(creds, config.stash_calendar_name, extra_calendar_ids=user.calendar_ids or [])
+    calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=user.calendar_ids or [])
 
     for message_id in new_message_ids:
         # Atomic claim: prevents duplicate processing from concurrent webhooks
@@ -1449,7 +1449,7 @@ def web_onboarding_status(
     connected = db_user is not None and db_user.google_refresh_token is not None
 
     if connected:
-        ready = _is_onboarded(user["user_id"], stash_calendar_id=db_user.stash_calendar_id)
+        ready = _is_onboarded(user["user_id"], scheduled_calendar_id=db_user.scheduled_calendar_id)
     else:
         ready = False
 
@@ -1491,9 +1491,9 @@ def web_settings_get(user: dict = Depends(get_authenticated_user)):
         "system_enabled": db_user.system_enabled,
         "autopilot_enabled": db_user.autopilot_enabled,
         "process_sales_emails": db_user.process_sales_emails,
-        "stash_branding_enabled": db_user.stash_branding_enabled,
+        "scheduled_branding_enabled": db_user.scheduled_branding_enabled,
         "reasoning_emails_enabled": db_user.reasoning_emails_enabled,
-        "stash_calendar_id": db_user.stash_calendar_id,
+        "scheduled_calendar_id": db_user.scheduled_calendar_id,
         "calendar_ids": db_user.calendar_ids or [],
         "guides": [
             {"name": g.name, "content": g.content, "updated_at": g.updated_at.isoformat()}
@@ -1544,10 +1544,10 @@ class WebUpdateBrandingRequest(BaseModel):
 
 @app.put("/web/api/v1/settings/branding")
 def web_settings_branding(req: WebUpdateBrandingRequest, user: dict = Depends(get_authenticated_user)):
-    from scheduler.db import update_stash_branding
+    from scheduler.db import update_scheduled_branding
 
-    update_stash_branding(user["user_id"], req.enabled)
-    return {"stash_branding_enabled": req.enabled}
+    update_scheduled_branding(user["user_id"], req.enabled)
+    return {"scheduled_branding_enabled": req.enabled}
 
 
 class WebUpdateReasoningEmailsRequest(BaseModel):
@@ -1572,17 +1572,17 @@ def web_list_calendars(user: dict = Depends(get_authenticated_user)):
         raise HTTPException(status_code=404, detail="User not found")
 
     creds = load_credentials(user["user_id"])
-    calendar = CalendarClient(creds, config.stash_calendar_name)
+    calendar = CalendarClient(creds, config.scheduled_calendar_name)
     selected_ids = set(db_user.calendar_ids or [])
 
     all_cals = calendar.list_calendars()
-    stash_id = calendar.get_or_create_stash_calendar()
+    scheduled_id = calendar.get_or_create_scheduled_calendar()
 
-    # Filter out the stash calendar — users shouldn't toggle it
+    # Filter out the scheduled calendar — users shouldn't toggle it
     return [
         {**cal, "selected": cal["id"] in selected_ids}
         for cal in all_cals
-        if cal["id"] != stash_id
+        if cal["id"] != scheduled_id
     ]
 
 
@@ -1627,8 +1627,8 @@ def _run_guide_regeneration(user_id: str, guide_name: str) -> None:
 
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
-    calendar = CalendarClient(creds, config.stash_calendar_name)
-    calendar.get_or_create_stash_calendar()
+    calendar = CalendarClient(creds, config.scheduled_calendar_name)
+    calendar.get_or_create_scheduled_calendar()
 
     guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
 
