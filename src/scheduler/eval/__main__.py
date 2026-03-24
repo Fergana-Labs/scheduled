@@ -216,11 +216,12 @@ def cmd_draft(args):
             "duration_minutes": c.duration_minutes,
         }
 
-        backend = ReplayDraftBackend(fixture)
-        composer = DraftComposer(backend, user_id="eval", user_email="eval@test.com")
-        composer.compose_and_create_draft(latest, classification)
-
         case = _get_eval_case(tid)
+        user_email = case.user_email if case else "henry@ferganalabs.com"
+
+        backend = ReplayDraftBackend(fixture)
+        composer = DraftComposer(backend, user_id="eval", user_email=user_email)
+        composer.compose_and_create_draft(latest, classification, current_datetime=latest["date"])
 
         result = {
             "thread_id": tid,

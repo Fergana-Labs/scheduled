@@ -12,6 +12,9 @@ class EvalCase:
     expected_intent: str  # e.g. "requesting_meeting", "proposing_times", "not_scheduling"
     expected_is_sales: bool = False
 
+    # Whose inbox this thread came from (used so the agent knows who it's composing for)
+    user_email: str = "henry@ferganalabs.com"
+
     # Reference draft — what a good response looks like.
     # None means "no draft should be created" (e.g. not_scheduling, already resolved).
     expected_draft: str | None = None

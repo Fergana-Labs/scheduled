@@ -34,7 +34,8 @@ agents.md
 
 # Eval fixtures (contain personal inbox/calendar data)
 eval/fixtures/
-evals/thread_fixtures.json
+evals/classifier_canonical_evals.json
+evals/draft_canonical_evals.json
 evals/golden_responses.json
 
 # Temp files

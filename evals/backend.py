@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-FIXTURES_PATH = Path(__file__).parent / "thread_fixtures.json"
+FIXTURES_PATH = Path(__file__).parent / "draft_canonical_evals.json"
 
 
 class EvalDraftBackend:
