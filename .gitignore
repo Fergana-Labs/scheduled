@@ -32,10 +32,11 @@ local_dev_guide_artifacts/
 CLAUDE.md
 agents.md
 
-# Eval fixtures (contain personal inbox/calendar data)
-eval/fixtures/
+# Eval data (symlinked from scheduler-evals, contains personal inbox/calendar data)
 evals/classifier_canonical_evals.json
 evals/draft_canonical_evals.json
+evals/fixtures
+evals/results
 
 # Temp files
 temp/
