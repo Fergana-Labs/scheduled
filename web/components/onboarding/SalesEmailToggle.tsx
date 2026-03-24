@@ -12,13 +12,16 @@ export default function SalesEmailToggle({ initialEnabled }: SalesEmailTogglePro
   const [saving, setSaving] = useState(false);
 
   async function toggle() {
+    const next = !enabled;
+    setEnabled(next);
     setSaving(true);
     try {
       await api('/web/api/v1/settings/sales-emails', {
         method: 'PUT',
-        body: JSON.stringify({ enabled: !enabled }),
+        body: JSON.stringify({ enabled: next }),
       });
-      setEnabled(!enabled);
+    } catch {
+      setEnabled(!next);
     } finally {
       setSaving(false);
     }
