@@ -164,7 +164,7 @@ def _email_field(email: Any, key: str) -> Any:
 def _classification_dict(classification: "ClassificationResult" | dict) -> dict:
     if isinstance(classification, dict):
         return {
-            "intent": classification.get("intent", "not_scheduling"),
+            "intent": classification.get("intent", "doesnt_need_draft"),
             "confidence": classification.get("confidence", 0.0),
             "summary": classification.get("summary", ""),
             "proposed_times": list(classification.get("proposed_times") or []),
@@ -334,15 +334,15 @@ class DraftComposer:
             "   - If a meeting was cancelled/rescheduled but the calendar still has the old event, note this discrepancy.\n"
             "3. Inspect the user's availability using get_calendar_events over a reasonable window "
             "(for example, the next 14 days).\n"
-            "4. Based on the intent:\n"
-            "   - If requesting_meeting or proposing_times: propose concrete meeting times that respect "
-            "the user's existing commitments and the extracted details from the classification. "
+            "4. Based on the thread context, draft the appropriate response:\n"
+            "   - If someone is requesting a meeting or proposing times: propose concrete meeting times "
+            "that respect the user's existing commitments. "
             "NEVER re-suggest a time that someone already said doesn't work.\n"
-            "   - If cancelling_rescheduling: acknowledge the cancellation or reschedule request. "
+            "   - If someone is cancelling or rescheduling: acknowledge it. "
             "If rescheduling, suggest alternative times based on the user's availability. "
             "Note if the user's calendar still has the old event that should be removed.\n"
-            "   - If confirming_time: draft a brief confirmation. Verify there is no calendar conflict "
-            "at the confirmed time.\n"
+            "   - If someone is confirming a time: draft a brief confirmation. Verify there is no "
+            "calendar conflict at the confirmed time.\n"
             "5. Consider location preferences when drafting replies. If the thread mentions an in-person "
             "meeting but no location, suggest one based on any observed location preferences. "
             "If a location is mentioned in the thread, acknowledge it in the reply.\n"

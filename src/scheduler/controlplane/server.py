@@ -1277,7 +1277,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
         new_message_ids,
     )
 
-    from scheduler.classifier.intent import SchedulingIntent, classify_email
+    from scheduler.classifier.intent import classify_email, SchedulingIntent
     from scheduler.classifier.newsletter import is_mass_email
     from scheduler.db import try_claim_message
 
@@ -1332,7 +1332,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 recipient=email.recipient, cc=email.cc,
             )
 
-            if classification.intent == SchedulingIntent.NOT_SCHEDULING:
+            if classification.intent == SchedulingIntent.DOESNT_NEED_DRAFT:
                 logger.info("gmail_webhook: message %s is not scheduling-related, skipping", message_id)
                 continue
 

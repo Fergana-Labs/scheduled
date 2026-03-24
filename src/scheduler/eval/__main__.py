@@ -122,7 +122,8 @@ def run_classify_eval(fixture: dict, thread_ids: list[str] | None = None) -> lis
         }
 
         if case:
-            expected_intent = case["expected_classification"].lower()
+            raw_expected = case["expected_classification"].lower()
+            expected_intent = "doesnt_need_draft" if raw_expected == "not_scheduling" else "needs_draft"
             result["expected_intent"] = expected_intent
             result["intent_match"] = c.intent.value == expected_intent
             expected_is_sales = case.get("expected_is_sales", False)

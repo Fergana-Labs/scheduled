@@ -19,13 +19,10 @@ from scheduler.config import config
 
 
 class SchedulingIntent(Enum):
-    """Classification result for an email."""
+    """Binary: does this email need a draft reply or not?"""
 
-    NOT_SCHEDULING = "not_scheduling"  # Email is not about scheduling
-    REQUESTING_MEETING = "requesting_meeting"  # Someone wants to meet with the user
-    PROPOSING_TIMES = "proposing_times"  # Someone is proposing specific times
-    CONFIRMING_TIME = "confirming_time"  # Someone is confirming a previously discussed time
-    CANCELLING_RESCHEDULING = "cancelling_rescheduling"  # Someone is cancelling or rescheduling
+    NEEDS_DRAFT = "needs_draft"
+    DOESNT_NEED_DRAFT = "doesnt_need_draft"
 
 
 @dataclass
@@ -42,13 +39,7 @@ class ClassificationResult:
 
 
 class _EmailClassificationJSON(TypedDict, total=False):
-    intent: Literal[
-        "not_scheduling",
-        "requesting_meeting",
-        "proposing_times",
-        "confirming_time",
-        "cancelling_rescheduling",
-    ]
+    intent: Literal["needs_draft", "doesnt_need_draft"]
     confidence: float
     summary: str
     proposed_times: list[str]
@@ -102,21 +93,30 @@ def classify_email(
     client = _get_anthropic_client()
 
     system_prompt = (
-        "You are a classifier for scheduling-related emails. "
+        "You are a classifier that decides whether an email needs a scheduling draft reply.\n\n"
         "Given an email subject, body, sender, and the prior thread history, "
-        "you must determine whether the email is about scheduling a meeting, "
-        "and if so, extract structured details.\n\n"
+        "decide: does this email need the user to take a scheduling action "
+        "(propose times, accept/decline, reschedule, etc.)? If yes, intent is \"needs_draft\". "
+        "If no, intent is \"doesnt_need_draft\".\n\n"
         "Focus your classification on the LATEST message, but use the thread history "
         "to understand context (e.g. what was previously discussed, proposed, or agreed to).\n\n"
-        "Valid intents:\n"
-        "- not_scheduling: Email is not about scheduling at all.\n"
-        "- requesting_meeting: Someone wants to meet with the user.\n"
-        "- proposing_times: Someone proposes one or more specific times.\n"
-        "- confirming_time: Someone confirms a previously discussed time.\n"
-        "- cancelling_rescheduling: Someone is cancelling or rescheduling a previously agreed meeting.\n\n"
+        "needs_draft examples:\n"
+        "- Someone requests a meeting\n"
+        "- Someone proposes specific times\n"
+        "- Someone confirms a time (user may need to send a calendar invite or acknowledge)\n"
+        "- Someone cancels or reschedules (user may need to propose new times)\n"
+        "- A booking confirmation from a scheduling tool (Cal.com, Calendly, etc.)\n"
+        "- A calendar invite that the user should acknowledge\n\n"
+        "doesnt_need_draft examples:\n"
+        "- Email is not about scheduling at all\n"
+        "- Newsletters, product updates, marketing emails\n"
+        "- Support questions unrelated to scheduling\n"
+        "- Multi-day events (conferences, retreats, offsites, summits)\n"
+        "- Group announcements addressed to many people (\"Hi Founders\", \"Hi everyone\")\n"
+        "- The user is only CC'd and someone else is the primary recipient\n\n"
         "You MUST respond with a single JSON object only, no prose, matching this schema:\n"
         "{\n"
-        '  \"intent\": \"not_scheduling\" | \"requesting_meeting\" | \"proposing_times\" | \"confirming_time\" | \"cancelling_rescheduling\",\n'
+        '  \"intent\": \"needs_draft\" | \"doesnt_need_draft\",\n'
         "  \"confidence\": number between 0 and 1,\n"
         "  \"summary\": string,\n"
         "  \"proposed_times\": list of strings,\n"
@@ -129,21 +129,7 @@ def classify_email(
         "fundraising outreach, recruiting cold emails, or any email where a stranger "
         "is trying to get a meeting without a prior relationship. Do NOT flag replies "
         "to the user's own outreach, or emails from known contacts. If in doubt, set false.\n\n"
-        "Multi-day events (conferences, retreats, offsites, summits, multi-day workshops, etc.) "
-        "are NOT scheduling requests — classify them as \"not_scheduling\". We only handle "
-        "single meetings/calls, not multi-day commitments.\n\n"
-        "Automated calendar invites and notifications (e.g. from Google Calendar, Outlook, "
-        "Calendly, or other scheduling tools) are NOT scheduling requests — classify them "
-        "as \"not_scheduling\". These are system-generated notifications, not personal emails "
-        "that need a response.\n\n"
-        "Group announcements and broadcast emails are NOT scheduling requests — classify them "
-        "as \"not_scheduling\". Signs of a group announcement include: the email is addressed "
-        "to a group (\"Hi Founders\", \"Hi everyone\", \"Hi team\"), the user is BCC'd or not "
-        "in the To/CC fields, the sender is informing a group about an event rather than "
-        "personally requesting the user to meet, or the email is a newsletter/community update. "
-        "These are one-to-many communications, not personal scheduling requests.\n\n"
-        "If the email is not about scheduling, set intent to \"not_scheduling\" and leave\n"
-        "the other fields as your best-effort defaults."
+        "If the email doesnt_need_draft, leave the other fields as your best-effort defaults."
     )
 
     # Build thread history section
@@ -194,9 +180,9 @@ def classify_email(
 
         data: _EmailClassificationJSON = json.loads(text)
     except Exception:
-        # On any failure, fall back to NOT_SCHEDULING with minimal info.
+        # On any failure, fall back to doesnt_need_draft.
         return ClassificationResult(
-            intent=SchedulingIntent.NOT_SCHEDULING,
+            intent=SchedulingIntent.DOESNT_NEED_DRAFT,
             confidence=0.0,
             summary="",
             proposed_times=[],
@@ -205,8 +191,11 @@ def classify_email(
             is_sales_email=False,
         )
 
-    intent_str = data.get("intent", "not_scheduling")
-    intent = SchedulingIntent(intent_str) if intent_str in SchedulingIntent._value2member_map_ else SchedulingIntent.NOT_SCHEDULING
+    intent_str = data.get("intent", "doesnt_need_draft")
+    try:
+        intent = SchedulingIntent(intent_str)
+    except ValueError:
+        intent = SchedulingIntent.DOESNT_NEED_DRAFT
 
     confidence = float(data.get("confidence", 0.0))
     summary = data.get("summary") or ""

@@ -9,7 +9,7 @@ import time
 
 from scheduler.auth.google_auth import get_credentials
 from scheduler.calendar.client import CalendarClient
-from scheduler.classifier.intent import SchedulingIntent, classify_email
+from scheduler.classifier.intent import classify_email
 from scheduler.config import config
 from scheduler.drafts.composer import DraftComposer
 from scheduler.gmail.client import GmailClient
@@ -36,7 +36,7 @@ def run_watcher():
     #     emails = gmail.get_recent_emails(since=last_check)
     #     for email in emails:
     #         result = classify_email(email.subject, email.body, email.sender)
-    #         if result.intent == SchedulingIntent.REQUESTING_MEETING:
+    #         if result.intent == SchedulingIntent.NEEDS_DRAFT:
     #             draft_id = composer.compose_and_create_draft(email, result)
     #             print(f"Created draft {draft_id} for thread {email.thread_id}")
     #     last_check = now
