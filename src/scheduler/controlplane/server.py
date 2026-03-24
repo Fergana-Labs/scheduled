@@ -1377,9 +1377,9 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 logger.info("gmail_webhook: message %s is not scheduling-related, skipping", message_id)
                 continue
 
-            # Skip sales emails unless user opted in
+            # Skip cold outreach unless user opted in
             if classification.is_sales_email and not user.process_sales_emails:
-                logger.info("gmail_webhook: message %s is a sales email, skipping", message_id)
+                logger.info("gmail_webhook: message %s is cold outreach, skipping", message_id)
                 continue
 
             logger.info(

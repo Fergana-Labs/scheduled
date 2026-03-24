@@ -27,10 +27,10 @@ export default function SalesEmailToggle({ initialEnabled }: SalesEmailTogglePro
   return (
     <div className="flex items-start justify-between gap-4 rounded-xl border border-gray-100 bg-[#FAFAFA] p-4">
       <div>
-        <p className="text-sm font-medium text-gray-900">Process sales emails</p>
+        <p className="text-sm font-medium text-gray-900">Process cold outreach</p>
         <p className="mt-1 text-xs text-gray-500">
-          When on, Scheduled will draft replies to sales outreach, pitches, and
-          promotional emails. When off, these are silently skipped.
+          When on, Scheduled will draft replies to cold outreach — sales pitches,
+          investor intros, recruiting emails, etc. When off, these are silently skipped.
         </p>
       </div>
       <button
