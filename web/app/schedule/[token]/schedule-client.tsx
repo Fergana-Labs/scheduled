@@ -45,23 +45,32 @@ type PageState =
 
 // -- Helpers --
 
+/**
+ * Create a Date in a specific IANA timezone.
+ * Uses Intl to figure out the UTC offset for that timezone on that date,
+ * then constructs the Date so it represents the correct instant.
+ */
+function dateInTimezone(dateStr: string, timeStr: string, tz: string): Date {
+  // Build a date string and parse it as if in the target timezone
+  const naive = new Date(`${dateStr}T${timeStr}:00`);
+  // Get the offset difference between local timezone and the target timezone
+  const localStr = naive.toLocaleString('en-US', { timeZone: tz });
+  const tzDate = new Date(localStr);
+  const offset = naive.getTime() - tzDate.getTime();
+  return new Date(naive.getTime() + offset);
+}
+
 function generateSlots(
   windows: { date: string; start: string; end: string }[],
   durationMinutes: number,
+  hostTimezone: string,
 ) {
   const slots: { start: Date; end: Date; dateKey: string }[] = [];
   const now = new Date();
 
   for (const w of windows) {
-    const [startH, startM] = w.start.split(':').map(Number);
-    const [endH, endM] = w.end.split(':').map(Number);
-
-    const baseDate = new Date(`${w.date}T00:00:00`);
-    let cursor = new Date(baseDate);
-    cursor.setHours(startH, startM, 0, 0);
-
-    const windowEnd = new Date(baseDate);
-    windowEnd.setHours(endH, endM, 0, 0);
+    const cursor = dateInTimezone(w.date, w.start, hostTimezone);
+    const windowEnd = dateInTimezone(w.date, w.end, hostTimezone);
 
     while (cursor.getTime() + durationMinutes * 60000 <= windowEnd.getTime()) {
       const slotStart = new Date(cursor);
@@ -71,7 +80,7 @@ function generateSlots(
         slots.push({ start: slotStart, end: slotEnd, dateKey: w.date });
       }
 
-      cursor = new Date(cursor.getTime() + durationMinutes * 60000);
+      cursor.setTime(cursor.getTime() + durationMinutes * 60000);
     }
   }
 
@@ -192,6 +201,7 @@ function CalendarPicker({
   windows,
   durationMinutes,
   hostName,
+  hostTimezone,
   selectedSlot,
   onSelectSlot,
   onConfirm,
@@ -200,12 +210,13 @@ function CalendarPicker({
   windows: { date: string; start: string; end: string }[];
   durationMinutes: number;
   hostName: string;
+  hostTimezone: string;
   selectedSlot: { start: Date; end: Date } | null;
   onSelectSlot: (slot: { start: Date; end: Date }) => void;
   onConfirm: () => void;
   confirming: boolean;
 }) {
-  const allSlots = generateSlots(windows, durationMinutes);
+  const allSlots = generateSlots(windows, durationMinutes, hostTimezone);
   const availableDates = new Set(allSlots.map((s) => s.dateKey));
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [viewMonth, setViewMonth] = useState<Date>(() => {
@@ -859,6 +870,7 @@ export default function SchedulePageClient({ token }: { token: string }) {
                     windows={data.suggested_windows}
                     durationMinutes={data.duration_minutes}
                     hostName={data.host_name}
+                    hostTimezone={data.timezone}
                     selectedSlot={selectedSlot}
                     onSelectSlot={(slot) => {
                       setSelectedSlot(slot);
