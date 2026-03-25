@@ -110,6 +110,13 @@ where they propose or accept times.
    - In-person vs. virtual preference
    - Common video conferencing tools (Zoom, Google Meet, Teams, etc.)
    - Geographic patterns (neighborhoods, areas of the city frequently used)
+   - Prioritization patterns: which meeting types take precedence over others \
+(e.g. work vs personal, external vs internal, 1:1s vs group)
+   - How the user handles scheduling conflicts — do they reschedule, decline, \
+or double-book? Which events get moved and which are immovable?
+   - Urgency signals: how quickly they respond to different types of requests, \
+language patterns that indicate high vs low priority
+   - Flexibility hierarchy: which calendar blocks are firm vs. negotiable
 4. Write a Markdown guide addressed to a future AI scheduling agent.
 5. Only report patterns you actually observe — note confidence levels (strong \
 pattern vs. weak signal). Do not fabricate patterns.
