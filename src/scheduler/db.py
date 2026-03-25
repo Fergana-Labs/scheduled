@@ -656,7 +656,7 @@ def get_funnel_data(weeks: int = 12) -> list[dict]:
 
 
 def get_cohort_data(weeks: int = 8) -> dict:
-    """Rich cohort data: retention, emails sent, active users, and lifetime actions — all by week cohort and week offset."""
+    """Rich cohort data: retention by week offset, plus absolute-date series for emails/active/actions."""
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
@@ -673,6 +673,7 @@ def get_cohort_data(weeks: int = 8) -> dict:
             weekly_activity AS (
                 SELECT
                     c.cohort_week,
+                    date_trunc('week', ae.created_at) AS activity_week,
                     FLOOR(EXTRACT(EPOCH FROM date_trunc('week', ae.created_at) - c.cohort_week) / 604800)::int AS week_offset,
                     count(DISTINCT c.user_id) AS active_users,
                     count(*) FILTER (WHERE ae.event = 'draft_sent') AS emails_sent,
@@ -680,18 +681,19 @@ def get_cohort_data(weeks: int = 8) -> dict:
                 FROM cohorts c
                 JOIN analytics_events ae ON ae.user_id = c.user_id
                 WHERE ae.event IN ('draft_composed', 'draft_sent', 'email_classified', 'setting_changed')
-                GROUP BY c.cohort_week, week_offset
+                GROUP BY c.cohort_week, activity_week, week_offset
             )
             SELECT
                 cs.cohort_week,
                 cs.size,
+                wa.activity_week,
                 wa.week_offset,
                 COALESCE(wa.active_users, 0) AS active_users,
                 COALESCE(wa.emails_sent, 0) AS emails_sent,
                 COALESCE(wa.total_actions, 0) AS total_actions
             FROM cohort_sizes cs
             LEFT JOIN weekly_activity wa ON wa.cohort_week = cs.cohort_week
-            ORDER BY cs.cohort_week, wa.week_offset
+            ORDER BY cs.cohort_week, wa.activity_week
             """,
             (weeks,),
         )
@@ -700,16 +702,26 @@ def get_cohort_data(weeks: int = 8) -> dict:
 
         # Build per-cohort data
         cohort_map: dict[str, dict] = {}
+        all_activity_weeks: set[str] = set()
         for row in rows:
             key = str(row["cohort_week"])
             if key not in cohort_map:
                 cohort_map[key] = {
                     "week": key,
                     "size": row["size"],
-                    "weekly": {},  # week_offset -> {active_users, emails_sent, total_actions}
+                    "by_offset": {},   # week_offset -> {active_users, ...}
+                    "by_date": {},     # activity_week ISO -> {active_users, emails_sent, total_actions}
                 }
             if row["week_offset"] is not None and row["week_offset"] >= 0:
-                cohort_map[key]["weekly"][row["week_offset"]] = {
+                cohort_map[key]["by_offset"][row["week_offset"]] = {
+                    "active_users": row["active_users"],
+                    "emails_sent": row["emails_sent"],
+                    "total_actions": row["total_actions"],
+                }
+            if row["activity_week"] is not None:
+                aw_key = row["activity_week"].isoformat()
+                all_activity_weeks.add(aw_key)
+                cohort_map[key]["by_date"][aw_key] = {
                     "active_users": row["active_users"],
                     "emails_sent": row["emails_sent"],
                     "total_actions": row["total_actions"],
@@ -717,35 +729,58 @@ def get_cohort_data(weeks: int = 8) -> dict:
 
         cohorts = sorted(cohort_map.values(), key=lambda c: c["week"])
         max_offset = max(
-            (max(c["weekly"].keys()) for c in cohorts if c["weekly"]),
+            (max(c["by_offset"].keys()) for c in cohorts if c["by_offset"]),
             default=0,
         )
+        sorted_activity_weeks = sorted(all_activity_weeks)
 
-        # Reshape into arrays for frontend charting
+        # Build retention arrays (by week offset) — week 0 = 100% by definition
         result_cohorts = []
         for c in cohorts:
             size = c["size"]
             retention = []
-            emails_sent = []
-            active_users = []
-            total_actions = []
             for i in range(int(max_offset) + 1):
-                w = c["weekly"].get(i, {})
-                active = w.get("active_users", 0)
-                retention.append(round(active / size * 100, 1) if size > 0 else 0)
-                emails_sent.append(w.get("emails_sent", 0))
-                active_users.append(active)
-                total_actions.append(w.get("total_actions", 0))
+                if i == 0:
+                    retention.append(100.0)
+                else:
+                    w = c["by_offset"].get(i, {})
+                    active = w.get("active_users", 0)
+                    retention.append(round(active / size * 100, 1) if size > 0 else 0)
+
+            # Cumulative actions for lifetime chart (by offset, averaged per user)
+            lifetime_actions = []
+            cumulative = 0
+            for i in range(int(max_offset) + 1):
+                cumulative += c["by_offset"].get(i, {}).get("total_actions", 0)
+                lifetime_actions.append(round(cumulative / size, 1) if size > 0 else 0)
+
             result_cohorts.append({
                 "week": c["week"],
                 "size": size,
                 "retention": retention,
-                "emails_sent": emails_sent,
-                "active_users": active_users,
-                "total_actions": total_actions,
+                "lifetime_actions": lifetime_actions,
             })
 
-        return {"cohorts": result_cohorts, "max_weeks": int(max_offset) + 1}
+        # Build absolute-date series for emails_sent and active_users
+        emails_by_week: list[dict] = []
+        active_by_week: list[dict] = []
+        for aw in sorted_activity_weeks:
+            email_point: dict = {"week": aw}
+            active_point: dict = {"week": aw}
+            for c in cohorts:
+                label = c["week"]
+                d = c["by_date"].get(aw, {})
+                email_point[label] = d.get("emails_sent", 0)
+                active_point[label] = d.get("active_users", 0)
+            emails_by_week.append(email_point)
+            active_by_week.append(active_point)
+
+        return {
+            "cohorts": result_cohorts,
+            "max_weeks": int(max_offset) + 1,
+            "emails_by_week": emails_by_week,
+            "active_by_week": active_by_week,
+        }
 
 
 def get_admin_drafts(

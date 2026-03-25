@@ -33,14 +33,19 @@ interface CohortRow {
   week: string;
   size: number;
   retention: number[];
-  emails_sent: number[];
-  active_users: number[];
-  total_actions: number[];
+  lifetime_actions: number[];
+}
+
+interface TimeSeriesPoint {
+  week: string;
+  [cohortWeek: string]: string | number;
 }
 
 interface CohortData {
   cohorts: CohortRow[];
   max_weeks: number;
+  emails_by_week: TimeSeriesPoint[];
+  active_by_week: TimeSeriesPoint[];
 }
 
 interface ThreadMessage {
@@ -145,15 +150,15 @@ function FunnelChart({ data }: { data: FunnelRow[] }) {
 }
 
 function CohortCharts({ data }: { data: CohortData }) {
-  const { cohorts, max_weeks } = data;
+  const { cohorts, max_weeks, emails_by_week, active_by_week } = data;
   if (cohorts.length === 0) {
     return <p className="text-gray-500">No cohort data yet.</p>;
   }
 
-  // Build time-series data: each point is a week_offset, each series is a cohort
   const weekOffsets = Array.from({ length: max_weeks }, (_, i) => i);
+  const cohortKeys = cohorts.map((c) => formatWeek(c.week));
 
-  // 1. Retention line chart (% retained per cohort)
+  // 1. Retention line chart (by week offset, starts at 100%)
   const retentionData = weekOffsets.map((offset) => {
     const point: Record<string, unknown> = { week: `W${offset}` };
     cohorts.forEach((c) => {
@@ -162,38 +167,26 @@ function CohortCharts({ data }: { data: CohortData }) {
     return point;
   });
 
-  // 2. Stacked area: emails sent by cohort
-  const emailsData = weekOffsets.map((offset) => {
-    const point: Record<string, unknown> = { week: `W${offset}` };
-    cohorts.forEach((c) => {
-      point[formatWeek(c.week)] = c.emails_sent[offset] ?? 0;
-    });
-    return point;
-  });
+  // 2. Emails sent by absolute date (from backend)
+  const emailsData = emails_by_week.map((p) => ({
+    ...p,
+    week: formatWeek(p.week as string),
+  }));
 
-  // 3. Stacked area: active users by cohort
-  const activeData = weekOffsets.map((offset) => {
-    const point: Record<string, unknown> = { week: `W${offset}` };
-    cohorts.forEach((c) => {
-      point[formatWeek(c.week)] = c.active_users[offset] ?? 0;
-    });
-    return point;
-  });
+  // 3. Active users by absolute date (from backend)
+  const activeData = active_by_week.map((p) => ({
+    ...p,
+    week: formatWeek(p.week as string),
+  }));
 
-  // 4. Average lifetime actions per user by cohort (cumulative, averaged)
+  // 4. Avg cumulative actions per user (by week offset)
   const lifetimeData = weekOffsets.map((offset) => {
     const point: Record<string, unknown> = { week: `W${offset}` };
     cohorts.forEach((c) => {
-      let cumulative = 0;
-      for (let i = 0; i <= offset; i++) {
-        cumulative += c.total_actions[i] ?? 0;
-      }
-      point[formatWeek(c.week)] = c.size > 0 ? Math.round((cumulative / c.size) * 10) / 10 : 0;
+      point[formatWeek(c.week)] = c.lifetime_actions[offset] ?? 0;
     });
     return point;
   });
-
-  const cohortKeys = cohorts.map((c) => formatWeek(c.week));
 
   return (
     <div className="space-y-10">
@@ -203,11 +196,11 @@ function CohortCharts({ data }: { data: CohortData }) {
           <LineChart data={retentionData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="week" tick={{ fontSize: 12 }} />
-            <YAxis unit="%" />
-            <Tooltip />
+            <YAxis unit="%" domain={[0, 100]} />
+            <Tooltip formatter={(value) => `${value}%`} />
             <Legend />
             {cohortKeys.map((key, i) => (
-              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={2} dot={false} />
+              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
             ))}
           </LineChart>
         </ResponsiveContainer>
@@ -223,7 +216,7 @@ function CohortCharts({ data }: { data: CohortData }) {
             <Tooltip />
             <Legend />
             {cohortKeys.map((key, i) => (
-              <Area key={key} type="monotone" dataKey={key} stackId="emails" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={0.6} />
+              <Area key={key} type="monotone" dataKey={key} stackId="emails" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={0.6} activeDot={{ r: 4 }} />
             ))}
           </AreaChart>
         </ResponsiveContainer>
@@ -239,7 +232,7 @@ function CohortCharts({ data }: { data: CohortData }) {
             <Tooltip />
             <Legend />
             {cohortKeys.map((key, i) => (
-              <Area key={key} type="monotone" dataKey={key} stackId="active" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={0.6} />
+              <Area key={key} type="monotone" dataKey={key} stackId="active" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={0.6} activeDot={{ r: 4 }} />
             ))}
           </AreaChart>
         </ResponsiveContainer>
@@ -255,7 +248,7 @@ function CohortCharts({ data }: { data: CohortData }) {
             <Tooltip />
             <Legend />
             {cohortKeys.map((key, i) => (
-              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={2} dot={false} />
+              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
             ))}
           </LineChart>
         </ResponsiveContainer>

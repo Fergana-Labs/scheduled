@@ -77,7 +77,11 @@ def record_draft_sent(
             anon_sent_body = anonymize_text(sent_body)
 
             original = row["original_body"]
-            matcher = difflib.SequenceMatcher(None, original, anon_sent_body)
+
+            # Normalize whitespace before comparing to ignore Gmail formatting artifacts
+            original_norm = " ".join(original.split())
+            sent_norm = " ".join(anon_sent_body.split())
+            matcher = difflib.SequenceMatcher(None, original_norm, sent_norm)
             similarity = matcher.ratio()
 
             was_edited = similarity < 0.98
