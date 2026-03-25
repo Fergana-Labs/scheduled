@@ -105,6 +105,10 @@ async def _watch_renewal_loop():
             analytics_deleted = await asyncio.to_thread(cleanup_old_analytics)
             if analytics_deleted:
                 logger.info("watch_renewal_loop: cleaned up %d old analytics_events rows", analytics_deleted)
+            from scheduler.db import cleanup_expired_scheduling_links
+            expired_links = await asyncio.to_thread(cleanup_expired_scheduling_links)
+            if expired_links:
+                logger.info("watch_renewal_loop: expired %d scheduling links", expired_links)
         except Exception:
             logger.exception("watch_renewal_loop: failed")
         await asyncio.sleep(_WATCH_RENEWAL_INTERVAL)
@@ -298,6 +302,7 @@ def auth0_callback(code: str | None = None, error: str | None = None):
     id_claims = jwt.decode(id_token, options={"verify_signature": False})
     email = id_claims.get("email")
     auth0_sub = id_claims.get("sub")
+    _auth0_display_name = id_claims.get("name")
 
     if not email or not auth0_sub:
         return RedirectResponse(f"{config.web_app_url}?error=missing_user_info")
@@ -326,6 +331,14 @@ def auth0_callback(code: str | None = None, error: str | None = None):
                 "method": "auth0",
                 "email_domain": email.split("@")[1] if "@" in email else "",
             })
+
+    # Store display name from Auth0 profile
+    if _auth0_display_name:
+        from scheduler.db import update_display_name
+        try:
+            update_display_name(str(user.id), _auth0_display_name)
+        except Exception:
+            logger.debug("Failed to update display_name for user=%s", user.id)
 
     from starlette.background import BackgroundTask
 
@@ -482,6 +495,21 @@ def auth_google_connect_callback(
         access_token_expires_at=expires_at,
     )
 
+    # Fetch and store display name from Google profile
+    try:
+        import httpx as _httpx
+        _userinfo = _httpx.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {google_access_token}"},
+        )
+        if _userinfo.status_code == 200:
+            _name = _userinfo.json().get("name")
+            if _name:
+                from scheduler.db import update_display_name
+                update_display_name(user_id, _name)
+    except Exception:
+        logger.debug("Failed to fetch display_name during google connect for user=%s", user_id)
+
     # Check onboarding status
     from scheduler.db import get_user_by_id as _get_user
     db_user = _get_user(user_id)
@@ -600,9 +628,12 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
         logger.error("Userinfo request failed: status=%s body=%s", userinfo_response.status_code, userinfo_response.text)
         return RedirectResponse(f"{config.web_app_url}?error=userinfo_failed")
 
-    email = userinfo_response.json().get("email")
+    userinfo_data = userinfo_response.json()
+    email = userinfo_data.get("email")
     if not email:
         return RedirectResponse(f"{config.web_app_url}?error=no_email")
+
+    _google_display_name = userinfo_data.get("name")
 
     from scheduler.db import get_user_by_email, upsert_user
 
@@ -632,6 +663,14 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
         if not user:
             logger.warning("sign-in attempt for unknown user: %s", email)
             return RedirectResponse(f"{config.web_app_url}?error=account_not_found")
+
+    # Store display name from Google profile
+    if _google_display_name:
+        from scheduler.db import update_display_name
+        try:
+            update_display_name(str(user.id), _google_display_name)
+        except Exception:
+            logger.debug("Failed to update display_name for user=%s", user.id)
 
     # Determine if user is already onboarded
     is_onboarded = _is_onboarded(str(user.id), scheduled_calendar_id=user.scheduled_calendar_id)
@@ -767,6 +806,7 @@ class CreateDraftRequest(BaseModel):
     subject: str
     body: str
     thread_context: list[dict] | None = None
+    scheduling_link_url: str | None = None
 
 
 class TrackEventRequest(BaseModel):
@@ -780,6 +820,7 @@ class SendEmailRequest(BaseModel):
     cc: str = ""
     subject: str
     body: str
+    scheduling_link_url: str | None = None
 
 
 class GetEventsRequest(BaseModel):
@@ -845,16 +886,26 @@ def gmail_message(message_id: str, session: dict = Depends(get_session)):
 @app.post("/api/v1/gmail/draft")
 def gmail_draft(req: CreateDraftRequest, session: dict = Depends(get_session)):
     gmail: GmailClient = session["gmail"]
-    from scheduler.db import get_user_by_id
+    from scheduler.drafts.composer import _apply_footer
 
-    user = get_user_by_id(session["user_id"])
-    body = req.body
-    content_type = "plain"
-    if user and user.scheduled_branding_enabled:
-        html_body = html.escape(body).replace("\n", "<br>")
-        html_body += '<br><br>sent by <a href="https://tryscheduled.com">Scheduled.</a>'
-        body = html_body
-        content_type = "html"
+    scheduling_link_url = req.scheduling_link_url
+    if not scheduling_link_url:
+        # Auto-create an availability-mode scheduling link
+        from scheduler.db import get_user_by_id as _get_u
+        _u = _get_u(session["user_id"])
+        if _u and _u.scheduled_branding_enabled:
+            from scheduler.db import create_scheduling_link as _create_sl
+            try:
+                _sl = _create_sl(
+                    user_id=session["user_id"], mode="availability",
+                    attendee_email=req.to, event_summary=req.subject,
+                    thread_id=req.thread_id,
+                )
+                scheduling_link_url = f"{config.web_app_url}/schedule/{_sl.id}"
+            except Exception:
+                logger.debug("Failed to auto-create availability link in gmail_draft")
+
+    body, content_type = _apply_footer(req.body, session["user_id"], scheduling_link_url)
 
     draft_id = gmail.create_draft(
         thread_id=req.thread_id, to=req.to, subject=req.subject, body=body, content_type=content_type, cc=req.cc
@@ -876,16 +927,25 @@ def gmail_draft(req: CreateDraftRequest, session: dict = Depends(get_session)):
 @app.post("/api/v1/gmail/send")
 def gmail_send(req: SendEmailRequest, session: dict = Depends(get_session)):
     gmail: GmailClient = session["gmail"]
-    from scheduler.db import get_user_by_id
+    from scheduler.drafts.composer import _apply_footer
 
-    user = get_user_by_id(session["user_id"])
-    body = req.body
-    content_type = "plain"
-    if user and user.scheduled_branding_enabled:
-        html_body = html.escape(body).replace("\n", "<br>")
-        html_body += '<br><br>sent by <a href="https://tryscheduled.com">Scheduled.</a>'
-        body = html_body
-        content_type = "html"
+    scheduling_link_url = req.scheduling_link_url
+    if not scheduling_link_url:
+        from scheduler.db import get_user_by_id as _get_u2
+        _u2 = _get_u2(session["user_id"])
+        if _u2 and _u2.scheduled_branding_enabled:
+            from scheduler.db import create_scheduling_link as _create_sl2
+            try:
+                _sl2 = _create_sl2(
+                    user_id=session["user_id"], mode="availability",
+                    attendee_email=req.to, event_summary=req.subject,
+                    thread_id=req.thread_id,
+                )
+                scheduling_link_url = f"{config.web_app_url}/schedule/{_sl2.id}"
+            except Exception:
+                logger.debug("Failed to auto-create availability link in gmail_send")
+
+    body, content_type = _apply_footer(req.body, session["user_id"], scheduling_link_url)
 
     message_id = gmail.send_email(
         thread_id=req.thread_id,
@@ -944,6 +1004,318 @@ def calendar_add(req: AddEventRequest, session: dict = Depends(get_session)):
     )
     event_id = calendar.add_event(event)
     return {"event_id": event_id, "status": "created"}
+
+
+# --- Scheduling link routes ---
+
+
+class CreateSchedulingLinkRequest(BaseModel):
+    attendee_email: str
+    attendee_name: str = ""
+    event_summary: str = "Meeting"
+    duration_minutes: int = 30
+    timezone: str = "America/New_York"
+    suggested_windows: list[dict] = []
+    thread_id: str = ""
+    add_google_meet: bool = False
+    location: str = ""
+    mode: str = "suggested"
+
+
+class ConfirmTimeRequest(BaseModel):
+    start: str
+    end: str
+
+
+class SubmitAvailabilityRequest(BaseModel):
+    availability: list[dict]
+
+
+@app.post("/api/v1/scheduling-link")
+def api_create_scheduling_link(req: CreateSchedulingLinkRequest, session: dict = Depends(get_session)):
+    """Session-authed endpoint for E2B sandbox to create scheduling links."""
+    from scheduler.db import create_scheduling_link
+
+    link = create_scheduling_link(
+        user_id=session["user_id"],
+        mode=req.mode,
+        attendee_email=req.attendee_email,
+        event_summary=req.event_summary,
+        duration_minutes=req.duration_minutes,
+        tz=req.timezone,
+        suggested_windows=req.suggested_windows,
+        thread_id=req.thread_id,
+        attendee_name=req.attendee_name or None,
+        add_google_meet=req.add_google_meet,
+        location=req.location,
+    )
+    url = f"{config.web_app_url}/schedule/{link.id}"
+    return {"link_id": str(link.id), "url": url}
+
+
+@app.get("/api/v1/schedule/{link_id}")
+def get_scheduling_link_public(link_id: str):
+    """Public endpoint — no auth required. Returns scheduling link data."""
+    from scheduler.db import get_scheduling_link, get_user_by_id
+
+    link = get_scheduling_link(link_id)
+    if not link:
+        raise HTTPException(status_code=404, detail="Scheduling link not found")
+
+    if link.status == "expired" or (link.expires_at and link.expires_at < datetime.now(timezone.utc)):
+        raise HTTPException(status_code=410, detail="This scheduling link has expired")
+
+    if link.status == "confirmed":
+        return {
+            "status": "confirmed",
+            "confirmed_time_start": link.confirmed_time_start.isoformat() if link.confirmed_time_start else None,
+            "confirmed_time_end": link.confirmed_time_end.isoformat() if link.confirmed_time_end else None,
+            "event_summary": link.event_summary,
+        }
+
+    if link.status == "submitted":
+        return {
+            "status": "submitted",
+            "event_summary": link.event_summary,
+        }
+
+    user = get_user_by_id(str(link.user_id))
+    display_name = (user.display_name or user.email.split("@")[0]) if user else "Someone"
+
+    return {
+        "status": link.status,
+        "mode": link.mode,
+        "host_name": display_name,
+        "event_summary": link.event_summary,
+        "duration_minutes": link.duration_minutes,
+        "timezone": link.timezone,
+        "suggested_windows": link.suggested_windows,
+        "location": link.location,
+        "add_google_meet": link.add_google_meet,
+        "expires_at": link.expires_at.isoformat() if link.expires_at else None,
+    }
+
+
+@app.post("/api/v1/schedule/{link_id}/confirm")
+def confirm_scheduling_link_public(link_id: str, req: ConfirmTimeRequest):
+    """Public endpoint — no auth. Confirm a time from suggested windows and create a calendar invite."""
+    from scheduler.db import get_scheduling_link, confirm_scheduling_link, get_user_by_id, insert_analytics_event
+
+    link = get_scheduling_link(link_id)
+    if not link:
+        raise HTTPException(status_code=404, detail="Scheduling link not found")
+    if link.status != "pending":
+        raise HTTPException(status_code=409, detail=f"Link already {link.status}")
+    if link.expires_at and link.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=410, detail="This scheduling link has expired")
+
+    selected_start = datetime.fromisoformat(req.start)
+    selected_end = datetime.fromisoformat(req.end)
+
+    if selected_start < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Selected time is in the past")
+
+    # Re-check user's calendar for conflicts
+    try:
+        creds = load_credentials(str(link.user_id))
+    except Exception:
+        raise HTTPException(status_code=503, detail="Unable to check availability. Please contact the host directly.")
+
+    user = get_user_by_id(str(link.user_id))
+    extra_ids = (user.calendar_ids or []) if user else []
+    calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=extra_ids)
+
+    existing = calendar.get_all_events(selected_start, selected_end, include_primary=True)
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail="This time slot is no longer available. Please select another time.",
+        )
+
+    # Create calendar invite
+    try:
+        event_id = calendar.create_invite_event(
+            summary=link.event_summary,
+            start=selected_start,
+            end=selected_end,
+            attendee_emails=[link.attendee_email],
+            description="Scheduled via Scheduled - https://tryscheduled.com",
+            location=link.location,
+            add_google_meet=link.add_google_meet,
+        )
+    except Exception:
+        logger.exception("confirm_scheduling_link: failed to create invite for link %s", link_id)
+        raise HTTPException(status_code=500, detail="Failed to create calendar invite")
+
+    confirm_scheduling_link(link_id, selected_start, selected_end, event_id)
+
+    try:
+        insert_analytics_event(str(link.user_id), "scheduling_link_confirmed", {
+            "link_id": link_id,
+            "mode": "suggested",
+            "event_summary": link.event_summary,
+        })
+    except Exception:
+        pass
+
+    return {"status": "confirmed", "event_id": event_id, "start": req.start, "end": req.end}
+
+
+@app.post("/api/v1/schedule/{link_id}/availability")
+def submit_scheduling_link_availability(link_id: str, req: SubmitAvailabilityRequest, background_tasks: BackgroundTasks):
+    """Public endpoint — no auth. Submit painted availability for a when2meet-style link."""
+    from scheduler.db import get_scheduling_link, submit_recipient_availability, insert_analytics_event
+
+    link = get_scheduling_link(link_id)
+    if not link:
+        raise HTTPException(status_code=404, detail="Scheduling link not found")
+    if link.status != "pending":
+        raise HTTPException(status_code=409, detail=f"Link already {link.status}")
+    if link.expires_at and link.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=410, detail="This scheduling link has expired")
+
+    submit_recipient_availability(link_id, req.availability)
+
+    try:
+        insert_analytics_event(str(link.user_id), "scheduling_link_availability_submitted", {
+            "link_id": link_id,
+            "slots_count": len(req.availability),
+        })
+    except Exception:
+        pass
+
+    # Trigger draft composition in background
+    background_tasks.add_task(_process_scheduling_link_submission, str(link.user_id), link_id)
+
+    return {"status": "submitted"}
+
+
+def _process_scheduling_link_submission(user_id: str, link_id: str) -> None:
+    """Background task: compose a draft based on recipient's painted availability."""
+    from scheduler.db import get_scheduling_link, get_user_by_id
+
+    link = get_scheduling_link(link_id)
+    if not link:
+        logger.warning("scheduling_link_submission: link %s not found", link_id)
+        return
+
+    user = get_user_by_id(user_id)
+    if not user:
+        logger.warning("scheduling_link_submission: user %s not found", user_id)
+        return
+
+    if not user.system_enabled:
+        logger.info("scheduling_link_submission: system disabled for user=%s", user_id)
+        return
+
+    try:
+        creds = load_credentials(user_id)
+    except Exception:
+        logger.exception("scheduling_link_submission: failed to load credentials for user=%s", user_id)
+        return
+
+    gmail = GmailClient(creds)
+    calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=user.calendar_ids or [])
+
+    # Get the original thread for context
+    thread_messages = []
+    if link.thread_id:
+        try:
+            thread_emails = gmail.get_thread(link.thread_id)
+            for t_email in thread_emails:
+                thread_messages.append({
+                    "sender": t_email.sender,
+                    "subject": t_email.subject,
+                    "body": t_email.body,
+                    "date": t_email.date.isoformat(),
+                })
+        except Exception:
+            logger.warning("scheduling_link_submission: failed to fetch thread %s", link.thread_id)
+
+    # Format the painted availability for the agent
+    avail_lines = []
+    for slot in (link.recipient_availability or []):
+        avail_lines.append(f"  - {slot.get('date', '?')} {slot.get('start', '?')}-{slot.get('end', '?')}")
+    avail_text = "\n".join(avail_lines) if avail_lines else "  (no specific times provided)"
+
+    # Build a synthetic classification for the composer
+    from scheduler.classifier.intent import ClassificationResult, SchedulingIntent
+    classification = ClassificationResult(
+        intent=SchedulingIntent.NEEDS_DRAFT,
+        confidence=1.0,
+        summary=(
+            f"{link.attendee_name or link.attendee_email} used your Scheduled link to share their "
+            f"availability for '{link.event_summary}'. Their available times:\n{avail_text}\n"
+            f"Find the best overlapping time with the user's calendar and draft a confirmation email."
+        ),
+        proposed_times=[f"{s.get('date', '')} {s.get('start', '')}-{s.get('end', '')}" for s in (link.recipient_availability or [])],
+        participants=[link.attendee_email],
+        duration_minutes=link.duration_minutes,
+    )
+
+    # Get the latest email in the thread to use as the trigger
+    email_payload = None
+    if link.thread_id:
+        try:
+            thread_emails = gmail.get_thread(link.thread_id)
+            if thread_emails:
+                email_payload = thread_emails[-1]
+        except Exception:
+            pass
+
+    if not email_payload:
+        logger.warning("scheduling_link_submission: no email found for thread %s, skipping", link.thread_id)
+        return
+
+    compose_result = _compose_draft_for_runtime(
+        user_id=user_id,
+        email=email_payload,
+        classification=classification,
+        gmail=gmail,
+        calendar=calendar,
+        autopilot=user.autopilot_enabled,
+        user_email=user.email,
+        thread_messages=thread_messages,
+    )
+
+    compose_result = compose_result or {}
+    draft_id = compose_result.get("draft_id")
+    invite_proposal = compose_result.get("invite_proposal")
+
+    if draft_id:
+        logger.info("scheduling_link_submission: created draft %s for link %s", draft_id, link_id)
+
+        if invite_proposal:
+            from scheduler.db import create_pending_invite
+            try:
+                create_pending_invite(
+                    user_id=user_id,
+                    thread_id=link.thread_id or "",
+                    attendee_emails=invite_proposal["attendee_emails"],
+                    event_summary=invite_proposal["event_summary"],
+                    event_start=datetime.fromisoformat(invite_proposal["event_start"]),
+                    event_end=datetime.fromisoformat(invite_proposal["event_end"]),
+                    add_google_meet=invite_proposal.get("add_google_meet", False),
+                    location=invite_proposal.get("location", ""),
+                )
+            except Exception:
+                logger.exception("scheduling_link_submission: failed to create pending invite")
+
+        # Send reasoning email mentioning the scheduling link
+        if user.reasoning_emails_enabled and link.thread_id:
+            try:
+                from scheduler.lifecycle.reasoning import send_reasoning_email
+                send_reasoning_email(
+                    user_email=user.email,
+                    thread_id=link.thread_id,
+                    subject=email_payload.subject if hasattr(email_payload, "subject") else link.event_summary,
+                    classification=classification,
+                    gmail=gmail,
+                    calendar=calendar,
+                    invite_proposal=invite_proposal,
+                )
+            except Exception:
+                logger.exception("scheduling_link_submission: failed to send reasoning email")
 
 
 # --- Settings routes ---

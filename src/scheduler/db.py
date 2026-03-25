@@ -43,6 +43,7 @@ class UserRow:
     auth0_sub: str | None = None
     calendar_ids: list[str] | None = None
     onboarding_status: str | None = None
+    display_name: str | None = None
 
 
 _USER_ROW_FIELDS.update(f.name for f in fields(UserRow))
@@ -999,6 +1000,144 @@ def get_admin_drafts(
         cols = [desc[0] for desc in cur.description]
         drafts = [dict(zip(cols, row)) for row in cur.fetchall()]
         return drafts, total
+
+
+def update_display_name(user_id: str, display_name: str) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET display_name = %s, updated_at = now() WHERE id = %s",
+            (display_name, user_id),
+        )
+        conn.commit()
+
+
+# --- Scheduling Links ---
+
+
+@dataclass
+class SchedulingLinkRow:
+    id: str
+    user_id: str
+    thread_id: str | None
+    mode: str
+    attendee_email: str
+    attendee_name: str | None
+    event_summary: str
+    duration_minutes: int
+    timezone: str
+    suggested_windows: list[dict]
+    recipient_availability: list[dict] | None
+    recipient_submitted_at: datetime | None
+    confirmed_time_start: datetime | None
+    confirmed_time_end: datetime | None
+    confirmed_at: datetime | None
+    calendar_event_id: str | None
+    status: str
+    add_google_meet: bool
+    location: str
+    expires_at: datetime
+    created_at: datetime
+
+
+def _scheduling_link_from_row(cols, row) -> SchedulingLinkRow:
+    data = dict(zip(cols, row))
+    for field in ("suggested_windows", "recipient_availability"):
+        val = data.get(field)
+        if isinstance(val, str):
+            data[field] = json.loads(val)
+    return SchedulingLinkRow(**data)
+
+
+def create_scheduling_link(
+    user_id: str,
+    attendee_email: str,
+    mode: str = "availability",
+    event_summary: str = "Meeting",
+    duration_minutes: int = 30,
+    tz: str = "America/New_York",
+    suggested_windows: list[dict] | None = None,
+    thread_id: str | None = None,
+    attendee_name: str | None = None,
+    add_google_meet: bool = False,
+    location: str = "",
+) -> SchedulingLinkRow:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO scheduling_links
+                (user_id, thread_id, mode, attendee_email, attendee_name,
+                 event_summary, duration_minutes, timezone, suggested_windows,
+                 add_google_meet, location)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING *
+            """,
+            (user_id, thread_id, mode, attendee_email, attendee_name,
+             event_summary, duration_minutes, tz,
+             json.dumps(suggested_windows or []),
+             add_google_meet, location),
+        )
+        row = cur.fetchone()
+        cols = [desc[0] for desc in cur.description]
+        conn.commit()
+        return _scheduling_link_from_row(cols, row)
+
+
+def get_scheduling_link(link_id: str) -> SchedulingLinkRow | None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute("SELECT * FROM scheduling_links WHERE id = %s", (link_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        cols = [desc[0] for desc in cur.description]
+        return _scheduling_link_from_row(cols, row)
+
+
+def submit_recipient_availability(
+    link_id: str,
+    availability: list[dict],
+    submitted_at: datetime | None = None,
+) -> None:
+    if submitted_at is None:
+        submitted_at = datetime.now(timezone.utc)
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE scheduling_links
+            SET recipient_availability = %s, recipient_submitted_at = %s, status = 'submitted'
+            WHERE id = %s
+            """,
+            (json.dumps(availability), submitted_at, link_id),
+        )
+        conn.commit()
+
+
+def confirm_scheduling_link(
+    link_id: str,
+    start: datetime,
+    end: datetime,
+    calendar_event_id: str,
+) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE scheduling_links
+            SET confirmed_time_start = %s, confirmed_time_end = %s,
+                confirmed_at = now(), calendar_event_id = %s, status = 'confirmed'
+            WHERE id = %s AND status IN ('pending', 'submitted')
+            """,
+            (start, end, calendar_event_id, link_id),
+        )
+        conn.commit()
+
+
+def cleanup_expired_scheduling_links() -> int:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE scheduling_links SET status = 'expired' WHERE status = 'pending' AND expires_at < now()"
+        )
+        count = cur.rowcount
+        conn.commit()
+        return count
 
 
 def disconnect_user(user_id: str) -> None:
