@@ -680,7 +680,7 @@ def get_cohort_data(weeks: int = 8) -> dict:
                     count(*) AS total_actions
                 FROM cohorts c
                 JOIN analytics_events ae ON ae.user_id = c.user_id
-                WHERE ae.event IN ('draft_composed', 'draft_sent', 'email_classified', 'setting_changed')
+                WHERE ae.event IN ('user_created', 'onboarding_completed', 'draft_composed', 'draft_sent', 'email_classified', 'setting_changed')
                 GROUP BY c.cohort_week, activity_week, week_offset
             )
             SELECT
@@ -819,7 +819,7 @@ def get_cohort_data_daily(days: int = 7) -> dict:
                     count(*) AS total_actions
                 FROM cohorts c
                 JOIN analytics_events ae ON ae.user_id = c.user_id
-                WHERE ae.event IN ('draft_composed', 'draft_sent', 'email_classified', 'setting_changed')
+                WHERE ae.event IN ('user_created', 'onboarding_completed', 'draft_composed', 'draft_sent', 'email_classified', 'setting_changed')
                 GROUP BY c.cohort_day, activity_day, day_offset
             )
             SELECT
