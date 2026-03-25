@@ -60,24 +60,28 @@ def _analyze_draft_for_scheduling(
             "You analyze email drafts to extract scheduling information.\n\n"
             f"Today's date is {today}.\n\n"
             "Given a draft email body, determine:\n"
-            "1. Does this draft propose specific meeting times? If yes, mode is \"suggested\". "
-            "If it's a general reply without time proposals, mode is \"availability\".\n"
-            "2. If \"suggested\": extract the available time windows as broad ranges. "
+            "1. Does this draft CONFIRM a single specific time that was already agreed upon, "
+            "or is it accepting a proposed time? If yes, mode is \"confirmation\" — "
+            "the meeting time is settled and no scheduling link is needed.\n"
+            "2. Does this draft propose MULTIPLE meeting time options for the recipient to "
+            "choose from? If yes, mode is \"suggested\".\n"
+            "3. Otherwise (general reply, no times proposed), mode is \"availability\".\n\n"
+            "If \"suggested\": extract the available time windows as broad ranges. "
             "For each proposed time, create a window that covers a reasonable range around it "
             "(e.g., if proposing '2pm on Tuesday', create a window like 1pm-5pm on that date). "
             "Times should be in the user's local timezone. "
             "Make sure dates use the correct year based on today's date.\n"
-            "3. Estimate the meeting duration from context (default 30 minutes).\n"
-            "4. Extract a short event summary.\n\n"
+            "Estimate the meeting duration from context (default 30 minutes).\n"
+            "Extract a short event summary.\n\n"
             f"The user's timezone is {user_timezone}.\n\n"
             "Respond with ONLY a JSON object:\n"
             "{\n"
-            '  "mode": "suggested" | "availability",\n'
+            '  "mode": "confirmation" | "suggested" | "availability",\n'
             '  "suggested_windows": [{"date": "YYYY-MM-DD", "start": "HH:MM", "end": "HH:MM"}],\n'
             '  "duration_minutes": integer,\n'
             '  "event_summary": "short summary"\n'
             "}\n"
-            "suggested_windows should be empty [] if mode is \"availability\"."
+            "suggested_windows should be empty [] if mode is \"confirmation\" or \"availability\"."
         ),
         messages=[{"role": "user", "content": f"Draft email body:\n\n{draft_body}"}],
     )
@@ -120,9 +124,15 @@ def _create_scheduling_link_for_draft(
     try:
         analysis = _analyze_draft_for_scheduling(draft_body, attendee_email, user_timezone)
 
+        mode = analysis.get("mode", "availability")
+
+        # Confirmation emails (single agreed time) just get "Sent by Scheduled"
+        if mode == "confirmation":
+            return None
+
         link = db_create(
             user_id=user_id,
-            mode=analysis.get("mode", "availability"),
+            mode=mode,
             attendee_email=attendee_email,
             event_summary=analysis.get("event_summary", subject or "Meeting"),
             duration_minutes=analysis.get("duration_minutes", 30),
