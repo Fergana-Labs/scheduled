@@ -50,18 +50,23 @@ def _analyze_draft_for_scheduling(
 
     client = Anthropic(api_key=config.anthropic_api_key)
 
+    from datetime import date as date_type
+    today = date_type.today().isoformat()
+
     response = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1024,
         system=(
             "You analyze email drafts to extract scheduling information.\n\n"
+            f"Today's date is {today}.\n\n"
             "Given a draft email body, determine:\n"
             "1. Does this draft propose specific meeting times? If yes, mode is \"suggested\". "
             "If it's a general reply without time proposals, mode is \"availability\".\n"
             "2. If \"suggested\": extract the available time windows as broad ranges. "
             "For each proposed time, create a window that covers a reasonable range around it "
             "(e.g., if proposing '2pm on Tuesday', create a window like 1pm-5pm on that date). "
-            "Times should be in the user's local timezone.\n"
+            "Times should be in the user's local timezone. "
+            "Make sure dates use the correct year based on today's date.\n"
             "3. Estimate the meeting duration from context (default 30 minutes).\n"
             "4. Extract a short event summary.\n\n"
             f"The user's timezone is {user_timezone}.\n\n"
