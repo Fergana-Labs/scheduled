@@ -573,28 +573,8 @@ def update_composed_draft_sent(
         conn.commit()
 
 
-def cleanup_old_analytics(days: int = 90) -> int:
-    """Delete analytics_events older than the given number of days."""
-    with _conn() as conn, conn.cursor() as cur:
-        cur.execute(
-            "DELETE FROM analytics_events WHERE created_at < now() - make_interval(days => %s)",
-            (days,),
-        )
-        count = cur.rowcount
-        conn.commit()
-        return count
 
-
-def cleanup_composed_drafts(days: int = 90) -> int:
-    """Delete composed_drafts older than the given number of days."""
-    with _conn() as conn, conn.cursor() as cur:
-        cur.execute(
-            "DELETE FROM composed_drafts WHERE composed_at < now() - make_interval(days => %s)",
-            (days,),
-        )
-        count = cur.rowcount
-        conn.commit()
-        return count
+_TZ = "America/Los_Angeles"
 
 
 def get_funnel_data(weeks: int = 12) -> list[dict]:
@@ -604,40 +584,44 @@ def get_funnel_data(weeks: int = 12) -> list[dict]:
             """
             WITH week_series AS (
                 SELECT generate_series(
-                    date_trunc('week', now() - make_interval(weeks => %s)),
-                    date_trunc('week', now()),
+                    date_trunc('week', (now() AT TIME ZONE %s) - make_interval(weeks => %s)),
+                    date_trunc('week', (now() AT TIME ZONE %s)) - interval '1 week',
                     '1 week'::interval
                 ) AS week
             ),
             page_views AS (
-                SELECT date_trunc('week', created_at) AS week, count(*) AS cnt
+                SELECT date_trunc('week', created_at AT TIME ZONE %s) AS week,
+                       count(DISTINCT properties->>'session_id') FILTER (WHERE properties->>'session_id' IS NOT NULL)
+                       + count(*) FILTER (WHERE properties->>'session_id' IS NULL) AS cnt
                 FROM page_events
                 WHERE event = 'landing_page_view'
                   AND created_at >= now() - make_interval(weeks => %s)
                 GROUP BY 1
             ),
             signup_clicks AS (
-                SELECT date_trunc('week', created_at) AS week, count(*) AS cnt
+                SELECT date_trunc('week', created_at AT TIME ZONE %s) AS week,
+                       count(DISTINCT properties->>'session_id') FILTER (WHERE properties->>'session_id' IS NOT NULL)
+                       + count(*) FILTER (WHERE properties->>'session_id' IS NULL) AS cnt
                 FROM page_events
                 WHERE event = 'signup_click'
                   AND created_at >= now() - make_interval(weeks => %s)
                 GROUP BY 1
             ),
             signups AS (
-                SELECT date_trunc('week', created_at) AS week, count(*) AS cnt
+                SELECT date_trunc('week', created_at AT TIME ZONE %s) AS week, count(*) AS cnt
                 FROM users
                 WHERE created_at >= now() - make_interval(weeks => %s)
                 GROUP BY 1
             ),
             onboarded AS (
-                SELECT date_trunc('week', created_at) AS week, count(DISTINCT user_id) AS cnt
+                SELECT date_trunc('week', created_at AT TIME ZONE %s) AS week, count(DISTINCT user_id) AS cnt
                 FROM analytics_events
                 WHERE event = 'onboarding_completed'
                   AND created_at >= now() - make_interval(weeks => %s)
                 GROUP BY 1
             ),
             first_drafts AS (
-                SELECT date_trunc('week', min_sent) AS week, count(*) AS cnt
+                SELECT date_trunc('week', min_sent AT TIME ZONE %s) AS week, count(*) AS cnt
                 FROM (
                     SELECT user_id, min(created_at) AS min_sent
                     FROM analytics_events
@@ -662,24 +646,28 @@ def get_funnel_data(weeks: int = 12) -> list[dict]:
             LEFT JOIN first_drafts f ON f.week = ws.week
             ORDER BY ws.week
             """,
-            (weeks, weeks, weeks, weeks, weeks, weeks),
+            (_TZ, weeks, _TZ, _TZ, weeks, _TZ, weeks, _TZ, weeks, _TZ, weeks, _TZ, weeks),
         )
         cols = [desc[0] for desc in cur.description]
         return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
 _ALL_EVENTS = ('user_created', 'onboarding_completed', 'draft_composed', 'draft_sent', 'email_classified', 'setting_changed')
-_USER_EVENTS = ('user_created', 'onboarding_completed', 'setting_changed', 'draft_sent')
+_EMAIL_EVENTS = ('draft_sent',)
+_RETENTION_EVENTS = ('user_created', 'onboarding_completed')
 
 
-def get_cohort_data(weeks: int = 8, active_only: bool = False) -> dict:
+def get_cohort_data(weeks: int = 8, emails_only: bool = False) -> dict:
     """Rich cohort data: retention by week offset, plus absolute-date series for emails/active/actions."""
-    events = _USER_EVENTS if active_only else _ALL_EVENTS
+    from datetime import timedelta
+    action_events = _EMAIL_EVENTS if emails_only else _ALL_EVENTS
+    # Always include signup/onboarding so users show as retained from W0
+    all_events = list(set(action_events) | set(_RETENTION_EVENTS))
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
             WITH cohorts AS (
-                SELECT id AS user_id, date_trunc('week', created_at) AS cohort_week
+                SELECT id AS user_id, date_trunc('week', created_at AT TIME ZONE %s) AS cohort_week
                 FROM users
                 WHERE created_at >= now() - make_interval(weeks => %s)
             ),
@@ -691,14 +679,15 @@ def get_cohort_data(weeks: int = 8, active_only: bool = False) -> dict:
             weekly_activity AS (
                 SELECT
                     c.cohort_week,
-                    date_trunc('week', ae.created_at) AS activity_week,
-                    FLOOR(EXTRACT(EPOCH FROM date_trunc('week', ae.created_at) - c.cohort_week) / 604800)::int AS week_offset,
+                    date_trunc('week', ae.created_at AT TIME ZONE %s) AS activity_week,
+                    FLOOR(EXTRACT(EPOCH FROM date_trunc('week', ae.created_at AT TIME ZONE %s) - c.cohort_week) / 604800)::int AS week_offset,
                     count(DISTINCT c.user_id) AS active_users,
                     count(*) FILTER (WHERE ae.event = 'draft_sent') AS emails_sent,
-                    count(*) AS total_actions
+                    count(*) FILTER (WHERE ae.event = ANY(%s)) AS total_actions
                 FROM cohorts c
                 JOIN analytics_events ae ON ae.user_id = c.user_id
                 WHERE ae.event = ANY(%s)
+                  AND date_trunc('week', ae.created_at AT TIME ZONE %s) < date_trunc('week', now() AT TIME ZONE %s)
                 GROUP BY c.cohort_week, activity_week, week_offset
             )
             SELECT
@@ -713,10 +702,21 @@ def get_cohort_data(weeks: int = 8, active_only: bool = False) -> dict:
             LEFT JOIN weekly_activity wa ON wa.cohort_week = cs.cohort_week
             ORDER BY cs.cohort_week, wa.activity_week
             """,
-            (weeks, list(events)),
+            (_TZ, weeks, _TZ, _TZ, list(action_events), all_events, _TZ, _TZ),
         )
         cols = [desc[0] for desc in cur.description]
         rows = [dict(zip(cols, row)) for row in cur.fetchall()]
+
+        # Current completed week boundary in Pacific time
+        now_pt = datetime.now(timezone.utc).astimezone()
+        # We need the start of the current week in PT to know the last completed week
+        # Parse from the DB to stay consistent — use a simple approach
+        cur.execute("SELECT date_trunc('week', now() AT TIME ZONE %s)", (_TZ,))
+        current_week_start = cur.fetchone()[0]
+        if hasattr(current_week_start, 'isoformat'):
+            current_week_iso = current_week_start.isoformat()
+        else:
+            current_week_iso = str(current_week_start)
 
         # Build per-cohort data
         cohort_map: dict[str, dict] = {}
@@ -727,8 +727,8 @@ def get_cohort_data(weeks: int = 8, active_only: bool = False) -> dict:
                 cohort_map[key] = {
                     "week": key,
                     "size": row["size"],
-                    "by_offset": {},   # week_offset -> {active_users, ...}
-                    "by_date": {},     # activity_week ISO -> {active_users, emails_sent, total_actions}
+                    "by_offset": {},
+                    "by_date": {},
                 }
             if row["week_offset"] is not None and row["week_offset"] >= 0:
                 cohort_map[key]["by_offset"][row["week_offset"]] = {
@@ -746,40 +746,49 @@ def get_cohort_data(weeks: int = 8, active_only: bool = False) -> dict:
                 }
 
         cohorts = sorted(cohort_map.values(), key=lambda c: c["week"])
-        # Use full range so all cohorts get a complete timeline
         max_offset = weeks
-        # Generate full week series from earliest cohort to now
+        # Generate full week series from earliest cohort to last completed week
         if cohorts:
-            from datetime import timedelta
             earliest = min(datetime.fromisoformat(c["week"]) for c in cohorts)
-            now_week = datetime.fromisoformat(
-                datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")
-            )
+            last_completed = current_week_start - timedelta(weeks=1)
             week_cursor = earliest
-            while week_cursor <= now_week:
+            while week_cursor <= last_completed:
                 all_activity_weeks.add(week_cursor.isoformat())
                 week_cursor += timedelta(weeks=1)
         sorted_activity_weeks = sorted(all_activity_weeks)
 
-        # Build retention arrays (by week offset) — week 0 = 100% by definition
+        # Compute max completed offset per cohort
+        # A cohort from week X has completed offset N if week X + N*7 days < current_week_start
+        def max_completed_offset(cohort_week_iso: str) -> int:
+            cohort_start = datetime.fromisoformat(cohort_week_iso)
+            delta = current_week_start - cohort_start
+            # Number of full weeks elapsed (not counting current incomplete week)
+            return max(0, int(delta.total_seconds() / 604800) - 1)
+
+        # Build retention arrays — use None for offsets beyond what the cohort has completed
         result_cohorts = []
         for c in cohorts:
             size = c["size"]
-            retention = []
+            max_complete = max_completed_offset(c["week"])
+            retention: list[float | None] = []
             for i in range(int(max_offset) + 1):
                 if i == 0:
                     retention.append(100.0)
+                elif i > max_complete:
+                    retention.append(None)
                 else:
                     w = c["by_offset"].get(i, {})
                     active = w.get("active_users", 0)
                     retention.append(round(active / size * 100, 1) if size > 0 else 0)
 
-            # Cumulative actions for lifetime chart (by offset, averaged per user)
-            lifetime_actions = []
+            lifetime_actions: list[float | None] = []
             cumulative = 0
             for i in range(int(max_offset) + 1):
-                cumulative += c["by_offset"].get(i, {}).get("total_actions", 0)
-                lifetime_actions.append(round(cumulative / size, 1) if size > 0 else 0)
+                if i > max_complete:
+                    lifetime_actions.append(None)
+                else:
+                    cumulative += c["by_offset"].get(i, {}).get("total_actions", 0)
+                    lifetime_actions.append(round(cumulative / size, 1) if size > 0 else 0)
 
             result_cohorts.append({
                 "week": c["week"],
@@ -810,14 +819,16 @@ def get_cohort_data(weeks: int = 8, active_only: bool = False) -> dict:
         }
 
 
-def get_cohort_data_daily(days: int = 7, active_only: bool = False) -> dict:
+def get_cohort_data_daily(days: int = 7, emails_only: bool = False) -> dict:
     """Same as get_cohort_data but cohorts are grouped by day and activity is daily."""
-    events = _USER_EVENTS if active_only else _ALL_EVENTS
+    from datetime import timedelta
+    action_events = _EMAIL_EVENTS if emails_only else _ALL_EVENTS
+    all_events = list(set(action_events) | set(_RETENTION_EVENTS))
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
             WITH cohorts AS (
-                SELECT id AS user_id, date_trunc('day', created_at) AS cohort_day
+                SELECT id AS user_id, date_trunc('day', created_at AT TIME ZONE %s) AS cohort_day
                 FROM users
                 WHERE created_at >= now() - make_interval(days => %s)
             ),
@@ -829,14 +840,15 @@ def get_cohort_data_daily(days: int = 7, active_only: bool = False) -> dict:
             daily_activity AS (
                 SELECT
                     c.cohort_day,
-                    date_trunc('day', ae.created_at) AS activity_day,
-                    (date_trunc('day', ae.created_at)::date - c.cohort_day::date)::int AS day_offset,
+                    date_trunc('day', ae.created_at AT TIME ZONE %s) AS activity_day,
+                    (date_trunc('day', ae.created_at AT TIME ZONE %s)::date - c.cohort_day::date)::int AS day_offset,
                     count(DISTINCT c.user_id) AS active_users,
                     count(*) FILTER (WHERE ae.event = 'draft_sent') AS emails_sent,
-                    count(*) AS total_actions
+                    count(*) FILTER (WHERE ae.event = ANY(%s)) AS total_actions
                 FROM cohorts c
                 JOIN analytics_events ae ON ae.user_id = c.user_id
                 WHERE ae.event = ANY(%s)
+                  AND date_trunc('day', ae.created_at AT TIME ZONE %s) < date_trunc('day', now() AT TIME ZONE %s)
                 GROUP BY c.cohort_day, activity_day, day_offset
             )
             SELECT
@@ -851,10 +863,14 @@ def get_cohort_data_daily(days: int = 7, active_only: bool = False) -> dict:
             LEFT JOIN daily_activity da ON da.cohort_day = cs.cohort_day
             ORDER BY cs.cohort_day, da.activity_day
             """,
-            (days, list(events)),
+            (_TZ, days, _TZ, _TZ, list(action_events), all_events, _TZ, _TZ),
         )
         cols = [desc[0] for desc in cur.description]
         rows = [dict(zip(cols, row)) for row in cur.fetchall()]
+
+        # Current day boundary in Pacific time
+        cur.execute("SELECT date_trunc('day', now() AT TIME ZONE %s)", (_TZ,))
+        current_day_start = cur.fetchone()[0]
 
         cohort_map: dict[str, dict] = {}
         all_activity_days: set[str] = set()
@@ -884,36 +900,45 @@ def get_cohort_data_daily(days: int = 7, active_only: bool = False) -> dict:
 
         cohorts = sorted(cohort_map.values(), key=lambda c: c["day"])
 
-        # Fill in all days in range
+        # Fill in all days up to last completed day
         if cohorts:
-            from datetime import timedelta
             earliest = min(datetime.fromisoformat(c["day"]) for c in cohorts)
-            now_day = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+            last_completed = current_day_start - timedelta(days=1)
             cursor = earliest
-            while cursor <= now_day:
+            while cursor <= last_completed:
                 all_activity_days.add(cursor.isoformat())
                 cursor += timedelta(days=1)
         sorted_activity_days = sorted(all_activity_days)
 
-        # Use full range so all cohorts get a complete timeline
         max_offset = days
+
+        def max_completed_offset(cohort_day_iso: str) -> int:
+            cohort_start = datetime.fromisoformat(cohort_day_iso)
+            delta = current_day_start - cohort_start
+            return max(0, delta.days - 1)
 
         result_cohorts = []
         for c in cohorts:
             size = c["size"]
-            retention = []
+            max_complete = max_completed_offset(c["day"])
+            retention: list[float | None] = []
             for i in range(int(max_offset) + 1):
                 if i == 0:
                     retention.append(100.0)
+                elif i > max_complete:
+                    retention.append(None)
                 else:
                     w = c["by_offset"].get(i, {})
                     active = w.get("active_users", 0)
                     retention.append(round(active / size * 100, 1) if size > 0 else 0)
-            lifetime_actions = []
+            lifetime_actions: list[float | None] = []
             cumulative = 0
             for i in range(int(max_offset) + 1):
-                cumulative += c["by_offset"].get(i, {}).get("total_actions", 0)
-                lifetime_actions.append(round(cumulative / size, 1) if size > 0 else 0)
+                if i > max_complete:
+                    lifetime_actions.append(None)
+                else:
+                    cumulative += c["by_offset"].get(i, {}).get("total_actions", 0)
+                    lifetime_actions.append(round(cumulative / size, 1) if size > 0 else 0)
             result_cohorts.append({
                 "week": c["day"],  # keep "week" key for frontend compatibility
                 "size": size,

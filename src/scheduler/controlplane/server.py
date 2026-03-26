@@ -98,13 +98,6 @@ async def _watch_renewal_loop():
             deleted = await asyncio.to_thread(cleanup_processed_messages)
             if deleted:
                 logger.info("watch_renewal_loop: cleaned up %d old processed_messages rows", deleted)
-            from scheduler.db import cleanup_composed_drafts, cleanup_old_analytics
-            draft_deleted = await asyncio.to_thread(cleanup_composed_drafts)
-            if draft_deleted:
-                logger.info("watch_renewal_loop: cleaned up %d old composed_drafts rows", draft_deleted)
-            analytics_deleted = await asyncio.to_thread(cleanup_old_analytics)
-            if analytics_deleted:
-                logger.info("watch_renewal_loop: cleaned up %d old analytics_events rows", analytics_deleted)
             from scheduler.db import cleanup_expired_scheduling_links
             expired_links = await asyncio.to_thread(cleanup_expired_scheduling_links)
             if expired_links:
@@ -2028,9 +2021,9 @@ def admin_funnel(weeks: int = 12, admin: dict = Depends(_require_admin)):
 
 
 @app.get("/web/api/v1/admin/cohorts")
-def admin_cohorts(weeks: int = 8, active_only: bool = False, admin: dict = Depends(_require_admin)):
+def admin_cohorts(weeks: int = 8, emails_only: bool = False, admin: dict = Depends(_require_admin)):
     from scheduler.db import get_cohort_data
-    result = get_cohort_data(weeks=weeks, active_only=active_only)
+    result = get_cohort_data(weeks=weeks, emails_only=emails_only)
     for c in result["cohorts"]:
         if isinstance(c.get("week"), datetime):
             c["week"] = c["week"].isoformat()
@@ -2038,9 +2031,9 @@ def admin_cohorts(weeks: int = 8, active_only: bool = False, admin: dict = Depen
 
 
 @app.get("/web/api/v1/admin/cohorts/daily")
-def admin_cohorts_daily(days: int = 7, active_only: bool = False, admin: dict = Depends(_require_admin)):
+def admin_cohorts_daily(days: int = 7, emails_only: bool = False, admin: dict = Depends(_require_admin)):
     from scheduler.db import get_cohort_data_daily
-    result = get_cohort_data_daily(days=days, active_only=active_only)
+    result = get_cohort_data_daily(days=days, emails_only=emails_only)
     for c in result["cohorts"]:
         if isinstance(c.get("week"), datetime):
             c["week"] = c["week"].isoformat()

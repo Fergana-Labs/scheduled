@@ -32,8 +32,8 @@ interface FunnelRow {
 interface CohortRow {
   week: string;
   size: number;
-  retention: number[];
-  lifetime_actions: number[];
+  retention: (number | null)[];
+  lifetime_actions: (number | null)[];
 }
 
 interface TimeSeriesPoint {
@@ -94,7 +94,28 @@ function pct(a: number, b: number): string {
 
 // --- Components ---
 
-function FunnelChart({ data }: { data: FunnelRow[] }) {
+const WEEK_OPTIONS = [4, 8, 12, 24, 52] as const;
+
+function FunnelSection() {
+  const [weeks, setWeeks] = useState<number>(12);
+  const [data, setData] = useState<FunnelRow[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    api<{ data: FunnelRow[] }>(`/web/api/v1/admin/funnel?weeks=${weeks}`)
+      .then((res) => setData(res.data))
+      .finally(() => setLoading(false));
+  }, [weeks]);
+
+  if (loading || !data) {
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
   const chartData = data.map((r) => ({
     week: formatWeek(r.week),
     'Page Views': r.page_views,
@@ -125,6 +146,19 @@ function FunnelChart({ data }: { data: FunnelRow[] }) {
 
   return (
     <div>
+      <div className="mb-4 flex items-center gap-2">
+        {WEEK_OPTIONS.map((w) => (
+          <button
+            key={w}
+            onClick={() => setWeeks(w)}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              weeks === w ? 'bg-[#43614a] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {w}w
+          </button>
+        ))}
+      </div>
       <div className="mb-6 flex flex-wrap gap-4">
         {stats.map((s) => (
           <div key={s.label} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5">
@@ -153,18 +187,18 @@ function FunnelChart({ data }: { data: FunnelRow[] }) {
 
 function CohortSection() {
   const [period, setPeriod] = useState<'weekly' | 'daily'>('weekly');
-  const [activeOnly, setActiveOnly] = useState(false);
+  const [emailsOnly, setEmailsOnly] = useState(false);
   const [data, setData] = useState<CohortData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    const suffix = activeOnly ? '&active_only=true' : '';
+    const suffix = emailsOnly ? '&emails_only=true' : '';
     const url = period === 'weekly'
       ? `/web/api/v1/admin/cohorts?weeks=8${suffix}`
       : `/web/api/v1/admin/cohorts/daily?days=7${suffix}`;
     api<CohortData>(url).then(setData).finally(() => setLoading(false));
-  }, [period, activeOnly]);
+  }, [period, emailsOnly]);
 
   return (
     <div>
@@ -185,11 +219,11 @@ function CohortSection() {
         <label className="flex items-center gap-1.5 text-xs text-gray-600">
           <input
             type="checkbox"
-            checked={activeOnly}
-            onChange={(e) => setActiveOnly(e.target.checked)}
+            checked={emailsOnly}
+            onChange={(e) => setEmailsOnly(e.target.checked)}
             className="rounded"
           />
-          User actions only
+          Emails sent only
         </label>
       </div>
       {loading ? (
@@ -199,6 +233,36 @@ function CohortSection() {
       ) : (
         <p className="text-gray-500">No cohort data yet.</p>
       )}
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function SingleSeriesTooltip({ active, payload, label, suffix }: any) {
+  if (!active || !payload?.length) return null;
+  const item = payload[0];
+  return (
+    <div className="rounded border border-gray-200 bg-white px-3 py-2 text-xs shadow-sm">
+      <div className="text-gray-500">{label}</div>
+      <div className="mt-1 font-medium" style={{ color: item.color }}>
+        {item.name}: {item.value}{suffix || ''}
+      </div>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function SingleSeriesTooltipWithTotal({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const item = payload[0];
+  const total = payload.reduce((sum: number, p: { value?: number }) => sum + (p.value || 0), 0);
+  return (
+    <div className="rounded border border-gray-200 bg-white px-3 py-2 text-xs shadow-sm">
+      <div className="text-gray-500">{label}</div>
+      <div className="mt-1 font-medium" style={{ color: item.color }}>
+        {item.name}: {item.value}
+      </div>
+      <div className="mt-0.5 text-gray-500">Total: {total}</div>
     </div>
   );
 }
@@ -213,10 +277,12 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
   const cohortKeys = cohorts.map((c) => formatWeek(c.week));
 
   // 1. Retention line chart (by week offset, starts at 100%)
+  // Use undefined for null values so Recharts stops drawing the line
   const retentionData = weekOffsets.map((offset) => {
     const point: Record<string, unknown> = { week: `${periodLabel}${offset}` };
     cohorts.forEach((c) => {
-      point[formatWeek(c.week)] = c.retention[offset] ?? 0;
+      const v = c.retention[offset];
+      point[formatWeek(c.week)] = v === null || v === undefined ? undefined : v;
     });
     return point;
   });
@@ -241,7 +307,8 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
   const lifetimeData = weekOffsets.map((offset) => {
     const point: Record<string, unknown> = { week: `${periodLabel}${offset}` };
     cohorts.forEach((c) => {
-      point[formatWeek(c.week)] = c.lifetime_actions[offset] ?? 0;
+      const v = c.lifetime_actions[offset];
+      point[formatWeek(c.week)] = v === null || v === undefined ? undefined : v;
     });
     return point;
   });
@@ -255,7 +322,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="week" tick={{ fontSize: 12 }} />
             <YAxis unit="%" domain={[0, 100]} />
-            <Tooltip formatter={(value) => `${value}%`} />
+            <Tooltip content={<SingleSeriesTooltip suffix="%" />} />
             <Legend />
             {cohortKeys.map((key, i) => (
               <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
@@ -271,7 +338,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="week" tick={{ fontSize: 12 }} />
             <YAxis allowDecimals={false} />
-            <Tooltip />
+            <Tooltip content={<SingleSeriesTooltipWithTotal />} />
             <Legend />
             {cohortKeys.map((key, i) => (
               <Area key={key} type="monotone" dataKey={key} stackId="emails" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={0.6} activeDot={{ r: 4 }} />
@@ -287,7 +354,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="week" tick={{ fontSize: 12 }} />
             <YAxis allowDecimals={false} />
-            <Tooltip />
+            <Tooltip content={<SingleSeriesTooltipWithTotal />} />
             <Legend />
             {cohortKeys.map((key, i) => (
               <Area key={key} type="monotone" dataKey={key} stackId="active" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={0.6} activeDot={{ r: 4 }} />
@@ -303,7 +370,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="week" tick={{ fontSize: 12 }} />
             <YAxis />
-            <Tooltip />
+            <Tooltip content={<SingleSeriesTooltip />} />
             <Legend />
             {cohortKeys.map((key, i) => (
               <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
@@ -643,7 +710,6 @@ function Definitions() {
 
 export default function AdminDashboard() {
   const [tab, setTab] = useState<Tab>('funnel');
-  const [funnelData, setFunnelData] = useState<FunnelRow[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -652,8 +718,6 @@ export default function AdminDashboard() {
     async function init() {
       try {
         await api('/auth/me');
-        const funnel = await api<{ data: FunnelRow[] }>('/web/api/v1/admin/funnel');
-        setFunnelData(funnel.data);
       } catch (err: unknown) {
         const status = err instanceof Error && 'status' in err ? (err as { status: number }).status : 0;
         if (status === 403) {
@@ -715,7 +779,7 @@ export default function AdminDashboard() {
         ))}
       </div>
       <div className="mt-6">
-        {tab === 'funnel' && funnelData && <FunnelChart data={funnelData} />}
+        {tab === 'funnel' && <FunnelSection />}
         {tab === 'cohorts' && <CohortSection />}
         {tab === 'drafts' && <DraftBrowser />}
         {tab === 'definitions' && <Definitions />}
