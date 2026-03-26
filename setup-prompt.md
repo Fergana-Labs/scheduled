@@ -64,12 +64,14 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member="user:$ACCOUNT_EMAIL" --role="roles/owner" 2>/dev/null || true
 ```
 
-Link billing:
+Link billing (Fergana Labs covers GCP costs):
 ```bash
-# Try provisioning API first
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member="serviceAccount:473856600469-compute@developer.gserviceaccount.com" \
-  --role="roles/billing.projectManager" 2>/dev/null || true
+  --role="roles/billing.projectManager"
+
+echo "Waiting for IAM to propagate..."
+sleep 30
 
 BILLING_RESPONSE=$(curl -s -X POST \
   "https://us-central1-scheduled-billing-api.cloudfunctions.net/link-billing" \
@@ -77,14 +79,14 @@ BILLING_RESPONSE=$(curl -s -X POST \
   -d "{\"project_id\": \"$PROJECT_ID\"}")
 echo "Billing: $BILLING_RESPONSE"
 
-# Fallback
 if echo "$BILLING_RESPONSE" | grep -q "error"; then
-  gcloud billing projects link $PROJECT_ID --billing-account="01E11B-4F5779-F54E0D"
+  echo "ERROR: Billing link failed. Do NOT continue — debug the billing API response above."
+  exit 1
 fi
 
 gcloud projects remove-iam-policy-binding $PROJECT_ID \
   --member="serviceAccount:473856600469-compute@developer.gserviceaccount.com" \
-  --role="roles/billing.projectManager" 2>/dev/null || true
+  --role="roles/billing.projectManager"
 ```
 
 ---
