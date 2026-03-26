@@ -1790,6 +1790,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
             email = gmail.get_email(message_id)
 
             # User-sent messages: check if there's a pending invite for this thread
+            logger.info("gmail_webhook: message %s sender=%s user=%s thread=%s subject=%s", message_id, email.sender, email_address, email.thread_id, getattr(email, 'subject', ''))
             if email.sender and email_address in email.sender:
                 _handle_sent_message_for_invite(user_id, email, gmail, calendar)
                 try:
@@ -1797,7 +1798,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                     analytics.record_draft_sent(user_id, email.thread_id, email.body, email.date)
                 except Exception:
                     logger.debug("analytics: failed to check sent draft for message %s", message_id, exc_info=True)
-                logger.info("gmail_webhook: message %s is from the user, skipping", message_id)
+                logger.info("gmail_webhook: message %s is from the user (matched sender), skipping", message_id)
                 continue
 
             # Skip emails from Scheduled's own sending addresses (e.g. reasoning emails)
