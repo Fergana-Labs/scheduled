@@ -81,9 +81,25 @@ def _now() -> datetime:
 
 
 def _doc_to_user(doc_dict: dict) -> UserRow:
-    """Convert a Firestore document dict to a UserRow, ignoring extra fields."""
+    """Convert a Firestore document dict to a UserRow, ignoring extra fields.
+
+    Fills in defaults for any missing required fields so partial documents
+    (e.g., from the setup script) don't crash.
+    """
+    defaults = {
+        "scheduled_calendar_id": None,
+        "gmail_history_id": None,
+        "system_enabled": True,
+        "scheduled_branding_enabled": True,
+        "autopilot_enabled": False,
+        "process_sales_emails": False,
+        "reasoning_emails_enabled": False,
+        "created_at": _now(),
+        "updated_at": _now(),
+    }
     valid_fields = set(UserRow.__dataclass_fields__)
-    return UserRow(**{k: v for k, v in doc_dict.items() if k in valid_fields})
+    data = {**defaults, **{k: v for k, v in doc_dict.items() if k in valid_fields}}
+    return UserRow(**data)
 
 
 def _user_ref(email: str):

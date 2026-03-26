@@ -73,13 +73,6 @@ async def _watch_renewal_loop():
             deleted = await asyncio.to_thread(cleanup_processed_messages)
             if deleted:
                 logger.info("watch_renewal_loop: cleaned up %d old processed_messages rows", deleted)
-            from scheduler.db import cleanup_composed_drafts, cleanup_old_analytics
-            draft_deleted = await asyncio.to_thread(cleanup_composed_drafts)
-            if draft_deleted:
-                logger.info("watch_renewal_loop: cleaned up %d old composed_drafts rows", draft_deleted)
-            analytics_deleted = await asyncio.to_thread(cleanup_old_analytics)
-            if analytics_deleted:
-                logger.info("watch_renewal_loop: cleaned up %d old analytics_events rows", analytics_deleted)
         except Exception:
             logger.exception("watch_renewal_loop: failed")
         await asyncio.sleep(_WATCH_RENEWAL_INTERVAL)

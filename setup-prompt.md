@@ -309,6 +309,7 @@ access_token = os.popen("gcloud auth print-access-token").read().strip()
 import urllib.request
 firestore_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/users?documentId={email}"
 
+now = datetime.now(timezone.utc).isoformat()
 doc = {
     "fields": {
         "id": {"stringValue": str(uuid.uuid4())},
@@ -316,14 +317,16 @@ doc = {
         "google_refresh_token": {"stringValue": creds.refresh_token},
         "google_access_token": {"stringValue": creds.token},
         "access_token_expires_at": {"timestampValue": (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()},
+        "scheduled_calendar_id": {"nullValue": None},
+        "gmail_history_id": {"nullValue": None},
         "system_enabled": {"booleanValue": True},
         "scheduled_branding_enabled": {"booleanValue": True},
         "autopilot_enabled": {"booleanValue": False},
         "process_sales_emails": {"booleanValue": False},
         "reasoning_emails_enabled": {"booleanValue": False},
         "onboarding_status": {"stringValue": "pending"},
-        "created_at": {"timestampValue": datetime.now(timezone.utc).isoformat()},
-        "updated_at": {"timestampValue": datetime.now(timezone.utc).isoformat()},
+        "created_at": {"timestampValue": now},
+        "updated_at": {"timestampValue": now},
     }
 }
 
