@@ -95,6 +95,12 @@ def record_draft_sent(
             matcher = difflib.SequenceMatcher(None, original_norm, sent_norm)
             similarity = matcher.ratio()
 
+            # If the sent message is too different from the composed draft,
+            # it's likely a different message on the same thread — skip it
+            if similarity < 0.3:
+                logger.debug("analytics.record_draft_sent: sent body too different (%.1f%% match), skipping thread %s", similarity * 100, thread_id)
+                return
+
             was_edited = similarity < 0.98
             edit_distance_ratio = 1.0 - similarity
 
