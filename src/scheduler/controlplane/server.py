@@ -473,6 +473,13 @@ def auth_google_connect_callback(
     google_access_token = tokens["access_token"]
     google_refresh_token = tokens.get("refresh_token")
 
+    granted_scopes = set(tokens.get("scope", "").split())
+    required_scopes = {"https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/gmail.readonly"}
+    missing = required_scopes - granted_scopes
+    if missing:
+        logger.warning("oauth_missing_scopes: user_id=%s missing=%s granted=%s", user_id, missing, granted_scopes)
+        return RedirectResponse(f"{config.web_app_url}?error=missing_permissions")
+
     if not google_refresh_token:
         return RedirectResponse(f"{config.web_app_url}?error=no_refresh_token")
 
@@ -632,6 +639,13 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
         return RedirectResponse(f"{config.web_app_url}?error=no_email")
 
     _google_display_name = userinfo_data.get("name")
+
+    granted_scopes = set(tokens.get("scope", "").split())
+    required_scopes = {"https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/gmail.readonly"}
+    missing = required_scopes - granted_scopes
+    if missing:
+        logger.warning("oauth_missing_scopes: email=%s missing=%s granted=%s", email, missing, granted_scopes)
+        return RedirectResponse(f"{config.web_app_url}?error=missing_permissions")
 
     from scheduler.db import get_user_by_email, upsert_user
 
