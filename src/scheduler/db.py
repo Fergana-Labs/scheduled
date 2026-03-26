@@ -806,7 +806,7 @@ def get_cohort_data(weeks: int = 8, emails_only: bool = False, include_current: 
             for c in cohorts:
                 label = c["week"]
                 d = c["by_date"].get(aw, {})
-                email_point[label] = d.get("emails_sent", 0)
+                email_point[label] = d.get("total_actions", 0)
                 active_point[label] = d.get("active_users", 0)
             emails_by_week.append(email_point)
             active_by_week.append(active_point)
@@ -956,7 +956,7 @@ def get_cohort_data_daily(days: int = 7, emails_only: bool = False, include_curr
             for c in cohorts:
                 label = c["day"]
                 d = c["by_date"].get(ad, {})
-                email_point[label] = d.get("emails_sent", 0)
+                email_point[label] = d.get("total_actions", 0)
                 active_point[label] = d.get("active_users", 0)
             emails_by_day.append(email_point)
             active_by_day.append(active_point)

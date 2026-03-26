@@ -311,14 +311,12 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
     return point;
   });
 
-  // Tooltip that shows only the hovered series
+  // Tooltip that shows only the hovered series — hidden when hovering whitespace
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const FocusedTooltip = ({ active, payload, label, suffix }: any) => {
-    if (!active || !payload?.length) return null;
-    const item = hoveredSeries
-      ? payload.find((p: { dataKey: string }) => p.dataKey === hoveredSeries) || payload[0]
-      : payload[0];
-    if (item.value === undefined || item.value === null) return null;
+    if (!active || !payload?.length || !hoveredSeries) return null;
+    const item = payload.find((p: { dataKey: string }) => p.dataKey === hoveredSeries);
+    if (!item || item.value === undefined || item.value === null) return null;
     return (
       <div className="rounded border border-gray-200 bg-white px-3 py-2 text-xs shadow-sm">
         <div className="text-gray-500">{label}</div>
@@ -332,10 +330,9 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
   // Tooltip that shows hovered series + total (for stacked area charts)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const FocusedTooltipWithTotal = ({ active, payload, label }: any) => {
-    if (!active || !payload?.length) return null;
-    const item = hoveredSeries
-      ? payload.find((p: { dataKey: string }) => p.dataKey === hoveredSeries) || payload[0]
-      : payload[0];
+    if (!active || !payload?.length || !hoveredSeries) return null;
+    const item = payload.find((p: { dataKey: string }) => p.dataKey === hoveredSeries);
+    if (!item) return null;
     const total = payload.reduce((sum: number, p: { value?: number }) => sum + (p.value || 0), 0);
     return (
       <div className="rounded border border-gray-200 bg-white px-3 py-2 text-xs shadow-sm">
@@ -370,7 +367,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
       </section>
 
       <section>
-        <h3 className="mb-3 text-sm font-medium text-gray-700">Total Emails Sent by Week Cohort</h3>
+        <h3 className="mb-3 text-sm font-medium text-gray-700">Total Actions by Week Cohort</h3>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={emailsData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -379,7 +376,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <Tooltip content={<FocusedTooltipWithTotal />} />
             <Legend onMouseEnter={(e) => setHoveredSeries(e.dataKey as string)} onMouseLeave={handleMouseLeave} />
             {cohortKeys.map((key, i) => (
-              <Area key={key} type="monotone" dataKey={key} stackId="emails" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={hoveredSeries === key ? 0.8 : hoveredSeries ? 0.3 : 0.6} activeDot={{ r: 4 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} />
+              <Area key={key} type="linear" dataKey={key} stackId="emails" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={hoveredSeries === key ? 0.8 : hoveredSeries ? 0.3 : 0.6} activeDot={{ r: 4 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} />
             ))}
           </AreaChart>
         </ResponsiveContainer>
@@ -395,7 +392,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <Tooltip content={<FocusedTooltipWithTotal />} />
             <Legend onMouseEnter={(e) => setHoveredSeries(e.dataKey as string)} onMouseLeave={handleMouseLeave} />
             {cohortKeys.map((key, i) => (
-              <Area key={key} type="monotone" dataKey={key} stackId="active" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={hoveredSeries === key ? 0.8 : hoveredSeries ? 0.3 : 0.6} activeDot={{ r: 4 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} />
+              <Area key={key} type="linear" dataKey={key} stackId="active" fill={COHORT_COLORS[i % COHORT_COLORS.length]} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} fillOpacity={hoveredSeries === key ? 0.8 : hoveredSeries ? 0.3 : 0.6} activeDot={{ r: 4 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} />
             ))}
           </AreaChart>
         </ResponsiveContainer>
