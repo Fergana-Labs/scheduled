@@ -10,9 +10,69 @@ import {
   ExternalLink,
   ChevronRight,
   ChevronLeft,
+  Globe,
 } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_CONTROL_PLANE_URL;
+
+const COMMON_TIMEZONES = [
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'America/Anchorage',
+  'Pacific/Honolulu',
+  'America/Toronto',
+  'America/Vancouver',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'Europe/Amsterdam',
+  'Europe/Zurich',
+  'Europe/Stockholm',
+  'Asia/Dubai',
+  'Asia/Kolkata',
+  'Asia/Singapore',
+  'Asia/Tokyo',
+  'Asia/Shanghai',
+  'Asia/Seoul',
+  'Australia/Sydney',
+  'Australia/Melbourne',
+  'Pacific/Auckland',
+];
+
+function getLocalTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+function formatTzLabel(tz: string): string {
+  try {
+    const now = new Date();
+    const short = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'short' }).split(' ').pop() || '';
+    const city = tz.split('/').pop()?.replace(/_/g, ' ') || tz;
+    return `${city} (${short})`;
+  } catch {
+    return tz;
+  }
+}
+
+function getTimezoneList(): string[] {
+  const local = getLocalTimezone();
+  const seen = new Set<string>();
+  const result: string[] = [];
+  // Local first, then common ones
+  if (local) {
+    result.push(local);
+    seen.add(local);
+  }
+  for (const tz of COMMON_TIMEZONES) {
+    if (!seen.has(tz)) {
+      result.push(tz);
+      seen.add(tz);
+    }
+  }
+  return result;
+}
 
 interface SchedulingLinkData {
   status: string;
@@ -87,11 +147,12 @@ function generateSlots(
   return slots;
 }
 
-function formatTime(date: Date) {
+function formatTime(date: Date, tz?: string) {
   return date.toLocaleTimeString(undefined, {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+    timeZone: tz,
   });
 }
 
@@ -202,6 +263,7 @@ function CalendarPicker({
   durationMinutes,
   hostName,
   hostTimezone,
+  displayTimezone,
   selectedSlot,
   onSelectSlot,
   onConfirm,
@@ -211,6 +273,7 @@ function CalendarPicker({
   durationMinutes: number;
   hostName: string;
   hostTimezone: string;
+  displayTimezone: string;
   selectedSlot: { start: Date; end: Date } | null;
   onSelectSlot: (slot: { start: Date; end: Date }) => void;
   onConfirm: () => void;
@@ -361,7 +424,7 @@ function CalendarPicker({
                         : 'border-gray-200 text-gray-700 hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100'
                     } disabled:opacity-50`}
                   >
-                    {formatTime(slot.start)} &ndash; {formatTime(slot.end)}
+                    {formatTime(slot.start, displayTimezone)} &ndash; {formatTime(slot.end, displayTimezone)}
                   </button>
                 );
               })}
@@ -376,11 +439,12 @@ function CalendarPicker({
                         weekday: 'long',
                         month: 'long',
                         day: 'numeric',
+                        timeZone: displayTimezone,
                       })}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {formatTime(selectedSlot.start)} &ndash;{' '}
-                      {formatTime(selectedSlot.end)}
+                      {formatTime(selectedSlot.start, displayTimezone)} &ndash;{' '}
+                      {formatTime(selectedSlot.end, displayTimezone)}
                     </p>
                   </div>
                   <button
@@ -594,6 +658,7 @@ export default function SchedulePageClient({ token }: { token: string }) {
     start: Date;
     end: Date;
   } | null>(null);
+  const [displayTz, setDisplayTz] = useState<string>(getLocalTimezone());
 
   useEffect(() => {
     async function load() {
@@ -793,9 +858,10 @@ export default function SchedulePageClient({ token }: { token: string }) {
                       weekday: 'long',
                       month: 'long',
                       day: 'numeric',
+                      timeZone: displayTz,
                     })}{' '}
-                    at {formatTime(selectedSlot.start)} &ndash;{' '}
-                    {formatTime(selectedSlot.end)}
+                    at {formatTime(selectedSlot.start, displayTz)} &ndash;{' '}
+                    {formatTime(selectedSlot.end, displayTz)}
                   </p>
                 )}
               </div>
@@ -855,6 +921,30 @@ export default function SchedulePageClient({ token }: { token: string }) {
                       <span className="text-blue-500">Google Meet</span>
                     )}
                   </div>
+
+                  {/* Timezone selector */}
+                  <div className="mt-3 inline-flex items-center gap-1.5 text-sm">
+                    <Globe className="w-3.5 h-3.5 text-gray-400" />
+                    <select
+                      value={displayTz}
+                      onChange={(e) => {
+                        setDisplayTz(e.target.value);
+                        setSelectedSlot(null);
+                      }}
+                      className="text-gray-600 bg-transparent border-none text-sm cursor-pointer hover:text-gray-900 focus:outline-none focus:ring-0 p-0 pr-5 -ml-0.5 appearance-none"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 0 center',
+                      }}
+                    >
+                      {getTimezoneList().map((tz) => (
+                        <option key={tz} value={tz}>
+                          {formatTzLabel(tz)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 {error && (
@@ -871,6 +961,7 @@ export default function SchedulePageClient({ token }: { token: string }) {
                     durationMinutes={data.duration_minutes}
                     hostName={data.host_name}
                     hostTimezone={data.timezone}
+                    displayTimezone={displayTz}
                     selectedSlot={selectedSlot}
                     onSelectSlot={(slot) => {
                       setSelectedSlot(slot);
