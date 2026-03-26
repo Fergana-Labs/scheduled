@@ -2020,6 +2020,16 @@ def admin_funnel(weeks: int = 12, include_current: bool = False, admin: dict = D
     return {"data": data}
 
 
+@app.get("/web/api/v1/admin/funnel/daily")
+def admin_funnel_daily(days: int = 7, include_current: bool = False, admin: dict = Depends(_require_admin)):
+    from scheduler.db import get_funnel_data_daily
+    data = get_funnel_data_daily(days=days, include_current=include_current)
+    for row in data:
+        if row.get("week"):
+            row["week"] = row["week"].isoformat()
+    return {"data": data}
+
+
 @app.get("/web/api/v1/admin/cohorts")
 def admin_cohorts(weeks: int = 8, emails_only: bool = False, include_current: bool = False, admin: dict = Depends(_require_admin)):
     from scheduler.db import get_cohort_data

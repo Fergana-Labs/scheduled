@@ -653,6 +653,82 @@ def get_funnel_data(weeks: int = 12, include_current: bool = False) -> list[dict
         return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
+def get_funnel_data_daily(days: int = 7, include_current: bool = False) -> list[dict]:
+    """Daily funnel: page views → signup clicks → signups → onboarded → first draft sent."""
+    with _conn() as conn, conn.cursor() as cur:
+        end_expr = "date_trunc('day', (now() AT TIME ZONE %s))" if include_current else "date_trunc('day', (now() AT TIME ZONE %s)) - interval '1 day'"
+        cur.execute(
+            f"""
+            WITH day_series AS (
+                SELECT generate_series(
+                    date_trunc('day', (now() AT TIME ZONE %s) - make_interval(days => %s)),
+                    {end_expr},
+                    '1 day'::interval
+                ) AS day
+            ),
+            page_views AS (
+                SELECT date_trunc('day', created_at AT TIME ZONE %s) AS day,
+                       count(DISTINCT properties->>'session_id') FILTER (WHERE properties->>'session_id' IS NOT NULL)
+                       + count(*) FILTER (WHERE properties->>'session_id' IS NULL) AS cnt
+                FROM page_events
+                WHERE event = 'landing_page_view'
+                  AND created_at >= now() - make_interval(days => %s)
+                GROUP BY 1
+            ),
+            signup_clicks AS (
+                SELECT date_trunc('day', created_at AT TIME ZONE %s) AS day,
+                       count(DISTINCT properties->>'session_id') FILTER (WHERE properties->>'session_id' IS NOT NULL)
+                       + count(*) FILTER (WHERE properties->>'session_id' IS NULL) AS cnt
+                FROM page_events
+                WHERE event = 'signup_click'
+                  AND created_at >= now() - make_interval(days => %s)
+                GROUP BY 1
+            ),
+            signups AS (
+                SELECT date_trunc('day', created_at AT TIME ZONE %s) AS day, count(*) AS cnt
+                FROM users
+                WHERE created_at >= now() - make_interval(days => %s)
+                GROUP BY 1
+            ),
+            onboarded AS (
+                SELECT date_trunc('day', created_at AT TIME ZONE %s) AS day, count(DISTINCT user_id) AS cnt
+                FROM analytics_events
+                WHERE event = 'onboarding_completed'
+                  AND created_at >= now() - make_interval(days => %s)
+                GROUP BY 1
+            ),
+            first_drafts AS (
+                SELECT date_trunc('day', min_sent AT TIME ZONE %s) AS day, count(*) AS cnt
+                FROM (
+                    SELECT user_id, min(created_at) AS min_sent
+                    FROM analytics_events
+                    WHERE event = 'draft_sent'
+                      AND created_at >= now() - make_interval(days => %s)
+                    GROUP BY user_id
+                ) sub
+                GROUP BY 1
+            )
+            SELECT
+                ds.day AS week,
+                COALESCE(pv.cnt, 0) AS page_views,
+                COALESCE(sc.cnt, 0) AS signup_clicks,
+                COALESCE(s.cnt, 0) AS signups,
+                COALESCE(o.cnt, 0) AS onboarded,
+                COALESCE(f.cnt, 0) AS first_draft_sent
+            FROM day_series ds
+            LEFT JOIN page_views pv ON pv.day = ds.day
+            LEFT JOIN signup_clicks sc ON sc.day = ds.day
+            LEFT JOIN signups s ON s.day = ds.day
+            LEFT JOIN onboarded o ON o.day = ds.day
+            LEFT JOIN first_drafts f ON f.day = ds.day
+            ORDER BY ds.day
+            """,
+            (_TZ, days, _TZ, _TZ, days, _TZ, days, _TZ, days, _TZ, days, _TZ, days),
+        )
+        cols = [desc[0] for desc in cur.description]
+        return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+
 _ALL_EVENTS = ('user_created', 'onboarding_completed', 'draft_composed', 'draft_sent', 'email_classified', 'setting_changed')
 _EMAIL_EVENTS = ('draft_sent',)
 _RETENTION_EVENTS = ('user_created', 'onboarding_completed')

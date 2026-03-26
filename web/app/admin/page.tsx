@@ -101,14 +101,18 @@ function FunnelSection() {
   const [includeCurrent, setIncludeCurrent] = useState(false);
   const [data, setData] = useState<FunnelRow[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const isDaily = weeks === 1;
 
   useEffect(() => {
     setLoading(true);
-    const params = `weeks=${weeks}${includeCurrent ? '&include_current=true' : ''}`;
-    api<{ data: FunnelRow[] }>(`/web/api/v1/admin/funnel?${params}`)
+    const currentParam = includeCurrent ? '&include_current=true' : '';
+    const url = isDaily
+      ? `/web/api/v1/admin/funnel/daily?days=7${currentParam}`
+      : `/web/api/v1/admin/funnel?weeks=${weeks}${currentParam}`;
+    api<{ data: FunnelRow[] }>(url)
       .then((res) => setData(res.data))
       .finally(() => setLoading(false));
-  }, [weeks, includeCurrent]);
+  }, [weeks, includeCurrent, isDaily]);
 
   if (loading || !data) {
     return (
@@ -158,7 +162,7 @@ function FunnelSection() {
                 weeks === w ? 'bg-[#43614a] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              {w}w
+              {w === 1 ? '7d' : `${w}w`}
             </button>
           ))}
         </div>
@@ -169,7 +173,7 @@ function FunnelSection() {
             onChange={(e) => setIncludeCurrent(e.target.checked)}
             className="rounded"
           />
-          Include current week
+          Include current {isDaily ? 'day' : 'week'}
         </label>
       </div>
       <div className="mb-6 flex flex-wrap gap-4">
