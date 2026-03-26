@@ -238,7 +238,8 @@ project_id = os.environ.get("PROJECT_ID", "MISSING")
 access_token = os.popen("gcloud auth print-access-token").read().strip()
 
 import urllib.request
-firestore_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/users?documentId={email}"
+from urllib.parse import quote
+firestore_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/users?documentId={quote(email, safe='')}"
 
 now = datetime.now(timezone.utc).isoformat()
 doc = {
