@@ -2,12 +2,14 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install dependencies first (cache layer)
+# Copy everything needed for install
 COPY pyproject.toml .
+COPY src/ src/
+
+# Install the package (includes dependencies)
 RUN pip install --no-cache-dir .
 
-# Copy application code
-COPY src/ src/
+ENV PYTHONPATH=/app/src
 
 EXPOSE 8080
 

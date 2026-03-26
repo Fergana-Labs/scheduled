@@ -22,10 +22,10 @@ jobs:
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io
 
-      - name: Build Docker image
-        run: docker build -t gcr.io/fergana-labs/scheduler:latest -t gcr.io/fergana-labs/scheduler:${{ github.sha }} .
+      - name: Build Docker image (amd64)
+        run: docker build --platform linux/amd64 -t gcr.io/stash-474601/scheduler:latest -t gcr.io/stash-474601/scheduler:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
-          docker push gcr.io/fergana-labs/scheduler:latest
-          docker push gcr.io/fergana-labs/scheduler:${{ github.sha }}
+          docker push gcr.io/stash-474601/scheduler:latest
+          docker push gcr.io/stash-474601/scheduler:${{ github.sha }}

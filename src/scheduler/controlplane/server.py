@@ -1260,6 +1260,35 @@ def web_onboarding_status(
     return result
 
 
+@app.post("/api/v1/admin/onboard-stuck-users")
+def admin_onboard_stuck_users(background_tasks: BackgroundTasks):
+    """Kick off onboarding for all users who have Google tokens but null onboarding status."""
+    from scheduler.db import get_all_users
+
+    users = get_all_users()
+    triggered = []
+    skipped = []
+
+    for u in users:
+        if not u.google_refresh_token:
+            skipped.append({"email": u.email, "reason": "no_refresh_token"})
+            continue
+        if u.onboarding_status == "done":
+            skipped.append({"email": u.email, "reason": "already_onboarded"})
+            continue
+
+        user_id = str(u.id)
+        with _onboarding_lock:
+            if _onboarding_status.get(user_id, {}).get("status") == "running":
+                skipped.append({"email": u.email, "reason": "already_running"})
+                continue
+
+        background_tasks.add_task(_run_onboarding, user_id)
+        triggered.append(u.email)
+
+    return {"triggered": triggered, "skipped": skipped}
+
+
 @app.get("/web/api/v1/settings")
 def web_settings_get(user: dict = Depends(get_authenticated_user)):
     from scheduler.db import get_guides_for_user, get_user_by_id
