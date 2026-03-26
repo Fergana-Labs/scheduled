@@ -558,6 +558,9 @@ def update_composed_draft_sent(
     chars_added: int,
     chars_removed: int,
     sent_at,
+    sent_message_sender: str | None = None,
+    sent_message_id: str | None = None,
+    sent_similarity: float | None = None,
 ) -> None:
     """Update a composed_drafts row with sent-time diff metrics."""
     with _conn() as conn, conn.cursor() as cur:
@@ -565,10 +568,12 @@ def update_composed_draft_sent(
             """
             UPDATE composed_drafts
             SET sent_body = %s, was_edited = %s, edit_distance_ratio = %s,
-                chars_added = %s, chars_removed = %s, sent_at = %s
+                chars_added = %s, chars_removed = %s, sent_at = %s,
+                sent_message_sender = %s, sent_message_id = %s, sent_similarity = %s
             WHERE id = %s
             """,
-            (sent_body, was_edited, edit_distance_ratio, chars_added, chars_removed, sent_at, draft_id),
+            (sent_body, was_edited, edit_distance_ratio, chars_added, chars_removed, sent_at,
+             sent_message_sender, sent_message_id, sent_similarity, draft_id),
         )
         conn.commit()
 
@@ -1112,7 +1117,8 @@ def get_admin_drafts(
             SELECT cd.id, u.email AS user_email, cd.original_subject, cd.original_body,
                    cd.sent_body, cd.was_edited, cd.edit_distance_ratio,
                    cd.chars_added, cd.chars_removed, cd.was_autopilot,
-                   cd.composed_at, cd.sent_at, cd.thread_context
+                   cd.composed_at, cd.sent_at, cd.thread_context,
+                   cd.sent_message_sender, cd.sent_message_id, cd.sent_similarity
             FROM composed_drafts cd
             JOIN users u ON u.id = cd.user_id
             {where_clause}

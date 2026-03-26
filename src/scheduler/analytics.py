@@ -69,6 +69,8 @@ def record_draft_sent(
     thread_id: str,
     sent_body: str,
     sent_at,
+    message_id: str | None = None,
+    sender: str | None = None,
 ) -> None:
     """Look up the composed draft, compute diff metrics, and update. Runs in a daemon thread."""
 
@@ -124,6 +126,9 @@ def record_draft_sent(
                 chars_added=chars_added,
                 chars_removed=chars_removed,
                 sent_at=sent_at,
+                sent_message_sender=sender,
+                sent_message_id=message_id,
+                sent_similarity=similarity,
             )
 
             track(user_id, "draft_sent", {

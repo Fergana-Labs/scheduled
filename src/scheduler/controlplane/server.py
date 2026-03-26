@@ -1795,7 +1795,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 _handle_sent_message_for_invite(user_id, email, gmail, calendar)
                 try:
                     from scheduler import analytics
-                    analytics.record_draft_sent(user_id, email.thread_id, email.body, email.date)
+                    analytics.record_draft_sent(user_id, email.thread_id, email.body, email.date, message_id=message_id, sender=email.sender)
                 except Exception:
                     logger.debug("analytics: failed to check sent draft for message %s", message_id, exc_info=True)
                 logger.info("gmail_webhook: message %s is from the user (matched sender), skipping", message_id)

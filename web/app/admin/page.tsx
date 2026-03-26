@@ -69,6 +69,9 @@ interface DraftRow {
   composed_at: string;
   sent_at: string | null;
   thread_context: ThreadMessage[];
+  sent_message_sender: string | null;
+  sent_message_id: string | null;
+  sent_similarity: number | null;
 }
 
 type Tab = 'funnel' | 'cohorts' | 'drafts' | 'definitions';
@@ -596,8 +599,8 @@ function DraftBrowser() {
                         <span className="text-gray-400">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-gray-500">{new Date(d.composed_at).toLocaleDateString()}</td>
-                    <td className="px-3 py-2 text-gray-500">{d.sent_at ? new Date(d.sent_at).toLocaleDateString() : '—'}</td>
+                    <td className="px-3 py-2 text-gray-500 text-xs">{new Date(d.composed_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
+                    <td className="px-3 py-2 text-gray-500 text-xs">{d.sent_at ? new Date(d.sent_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—'}</td>
                   </tr>
                   {expandedId === d.id && (
                     <tr className="border-b border-gray-100 bg-gray-50">
@@ -640,6 +643,14 @@ function DraftBrowser() {
                           <div className="mt-3 flex gap-4 text-xs text-gray-500">
                             <span className="text-green-600">+{d.chars_added} added</span>
                             <span className="text-red-600">-{d.chars_removed} removed</span>
+                            {d.sent_similarity !== null && (
+                              <span>Similarity: {(d.sent_similarity * 100).toFixed(1)}%</span>
+                            )}
+                          </div>
+                        )}
+                        {d.sent_message_sender && (
+                          <div className="mt-2 text-xs text-gray-400">
+                            Matched from: {d.sent_message_sender} (msg: {d.sent_message_id || '?'})
                           </div>
                         )}
                       </td>
