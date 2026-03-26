@@ -98,15 +98,17 @@ const WEEK_OPTIONS = [4, 8, 12, 24, 52] as const;
 
 function FunnelSection() {
   const [weeks, setWeeks] = useState<number>(12);
+  const [includeCurrent, setIncludeCurrent] = useState(false);
   const [data, setData] = useState<FunnelRow[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    api<{ data: FunnelRow[] }>(`/web/api/v1/admin/funnel?weeks=${weeks}`)
+    const params = `weeks=${weeks}${includeCurrent ? '&include_current=true' : ''}`;
+    api<{ data: FunnelRow[] }>(`/web/api/v1/admin/funnel?${params}`)
       .then((res) => setData(res.data))
       .finally(() => setLoading(false));
-  }, [weeks]);
+  }, [weeks, includeCurrent]);
 
   if (loading || !data) {
     return (
@@ -146,18 +148,29 @@ function FunnelSection() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-2">
-        {WEEK_OPTIONS.map((w) => (
-          <button
-            key={w}
-            onClick={() => setWeeks(w)}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-              weeks === w ? 'bg-[#43614a] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {w}w
-          </button>
-        ))}
+      <div className="mb-4 flex items-center gap-4">
+        <div className="flex gap-1">
+          {WEEK_OPTIONS.map((w) => (
+            <button
+              key={w}
+              onClick={() => setWeeks(w)}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                weeks === w ? 'bg-[#43614a] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {w}w
+            </button>
+          ))}
+        </div>
+        <label className="flex items-center gap-1.5 text-xs text-gray-600">
+          <input
+            type="checkbox"
+            checked={includeCurrent}
+            onChange={(e) => setIncludeCurrent(e.target.checked)}
+            className="rounded"
+          />
+          Include current week
+        </label>
       </div>
       <div className="mb-6 flex flex-wrap gap-4">
         {stats.map((s) => (
@@ -188,17 +201,22 @@ function FunnelSection() {
 function CohortSection() {
   const [period, setPeriod] = useState<'weekly' | 'daily'>('weekly');
   const [emailsOnly, setEmailsOnly] = useState(false);
+  const [includeCurrent, setIncludeCurrent] = useState(false);
   const [data, setData] = useState<CohortData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    const suffix = emailsOnly ? '&emails_only=true' : '';
+    const params = [
+      emailsOnly ? 'emails_only=true' : '',
+      includeCurrent ? 'include_current=true' : '',
+    ].filter(Boolean).join('&');
+    const suffix = params ? `&${params}` : '';
     const url = period === 'weekly'
       ? `/web/api/v1/admin/cohorts?weeks=8${suffix}`
       : `/web/api/v1/admin/cohorts/daily?days=7${suffix}`;
     api<CohortData>(url).then(setData).finally(() => setLoading(false));
-  }, [period, emailsOnly]);
+  }, [period, emailsOnly, includeCurrent]);
 
   return (
     <div>
@@ -224,6 +242,15 @@ function CohortSection() {
             className="rounded"
           />
           Emails sent only
+        </label>
+        <label className="flex items-center gap-1.5 text-xs text-gray-600">
+          <input
+            type="checkbox"
+            checked={includeCurrent}
+            onChange={(e) => setIncludeCurrent(e.target.checked)}
+            className="rounded"
+          />
+          Include current {period === 'weekly' ? 'week' : 'day'}
         </label>
       </div>
       {loading ? (

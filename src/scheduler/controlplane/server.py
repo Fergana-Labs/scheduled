@@ -2010,9 +2010,9 @@ def web_page_event(req: TrackEventRequest):
 
 
 @app.get("/web/api/v1/admin/funnel")
-def admin_funnel(weeks: int = 12, admin: dict = Depends(_require_admin)):
+def admin_funnel(weeks: int = 12, include_current: bool = False, admin: dict = Depends(_require_admin)):
     from scheduler.db import get_funnel_data
-    data = get_funnel_data(weeks=weeks)
+    data = get_funnel_data(weeks=weeks, include_current=include_current)
     # Serialize datetimes to ISO strings
     for row in data:
         if row.get("week"):
@@ -2021,9 +2021,9 @@ def admin_funnel(weeks: int = 12, admin: dict = Depends(_require_admin)):
 
 
 @app.get("/web/api/v1/admin/cohorts")
-def admin_cohorts(weeks: int = 8, emails_only: bool = False, admin: dict = Depends(_require_admin)):
+def admin_cohorts(weeks: int = 8, emails_only: bool = False, include_current: bool = False, admin: dict = Depends(_require_admin)):
     from scheduler.db import get_cohort_data
-    result = get_cohort_data(weeks=weeks, emails_only=emails_only)
+    result = get_cohort_data(weeks=weeks, emails_only=emails_only, include_current=include_current)
     for c in result["cohorts"]:
         if isinstance(c.get("week"), datetime):
             c["week"] = c["week"].isoformat()
@@ -2031,9 +2031,9 @@ def admin_cohorts(weeks: int = 8, emails_only: bool = False, admin: dict = Depen
 
 
 @app.get("/web/api/v1/admin/cohorts/daily")
-def admin_cohorts_daily(days: int = 7, emails_only: bool = False, admin: dict = Depends(_require_admin)):
+def admin_cohorts_daily(days: int = 7, emails_only: bool = False, include_current: bool = False, admin: dict = Depends(_require_admin)):
     from scheduler.db import get_cohort_data_daily
-    result = get_cohort_data_daily(days=days, emails_only=emails_only)
+    result = get_cohort_data_daily(days=days, emails_only=emails_only, include_current=include_current)
     for c in result["cohorts"]:
         if isinstance(c.get("week"), datetime):
             c["week"] = c["week"].isoformat()

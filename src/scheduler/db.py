@@ -577,15 +577,16 @@ def update_composed_draft_sent(
 _TZ = "America/Los_Angeles"
 
 
-def get_funnel_data(weeks: int = 12) -> list[dict]:
+def get_funnel_data(weeks: int = 12, include_current: bool = False) -> list[dict]:
     """Weekly funnel: page views → signup clicks → signups → onboarded → first draft sent."""
     with _conn() as conn, conn.cursor() as cur:
+        end_expr = "date_trunc('week', (now() AT TIME ZONE %s))" if include_current else "date_trunc('week', (now() AT TIME ZONE %s)) - interval '1 week'"
         cur.execute(
-            """
+            f"""
             WITH week_series AS (
                 SELECT generate_series(
                     date_trunc('week', (now() AT TIME ZONE %s) - make_interval(weeks => %s)),
-                    date_trunc('week', (now() AT TIME ZONE %s)) - interval '1 week',
+                    {end_expr},
                     '1 week'::interval
                 ) AS week
             ),
@@ -657,15 +658,17 @@ _EMAIL_EVENTS = ('draft_sent',)
 _RETENTION_EVENTS = ('user_created', 'onboarding_completed')
 
 
-def get_cohort_data(weeks: int = 8, emails_only: bool = False) -> dict:
+def get_cohort_data(weeks: int = 8, emails_only: bool = False, include_current: bool = False) -> dict:
     """Rich cohort data: retention by week offset, plus absolute-date series for emails/active/actions."""
     from datetime import timedelta
     action_events = _EMAIL_EVENTS if emails_only else _ALL_EVENTS
     # Always include signup/onboarding so users show as retained from W0
     all_events = list(set(action_events) | set(_RETENTION_EVENTS))
+    cutoff_clause = "" if include_current else "AND date_trunc('week', ae.created_at AT TIME ZONE %s) < date_trunc('week', now() AT TIME ZONE %s)"
+    tz_params = () if include_current else (_TZ, _TZ)
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
-            """
+            f"""
             WITH cohorts AS (
                 SELECT id AS user_id, date_trunc('week', created_at AT TIME ZONE %s) AS cohort_week
                 FROM users
@@ -687,7 +690,7 @@ def get_cohort_data(weeks: int = 8, emails_only: bool = False) -> dict:
                 FROM cohorts c
                 JOIN analytics_events ae ON ae.user_id = c.user_id
                 WHERE ae.event = ANY(%s)
-                  AND date_trunc('week', ae.created_at AT TIME ZONE %s) < date_trunc('week', now() AT TIME ZONE %s)
+                  {cutoff_clause}
                 GROUP BY c.cohort_week, activity_week, week_offset
             )
             SELECT
@@ -702,15 +705,12 @@ def get_cohort_data(weeks: int = 8, emails_only: bool = False) -> dict:
             LEFT JOIN weekly_activity wa ON wa.cohort_week = cs.cohort_week
             ORDER BY cs.cohort_week, wa.activity_week
             """,
-            (_TZ, weeks, _TZ, _TZ, list(action_events), all_events, _TZ, _TZ),
+            (_TZ, weeks, _TZ, _TZ, list(action_events), all_events) + tz_params,
         )
         cols = [desc[0] for desc in cur.description]
         rows = [dict(zip(cols, row)) for row in cur.fetchall()]
 
-        # Current completed week boundary in Pacific time
-        now_pt = datetime.now(timezone.utc).astimezone()
-        # We need the start of the current week in PT to know the last completed week
-        # Parse from the DB to stay consistent — use a simple approach
+        # Current week boundary in Pacific time
         cur.execute("SELECT date_trunc('week', now() AT TIME ZONE %s)", (_TZ,))
         current_week_start = cur.fetchone()[0]
         if hasattr(current_week_start, 'isoformat'):
@@ -747,23 +747,23 @@ def get_cohort_data(weeks: int = 8, emails_only: bool = False) -> dict:
 
         cohorts = sorted(cohort_map.values(), key=lambda c: c["week"])
         max_offset = weeks
-        # Generate full week series from earliest cohort to last completed week
+        # Generate full week series from earliest cohort to last boundary
         if cohorts:
             earliest = min(datetime.fromisoformat(c["week"]) for c in cohorts)
-            last_completed = current_week_start - timedelta(weeks=1)
+            last_week = current_week_start if include_current else current_week_start - timedelta(weeks=1)
             week_cursor = earliest
-            while week_cursor <= last_completed:
+            while week_cursor <= last_week:
                 all_activity_weeks.add(week_cursor.isoformat())
                 week_cursor += timedelta(weeks=1)
         sorted_activity_weeks = sorted(all_activity_weeks)
 
         # Compute max completed offset per cohort
-        # A cohort from week X has completed offset N if week X + N*7 days < current_week_start
+        # When include_current, allow the current incomplete offset too
         def max_completed_offset(cohort_week_iso: str) -> int:
             cohort_start = datetime.fromisoformat(cohort_week_iso)
             delta = current_week_start - cohort_start
-            # Number of full weeks elapsed (not counting current incomplete week)
-            return max(0, int(delta.total_seconds() / 604800) - 1)
+            full_weeks = int(delta.total_seconds() / 604800)
+            return max(0, full_weeks if include_current else full_weeks - 1)
 
         # Build retention arrays — use None for offsets beyond what the cohort has completed
         result_cohorts = []
@@ -819,14 +819,16 @@ def get_cohort_data(weeks: int = 8, emails_only: bool = False) -> dict:
         }
 
 
-def get_cohort_data_daily(days: int = 7, emails_only: bool = False) -> dict:
+def get_cohort_data_daily(days: int = 7, emails_only: bool = False, include_current: bool = False) -> dict:
     """Same as get_cohort_data but cohorts are grouped by day and activity is daily."""
     from datetime import timedelta
     action_events = _EMAIL_EVENTS if emails_only else _ALL_EVENTS
     all_events = list(set(action_events) | set(_RETENTION_EVENTS))
+    cutoff_clause = "" if include_current else "AND date_trunc('day', ae.created_at AT TIME ZONE %s) < date_trunc('day', now() AT TIME ZONE %s)"
+    tz_params = () if include_current else (_TZ, _TZ)
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
-            """
+            f"""
             WITH cohorts AS (
                 SELECT id AS user_id, date_trunc('day', created_at AT TIME ZONE %s) AS cohort_day
                 FROM users
@@ -848,7 +850,7 @@ def get_cohort_data_daily(days: int = 7, emails_only: bool = False) -> dict:
                 FROM cohorts c
                 JOIN analytics_events ae ON ae.user_id = c.user_id
                 WHERE ae.event = ANY(%s)
-                  AND date_trunc('day', ae.created_at AT TIME ZONE %s) < date_trunc('day', now() AT TIME ZONE %s)
+                  {cutoff_clause}
                 GROUP BY c.cohort_day, activity_day, day_offset
             )
             SELECT
@@ -863,7 +865,7 @@ def get_cohort_data_daily(days: int = 7, emails_only: bool = False) -> dict:
             LEFT JOIN daily_activity da ON da.cohort_day = cs.cohort_day
             ORDER BY cs.cohort_day, da.activity_day
             """,
-            (_TZ, days, _TZ, _TZ, list(action_events), all_events, _TZ, _TZ),
+            (_TZ, days, _TZ, _TZ, list(action_events), all_events) + tz_params,
         )
         cols = [desc[0] for desc in cur.description]
         rows = [dict(zip(cols, row)) for row in cur.fetchall()]
@@ -900,12 +902,12 @@ def get_cohort_data_daily(days: int = 7, emails_only: bool = False) -> dict:
 
         cohorts = sorted(cohort_map.values(), key=lambda c: c["day"])
 
-        # Fill in all days up to last completed day
+        # Fill in all days up to last boundary
         if cohorts:
             earliest = min(datetime.fromisoformat(c["day"]) for c in cohorts)
-            last_completed = current_day_start - timedelta(days=1)
+            last_day = current_day_start if include_current else current_day_start - timedelta(days=1)
             cursor = earliest
-            while cursor <= last_completed:
+            while cursor <= last_day:
                 all_activity_days.add(cursor.isoformat())
                 cursor += timedelta(days=1)
         sorted_activity_days = sorted(all_activity_days)
@@ -915,7 +917,7 @@ def get_cohort_data_daily(days: int = 7, emails_only: bool = False) -> dict:
         def max_completed_offset(cohort_day_iso: str) -> int:
             cohort_start = datetime.fromisoformat(cohort_day_iso)
             delta = current_day_start - cohort_start
-            return max(0, delta.days - 1)
+            return max(0, delta.days if include_current else delta.days - 1)
 
         result_cohorts = []
         for c in cohorts:
