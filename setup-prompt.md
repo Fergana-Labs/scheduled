@@ -4,6 +4,25 @@ You are setting up Scheduled, an AI scheduling assistant that lives in Gmail. It
 
 This setup deploys everything to the user's Google Cloud Platform project. Run all bash commands without asking for permission. The user has already consented to this setup by pasting this prompt.
 
+## Before you start
+
+The user needs two things that can't be created via CLI:
+
+1. **A GCP billing account** — if they don't have one, send them to https://console.cloud.google.com/billing/create
+2. **An OAuth client ID** — they must create a "Desktop app" OAuth client:
+   - Go to https://console.cloud.google.com/apis/credentials
+   - Click **Create Credentials** → **OAuth client ID**
+   - Application type: **Desktop app**
+   - Copy the **Client ID** and **Client Secret**
+
+Ask the user for their OAuth Client ID and Client Secret before proceeding. Store them:
+
+```bash
+read -p "Enter your OAuth Client ID: " GOOGLE_CLIENT_ID
+read -p "Enter your OAuth Client Secret: " GOOGLE_CLIENT_SECRET
+echo "Client ID: $GOOGLE_CLIENT_ID"
+```
+
 ---
 
 ## Phase 1: Prerequisites
@@ -86,11 +105,7 @@ gcloud services enable \
   calendar-json.googleapis.com \
   run.googleapis.com \
   firestore.googleapis.com \
-  aiplatform.googleapis.com \
-  cloudresourcemanager.googleapis.com \
-  vpcaccess.googleapis.com \
-  compute.googleapis.com \
-  dns.googleapis.com
+  cloudresourcemanager.googleapis.com
 ```
 
 ---
@@ -99,7 +114,14 @@ gcloud services enable \
 
 ```bash
 gcloud firestore databases create --location=us-central1 --type=firestore-native
+```
 
+Grant the default compute service account Firestore access:
+```bash
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/datastore.user"
 ```
 
 ---
@@ -122,8 +144,8 @@ gcloud run deploy scheduler \
   --set-env-vars="\
 GCP_PROJECT_ID=$PROJECT_ID,\
 GCP_REGION=us-central1,\
-GOOGLE_CLIENT_ID=1098804761920-k7qgt7gvhf10pub9sisviu11puk7j4rk.apps.googleusercontent.com,\
-GOOGLE_CLIENT_SECRET=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,\
+GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID,\
+GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET,\
 SESSION_SECRET=$SESSION_SECRET,\
 CONTROL_PLANE_PUBLIC_URL=PLACEHOLDER"
 
@@ -142,83 +164,7 @@ GOOGLE_WEB_REDIRECT_URI=$CLOUD_RUN_URL"
 
 ---
 
-## Phase 6: Egress Lockdown (MANDATORY)
-
-This restricts the container to only communicate with Google APIs. No data can be sent anywhere else.
-
-The key is: route through a VPC with Private Google Access enabled, then block all egress except Google's restricted API ranges.
-
-```bash
-# Create a custom subnet with Private Google Access enabled
-gcloud compute networks subnets update default \
-  --region=us-central1 \
-  --enable-private-ip-google-access
-
-# Create VPC connector
-gcloud compute networks vpc-access connectors create scheduler-connector \
-  --region=us-central1 \
-  --network=default \
-  --range=10.8.0.0/28
-
-# Configure DNS to route *.googleapis.com to restricted.googleapis.com IPs
-# This ensures API calls go through the restricted range
-gcloud dns managed-zones create googleapis-restricted \
-  --dns-name="googleapis.com." \
-  --visibility=private \
-  --networks=default \
-  --description="Route Google APIs through restricted VIP" 2>/dev/null || true
-
-gcloud dns record-sets create "*.googleapis.com." \
-  --zone=googleapis-restricted \
-  --type=CNAME \
-  --rrdatas="restricted.googleapis.com." \
-  --ttl=300 2>/dev/null || true
-
-gcloud dns record-sets create "restricted.googleapis.com." \
-  --zone=googleapis-restricted \
-  --type=A \
-  --rrdatas="199.36.153.4,199.36.153.5,199.36.153.6,199.36.153.7" \
-  --ttl=300 2>/dev/null || true
-
-# Allow only Google restricted API ranges
-gcloud compute firewall-rules create allow-google-apis \
-  --network=default \
-  --direction=EGRESS \
-  --action=ALLOW \
-  --rules=tcp:443 \
-  --destination-ranges=199.36.153.4/30 \
-  --priority=1000
-
-# Allow DNS (needed for resolving googleapis.com)
-gcloud compute firewall-rules create allow-dns \
-  --network=default \
-  --direction=EGRESS \
-  --action=ALLOW \
-  --rules=udp:53,tcp:53 \
-  --destination-ranges=0.0.0.0/0 \
-  --priority=999
-
-# Block everything else
-gcloud compute firewall-rules create deny-all-egress \
-  --network=default \
-  --direction=EGRESS \
-  --action=DENY \
-  --rules=all \
-  --destination-ranges=0.0.0.0/0 \
-  --priority=2000
-
-# Route Cloud Run through the locked-down VPC
-gcloud run services update scheduler \
-  --region=us-central1 \
-  --vpc-connector=scheduler-connector \
-  --vpc-egress=all-traffic
-```
-
-If any egress lockdown command fails, do NOT skip it. Debug and fix the issue. The DNS API may need to be enabled first: `gcloud services enable dns.googleapis.com`
-
----
-
-## Phase 7: User OAuth
+## Phase 6: User OAuth
 
 Run the OAuth flow locally. This opens a browser — the user clicks "Allow".
 
@@ -249,10 +195,16 @@ SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
 ]
 
+client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
+client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+if not client_id or not client_secret:
+    print("ERROR: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be set.")
+    sys.exit(1)
+
 client_config = {
     "installed": {
-        "client_id": "1098804761920-k7qgt7gvhf10pub9sisviu11puk7j4rk.apps.googleusercontent.com",
-        "client_secret": "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",
+        "client_id": client_id,
+        "client_secret": client_secret,
         "redirect_uris": ["http://localhost:8080"],
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://oauth2.googleapis.com/token",
@@ -326,7 +278,7 @@ OAUTH_SCRIPT
 
 ---
 
-## Phase 8: Initialize Gmail Polling
+## Phase 7: Initialize Gmail Polling
 
 Set the Gmail history ID baseline so the polling loop knows where to start checking for new messages.
 
@@ -335,6 +287,8 @@ python3 << 'HISTORY_SCRIPT'
 import json, os, urllib.request
 
 project_id = os.environ.get("PROJECT_ID", "MISSING")
+client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
+client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 access_token = os.popen("gcloud auth print-access-token").read().strip()
 
 # Get the user's OAuth token from Firestore
@@ -359,8 +313,8 @@ creds = Credentials(
     token=None,
     refresh_token=refresh_token,
     token_uri="https://oauth2.googleapis.com/token",
-    client_id="1098804761920-k7qgt7gvhf10pub9sisviu11puk7j4rk.apps.googleusercontent.com",
-    client_secret="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",
+    client_id=client_id,
+    client_secret=client_secret,
 )
 creds.refresh(Request())
 
@@ -389,9 +343,7 @@ HISTORY_SCRIPT
 
 ---
 
-## Phase 9: Verify & Done
-
-Send a test email to verify the system works. Also add a DNS enablement step if needed.
+## Phase 8: Verify & Done
 
 ```bash
 # Health check
