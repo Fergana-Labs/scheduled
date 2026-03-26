@@ -105,6 +105,7 @@ function FunnelSection() {
 
   useEffect(() => {
     setLoading(true);
+    setData(null);
     const currentParam = includeCurrent ? '&include_current=true' : '';
     const url = isDaily
       ? `/web/api/v1/admin/funnel/daily?days=7${currentParam}`
@@ -368,7 +369,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <Tooltip content={<FocusedTooltip suffix="%" showSize />} />
             <Legend onMouseEnter={(e) => setHoveredSeries(e.dataKey as string)} onMouseLeave={handleMouseLeave} />
             {cohortKeys.map((key, i) => (
-              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={hoveredSeries === key ? 3 : hoveredSeries ? 1 : 2} dot={false} activeDot={{ r: 6 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} connectNulls={false} style={{ pointerEvents: 'all', cursor: 'pointer' }} />
+              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={hoveredSeries === key ? 3 : hoveredSeries ? 1 : 2} dot={{ r: 2 }} activeDot={{ r: 6 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} connectNulls={false} style={{ pointerEvents: 'all', cursor: 'pointer' }} />
             ))}
           </LineChart>
         </ResponsiveContainer>
@@ -416,7 +417,7 @@ function CohortCharts({ data, periodLabel }: { data: CohortData; periodLabel: st
             <Tooltip content={<FocusedTooltip showSize />} />
             <Legend onMouseEnter={(e) => setHoveredSeries(e.dataKey as string)} onMouseLeave={handleMouseLeave} />
             {cohortKeys.map((key, i) => (
-              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={hoveredSeries === key ? 3 : hoveredSeries ? 1 : 2} dot={false} activeDot={{ r: 6 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} connectNulls={false} style={{ pointerEvents: 'all', cursor: 'pointer' }} />
+              <Line key={key} type="monotone" dataKey={key} stroke={COHORT_COLORS[i % COHORT_COLORS.length]} strokeWidth={hoveredSeries === key ? 3 : hoveredSeries ? 1 : 2} dot={{ r: 2 }} activeDot={{ r: 6 }} onMouseEnter={handleMouseEnter(key)} onMouseLeave={handleMouseLeave} connectNulls={false} style={{ pointerEvents: 'all', cursor: 'pointer' }} />
             ))}
           </LineChart>
         </ResponsiveContainer>
