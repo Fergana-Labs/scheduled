@@ -2455,6 +2455,164 @@ def web_account_disconnect(request: Request, user: dict = Depends(get_authentica
     return JSONResponse({"status": "disconnected"})
 
 
+# ---------------------------------------------------------------------------
+# Demo chat endpoint — public, no auth required
+# ---------------------------------------------------------------------------
+
+DEMO_USER_EMAIL = "sam@ferganalabs.com"
+
+# Simple in-memory rate limiter: IP -> list of timestamps
+_demo_rate: dict[str, list[float]] = {}
+_DEMO_RATE_LIMIT = 20  # requests per window
+_DEMO_RATE_WINDOW = 60  # seconds
+
+
+class DemoChatRequest(BaseModel):
+    messages: list[dict]  # [{"role": "user"|"assistant", "content": "..."}]
+
+
+def _demo_rate_check(ip: str) -> None:
+    now = time.time()
+    hits = _demo_rate.get(ip, [])
+    hits = [t for t in hits if now - t < _DEMO_RATE_WINDOW]
+    if len(hits) >= _DEMO_RATE_LIMIT:
+        raise HTTPException(status_code=429, detail="Too many requests — try again shortly")
+    hits.append(now)
+    _demo_rate[ip] = hits
+
+
+@app.post("/api/v1/demo/chat")
+def demo_chat(req: DemoChatRequest, request: Request):
+    """Public demo endpoint: real calendar + fast LLM reply.
+
+    Fetches Sam's real calendar, asks Claude to reply as a scheduling
+    assistant, and returns the reply. When a meeting time is agreed the
+    response includes masked calendar events and reasoning data.
+    """
+    from datetime import timedelta
+
+    from anthropic import Anthropic
+
+    from scheduler.auth.google_auth import load_credentials
+    from scheduler.db import get_user_by_email
+
+    _demo_rate_check(request.client.host if request.client else "unknown")
+
+    # 1. Load demo user
+    db_user = get_user_by_email(DEMO_USER_EMAIL)
+    if not db_user:
+        raise HTTPException(status_code=500, detail="Demo user not configured")
+
+    creds = load_credentials(str(db_user.id))
+    calendar = CalendarClient(
+        credentials=creds,
+        scheduled_calendar_name=config.scheduled_calendar_name,
+        extra_calendar_ids=db_user.calendar_ids or [],
+    )
+
+    # 2. Fetch events for the next 7 days
+    user_tz = calendar.get_user_timezone()
+    now = datetime.now(timezone.utc)
+    events = calendar.get_all_events(
+        time_min=now,
+        time_max=now + timedelta(days=7),
+        include_primary=True,
+    )
+
+    # Build availability string for the LLM (real data — LLM needs it to
+    # find free slots), but we never send summaries to the frontend.
+    events_for_llm = "\n".join(
+        f"- {e.start.strftime('%A %B %-d, %-I:%M %p')} – {e.end.strftime('%-I:%M %p')}: busy"
+        for e in sorted(events, key=lambda ev: ev.start)
+    )
+
+    # 3. Single Claude API call
+    client = Anthropic(api_key=config.anthropic_api_key)
+
+    system_prompt = (
+        "You are Scheduled, an AI scheduling assistant replying on behalf of Sam. "
+        "You have access to Sam's real calendar below.\n\n"
+        f"Sam's timezone: {user_tz}\n"
+        f"Current time: {now.strftime('%A %B %-d, %Y %-I:%M %p')} UTC\n\n"
+        f"Sam's calendar (next 7 days — busy slots):\n{events_for_llm}\n\n"
+        "Rules:\n"
+        "- Suggest times that DON'T conflict with busy slots above.\n"
+        "- Be natural, warm, and concise — like a real person, not a bot.\n"
+        "- Keep replies to 1-3 sentences.\n"
+        "- When both parties agree on a time, confirm it.\n\n"
+        "Respond with JSON only (no markdown fences):\n"
+        '{"reply": "your message text", "is_complete": false}\n'
+        "Set is_complete to true once a specific time is confirmed by both sides.\n"
+        "When is_complete is true, also include:\n"
+        '{"reply": "...", "is_complete": true, '
+        '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
+        '"event_summary": "short title", "reasoning_summary": "why this draft was created"}'
+    )
+
+    llm_messages = [{"role": m["role"], "content": m["content"]} for m in req.messages]
+
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=512,
+        system=system_prompt,
+        messages=llm_messages,
+    )
+
+    text = response.content[0].text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError:
+        result = {"reply": text, "is_complete": False}
+
+    reply = result.get("reply", "")
+    is_complete = result.get("is_complete", False)
+
+    resp: dict = {"reply": reply, "is_complete": is_complete}
+
+    if is_complete:
+        # Build masked events for the reasoning email display
+        agreed_start = result.get("agreed_time_start", "")
+        agreed_end = result.get("agreed_time_end", "")
+
+        # Determine the date range for the reasoning email
+        from dateutil import parser as dateutil_parser
+
+        try:
+            agreed_dt = dateutil_parser.parse(agreed_start)
+            day_start = agreed_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+            day_end = day_start + timedelta(days=1)
+        except (ValueError, OverflowError):
+            day_start = now
+            day_end = now + timedelta(days=1)
+
+        day_events = calendar.get_all_events(
+            time_min=day_start, time_max=day_end, include_primary=True
+        )
+
+        masked_events = [
+            {
+                "start": e.start.strftime("%-I:%M %p"),
+                "end": e.end.strftime("%-I:%M %p"),
+                "summary": "Blocked",
+            }
+            for e in sorted(day_events, key=lambda ev: ev.start)
+        ]
+
+        resp["events"] = masked_events
+        resp["reasoning"] = {
+            "summary": result.get("reasoning_summary", "Scheduling request"),
+            "date_label": day_start.strftime("%B %-d, %Y"),
+            "event_summary": result.get("event_summary", "Meeting"),
+            "agreed_time_start": agreed_start,
+            "agreed_time_end": agreed_end,
+        }
+
+    return resp
+
+
 @app.post("/api/v1/gmail/watch/renew")
 def gmail_watch_renew():
     """Renew Gmail push notification watches for all users.
