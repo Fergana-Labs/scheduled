@@ -2549,7 +2549,8 @@ def demo_chat(req: DemoChatRequest, request: Request):
         "- Warm, concise, friendly. Signs off casually.\n"
         "- Offers 2-3 specific time slots across different days.\n"
         "- Prefers 30-minute meetings.\n"
-        "- All meetings are virtual (Google Meet).\n\n"
+        "- All meetings are virtual (Google Meet).\n"
+        "- NEVER use emojis or em dashes (—) in replies.\n\n"
         "## Rules\n"
         "- Suggest times that DON'T conflict with busy slots above.\n"
         "- Offer 2-3 time slots across different days when first proposing.\n"
@@ -2565,8 +2566,9 @@ def demo_chat(req: DemoChatRequest, request: Request):
         "CRITICAL: Your ENTIRE response must be a single raw JSON object. "
         "No explanation, no commentary, no markdown fences. Just JSON.\n\n"
         '{"reply": "your email text", "is_complete": false, '
-        '"proposed_date": "YYYY-MM-DD", '
+        '"proposed_dates": ["YYYY-MM-DD", ...], '
         '"reasoning_summary": "2-3 sentences explaining your calendar analysis"}\n\n'
+        "proposed_dates should list ALL dates you mention in the reply.\n"
         "Set is_complete to true when a specific time is confirmed.\n"
         "When is_complete is true, also include:\n"
         '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
@@ -2611,22 +2613,37 @@ def demo_chat(req: DemoChatRequest, request: Request):
     # Always build masked events + reasoning (not just on is_complete)
     from dateutil import parser as dateutil_parser
 
-    # Determine which day to show events for
-    proposed_date = result.get("proposed_date", "")
     agreed_start = result.get("agreed_time_start", "")
     agreed_end = result.get("agreed_time_end", "")
-    target_date_str = agreed_start if is_complete else proposed_date
 
-    try:
-        target_dt = dateutil_parser.parse(target_date_str)
-        day_start = target_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        day_end = day_start + timedelta(days=1)
-    except (ValueError, OverflowError):
-        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
-        day_end = day_start + timedelta(days=1)
+    # Collect all proposed dates (plural) to fetch events for each
+    proposed_dates_raw = result.get("proposed_dates", [])
+    if isinstance(proposed_dates_raw, str):
+        proposed_dates_raw = [proposed_dates_raw]
+    # Fallback to old single field
+    if not proposed_dates_raw:
+        old = result.get("proposed_date", "")
+        if old:
+            proposed_dates_raw = [old]
+    if is_complete and agreed_start:
+        proposed_dates_raw = [agreed_start]
 
-    day_events = calendar.get_all_events(
-        time_min=day_start, time_max=day_end, include_primary=True
+    # Parse dates and fetch events for the full range
+    parsed_dates = []
+    for d in proposed_dates_raw:
+        try:
+            parsed_dates.append(dateutil_parser.parse(d))
+        except (ValueError, OverflowError):
+            continue
+
+    if not parsed_dates:
+        parsed_dates = [now + timedelta(days=1)]
+
+    range_start = min(parsed_dates).replace(hour=0, minute=0, second=0, microsecond=0)
+    range_end = max(parsed_dates).replace(hour=23, minute=59, second=59) + timedelta(seconds=1)
+
+    all_events = calendar.get_all_events(
+        time_min=range_start, time_max=range_end, include_primary=True
     )
 
     masked_events = [
@@ -2635,13 +2652,16 @@ def demo_chat(req: DemoChatRequest, request: Request):
             "end": e.end.isoformat(),
             "summary": "Blocked",
         }
-        for e in sorted(day_events, key=lambda ev: ev.start)
+        for e in sorted(all_events, key=lambda ev: ev.start)
     ]
+
+    date_labels = [d.strftime("%B %-d") for d in sorted(set(d.date() for d in parsed_dates))]
+    date_label = " & ".join(date_labels) + f", {parsed_dates[0].year}"
 
     resp["events"] = masked_events
     resp["reasoning"] = {
         "summary": result.get("reasoning_summary", "Scheduling request"),
-        "date_label": day_start.strftime("%B %-d, %Y"),
+        "date_label": date_label,
     }
 
     if is_complete:

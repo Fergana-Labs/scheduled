@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import TypingIndicator from './TypingIndicator';
 import CalendarDayView from './CalendarDayView';
 import MeetingConfirmed from './MeetingConfirmed';
@@ -39,7 +40,6 @@ interface Message {
   isDraft?: boolean;
   events?: MaskedEvent[];
   reasoning?: ReasoningData;
-  // For confirmation card
   eventSummary?: string;
   agreedTimeStart?: string;
   agreedTimeEnd?: string;
@@ -58,7 +58,9 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [waitingForSend, setWaitingForSend] = useState(false);
+  const [highlightCompose, setHighlightCompose] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const exchangeRef = useRef(0);
   const latestResponseRef = useRef<DemoResponse | null>(null);
 
@@ -89,6 +91,13 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
             },
           ]);
         }, 800);
+      } else {
+        // Highlight compose area to guide user
+        setHighlightCompose(true);
+        setTimeout(() => {
+          textareaRef.current?.focus();
+          setHighlightCompose(false);
+        }, 2000);
       }
     }
   }, [draftSent, waitingForSend]);
@@ -98,7 +107,6 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
     if (autopilot && waitingForSend && !draftSent) {
       const timer = setTimeout(() => {
         onStep('sent');
-        // Simulate the send
         setMessages((prev) =>
           prev.map((m) => (m.isDraft ? { ...m, isDraft: false } : m)),
         );
@@ -119,6 +127,13 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
               },
             ]);
           }, 800);
+        } else {
+          // Highlight compose area
+          setHighlightCompose(true);
+          setTimeout(() => {
+            textareaRef.current?.focus();
+            setHighlightCompose(false);
+          }, 2000);
         }
       }, 1500);
       return () => clearTimeout(timer);
@@ -130,6 +145,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
     if (!text || isLoading || isComplete || waitingForSend) return;
 
     trackPageEvent('demo_message_sent');
+    setHighlightCompose(false);
 
     const userMsg: Message = { type: 'user', content: text };
     const newMessages = [...messages, userMsg];
@@ -144,7 +160,6 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
     onStep('drafting');
 
     try {
-      // Strip non-chat messages before sending to API
       const apiMessages = newMessages
         .filter((m) => m.type === 'user' || m.type === 'assistant')
         .map((m) => ({ role: m.type === 'user' ? 'user' : 'assistant', content: m.content }));
@@ -176,7 +191,6 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
         });
       }
 
-      // The draft reply
       newMsgs.push({
         type: 'assistant',
         content: data.reply,
@@ -213,6 +227,8 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
     }
   };
 
+  const hasMessages = messages.length > 0;
+
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white">
       {/* Thread header */}
@@ -227,7 +243,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        {messages.length === 0 && !isLoading && (
+        {!hasMessages && !isLoading && (
           <div className="flex h-full items-center justify-center px-6">
             <p className="max-w-xs text-center text-sm leading-relaxed text-gray-400">
               Type a message to start scheduling a virtual meeting with Sam.
@@ -274,7 +290,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
             );
           }
 
-          // user or assistant
+          // user or assistant — render markdown
           return (
             <div
               key={i}
@@ -298,8 +314,8 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
                 </div>
                 <span className="text-[10px] text-gray-300">just now</span>
               </div>
-              <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-gray-700">
-                {msg.content}
+              <div className="mt-2 text-sm leading-relaxed text-gray-700 [&_ul]:ml-4 [&_ul]:list-disc [&_ul]:space-y-0.5 [&_ol]:ml-4 [&_ol]:list-decimal [&_ol]:space-y-0.5 [&_p]:mb-1 [&_p:last-child]:mb-0">
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
             </div>
           );
@@ -318,37 +334,51 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
         )}
       </div>
 
-      {/* Compose area */}
-      <div className="border-t border-gray-200 px-5 py-3">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={
-            isComplete
-              ? 'Meeting booked!'
-              : waitingForSend && !autopilot
+      {/* Compose area — hidden when meeting is confirmed */}
+      {!isComplete ? (
+        <div
+          className={`border-t px-5 py-3 transition-colors duration-500 ${
+            highlightCompose
+              ? 'border-[#43614a] bg-[#43614a]/[0.03]'
+              : 'border-gray-200'
+          }`}
+        >
+          {highlightCompose && (
+            <div className="mb-2 text-xs font-medium text-[#43614a]">
+              Your turn — reply to continue the conversation
+            </div>
+          )}
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={
+              waitingForSend && !autopilot
                 ? 'Hit "Send draft" in the panel first'
-                : 'Hey, I\'d love to set up a meeting to learn more about Scheduled...'
-          }
-          disabled={isLoading || isComplete || (waitingForSend && !autopilot)}
-          rows={2}
-          className="w-full resize-none bg-transparent text-sm leading-relaxed text-gray-800 placeholder-gray-400 outline-none disabled:opacity-50"
-        />
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-[11px] text-gray-400">
-            To: sam@ferganalabs.com
-          </span>
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim() || isLoading || isComplete || (waitingForSend && !autopilot)}
-            className="inline-flex items-center gap-1.5 rounded bg-[#43614a] px-3 py-1 text-xs font-medium text-white transition-all hover:bg-[#527559] disabled:opacity-40"
-          >
-            <Send className="h-3 w-3" />
-            Send
-          </button>
+                : hasMessages
+                  ? 'Reply to Sam...'
+                  : 'Hey, I\'d love to set up a meeting to learn more about Scheduled...'
+            }
+            disabled={isLoading || (waitingForSend && !autopilot)}
+            rows={2}
+            className="w-full resize-none bg-transparent text-sm leading-relaxed text-gray-800 placeholder-gray-400 outline-none disabled:opacity-50"
+          />
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-[11px] text-gray-400">
+              To: sam@ferganalabs.com
+            </span>
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || isLoading || (waitingForSend && !autopilot)}
+              className="inline-flex items-center gap-1.5 rounded bg-[#43614a] px-3 py-1 text-xs font-medium text-white transition-all hover:bg-[#527559] disabled:opacity-40"
+            >
+              <Send className="h-3 w-3" />
+              Send
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

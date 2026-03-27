@@ -123,16 +123,8 @@ export default function SidePanel({ step, onSendDraft, autopilot }: Props) {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div className="text-xs font-medium uppercase tracking-wider text-gray-400">
-          What Scheduled is doing
-        </div>
-        {autopilot && (
-          <div className="flex items-center gap-1 rounded-full bg-[#43614a]/10 px-2 py-0.5 text-[10px] font-semibold text-[#43614a]">
-            <Zap className="h-3 w-3" />
-            Autopilot
-          </div>
-        )}
+      <div className="text-xs font-medium uppercase tracking-wider text-gray-400">
+        What Scheduled is doing
       </div>
 
       {/* Step timeline */}
@@ -176,6 +168,17 @@ export default function SidePanel({ step, onSendDraft, autopilot }: Props) {
           );
         })}
       </div>
+
+      {/* Autopilot callout — shown after first reply is sent */}
+      {autopilot && step === 'sent' && (
+        <div className="flex items-start gap-2 rounded-lg bg-[#43614a]/5 px-3 py-2.5">
+          <Zap className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#43614a]" />
+          <div className="text-xs leading-relaxed text-gray-600">
+            <span className="font-medium text-[#43614a]">Autopilot enabled.</span>{' '}
+            Scheduled will automatically send replies as they&apos;re drafted.
+          </div>
+        </div>
+      )}
 
       {/* Send draft button — only when not on autopilot */}
       {step === 'draft-ready' && onSendDraft && !autopilot && (
