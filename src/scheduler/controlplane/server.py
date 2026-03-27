@@ -2558,14 +2558,19 @@ def demo_chat(req: DemoChatRequest, request: Request):
         "- Offer 2-3 time slots across different days when first proposing times.\n"
         "- Be natural, warm, and concise — match the email style guide above.\n"
         "- Keep replies to 1-4 sentences.\n"
-        "- When both parties agree on a time, confirm it.\n\n"
+        "- When both parties agree on a time, confirm it.\n"
+        "- When confirming a time, ALWAYS say you will send a calendar invite. "
+        "Never ask 'should I send an invite?' — just confirm you will send one.\n"
+        "- This is a virtual meeting (video call), not in-person.\n\n"
         "Respond with JSON only (no markdown fences):\n"
-        '{"reply": "your message text", "is_complete": false}\n'
+        '{"reply": "...", "is_complete": false, "proposed_date": "YYYY-MM-DD", '
+        '"reasoning_summary": "one-line explanation of why you chose these times"}\n'
+        "Always include proposed_date (the primary date you're suggesting).\n"
         "Set is_complete to true once a specific time is confirmed by both sides.\n"
         "When is_complete is true, also include:\n"
-        '{"reply": "...", "is_complete": true, '
+        '{"reply": "...", "is_complete": true, "proposed_date": "YYYY-MM-DD", '
         '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
-        '"event_summary": "short title", "reasoning_summary": "why this draft was created"}'
+        '"event_summary": "short title", "reasoning_summary": "..."}'
     )
 
     llm_messages = [{"role": m["role"], "content": m["content"]} for m in req.messages]
@@ -2591,43 +2596,46 @@ def demo_chat(req: DemoChatRequest, request: Request):
 
     resp: dict = {"reply": reply, "is_complete": is_complete}
 
-    if is_complete:
-        # Build masked events for the reasoning email display
-        agreed_start = result.get("agreed_time_start", "")
-        agreed_end = result.get("agreed_time_end", "")
+    # Always build masked events + reasoning (not just on is_complete)
+    from dateutil import parser as dateutil_parser
 
-        # Determine the date range for the reasoning email
-        from dateutil import parser as dateutil_parser
+    # Determine which day to show events for
+    proposed_date = result.get("proposed_date", "")
+    agreed_start = result.get("agreed_time_start", "")
+    agreed_end = result.get("agreed_time_end", "")
+    target_date_str = agreed_start if is_complete else proposed_date
 
-        try:
-            agreed_dt = dateutil_parser.parse(agreed_start)
-            day_start = agreed_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-            day_end = day_start + timedelta(days=1)
-        except (ValueError, OverflowError):
-            day_start = now
-            day_end = now + timedelta(days=1)
+    try:
+        target_dt = dateutil_parser.parse(target_date_str)
+        day_start = target_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+    except (ValueError, OverflowError):
+        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        day_end = day_start + timedelta(days=1)
 
-        day_events = calendar.get_all_events(
-            time_min=day_start, time_max=day_end, include_primary=True
-        )
+    day_events = calendar.get_all_events(
+        time_min=day_start, time_max=day_end, include_primary=True
+    )
 
-        masked_events = [
-            {
-                "start": e.start.strftime("%-I:%M %p"),
-                "end": e.end.strftime("%-I:%M %p"),
-                "summary": "Blocked",
-            }
-            for e in sorted(day_events, key=lambda ev: ev.start)
-        ]
-
-        resp["events"] = masked_events
-        resp["reasoning"] = {
-            "summary": result.get("reasoning_summary", "Scheduling request"),
-            "date_label": day_start.strftime("%B %-d, %Y"),
-            "event_summary": result.get("event_summary", "Meeting"),
-            "agreed_time_start": agreed_start,
-            "agreed_time_end": agreed_end,
+    masked_events = [
+        {
+            "start": e.start.isoformat(),
+            "end": e.end.isoformat(),
+            "summary": "Blocked",
         }
+        for e in sorted(day_events, key=lambda ev: ev.start)
+    ]
+
+    resp["events"] = masked_events
+    resp["reasoning"] = {
+        "summary": result.get("reasoning_summary", "Scheduling request"),
+        "date_label": day_start.strftime("%B %-d, %Y"),
+    }
+
+    if is_complete:
+        resp["event_summary"] = result.get("event_summary", "Meeting")
+        resp["agreed_time_start"] = agreed_start
+        resp["agreed_time_end"] = agreed_end
 
     return resp
 

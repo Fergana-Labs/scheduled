@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Inbox, Calendar, FileEdit, Mail, Send, CheckCircle, Loader2, CalendarCheck } from 'lucide-react';
-import ReasoningEmail from './ReasoningEmail';
+import { Inbox, Calendar, FileEdit, Mail, Send, CheckCircle, Loader2, CalendarCheck, Zap } from 'lucide-react';
 
 export type SidePanelStep =
   | 'idle'
@@ -14,26 +13,10 @@ export type SidePanelStep =
   | 'sent'
   | 'complete';
 
-interface MaskedEvent {
-  start: string;
-  end: string;
-  summary: string;
-}
-
-interface ReasoningData {
-  summary: string;
-  date_label: string;
-  event_summary: string;
-  agreed_time_start: string;
-  agreed_time_end: string;
-}
-
 interface Props {
   step: SidePanelStep;
-  events?: MaskedEvent[];
-  reasoning?: ReasoningData;
   onSendDraft?: () => void;
-  isConversationComplete?: boolean;
+  autopilot?: boolean;
 }
 
 interface StepInfo {
@@ -54,7 +37,7 @@ const STEP_ORDER: SidePanelStep[] = [
   'complete',
 ];
 
-export default function SidePanel({ step, events, reasoning, onSendDraft, isConversationComplete }: Props) {
+export default function SidePanel({ step, onSendDraft, autopilot }: Props) {
   const [visibleSteps, setVisibleSteps] = useState<SidePanelStep[]>([]);
 
   useEffect(() => {
@@ -90,35 +73,35 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
     received: {
       icon: <Inbox className="h-4 w-4" />,
       title: 'Email received',
-      description: 'Scheduled detected a new scheduling email in Sam\'s inbox.',
+      description: 'Scheduled detected a new scheduling email.',
       active: step === 'received',
       complete: STEP_ORDER.indexOf(step) > 0,
     },
     'checking-calendar': {
       icon: <Calendar className="h-4 w-4" />,
       title: 'Checking calendar',
-      description: 'Reading Sam\'s calendar to find available time slots...',
+      description: 'Reading Sam\'s calendar for available slots...',
       active: step === 'checking-calendar',
       complete: STEP_ORDER.indexOf(step) > 1,
     },
     drafting: {
       icon: <FileEdit className="h-4 w-4" />,
       title: 'Drafting reply',
-      description: 'Writing a reply as Sam based on availability and preferences.',
+      description: 'Writing a reply as Sam.',
       active: step === 'drafting',
       complete: STEP_ORDER.indexOf(step) > 2,
     },
     reasoning: {
       icon: <Mail className="h-4 w-4" />,
       title: 'Reasoning email sent',
-      description: 'Sam gets an email explaining why this draft was created.',
+      description: 'Sam gets an internal email explaining the draft.',
       active: step === 'reasoning',
       complete: STEP_ORDER.indexOf(step) > 3,
     },
     'draft-ready': {
       icon: <Send className="h-4 w-4" />,
       title: 'Draft ready',
-      description: 'The draft is waiting in Sam\'s inbox. Sam just needs to hit send.',
+      description: autopilot ? 'Auto-sending...' : 'Waiting for Sam to hit send.',
       active: step === 'draft-ready',
       complete: STEP_ORDER.indexOf(step) > 4,
     },
@@ -132,7 +115,7 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
     complete: {
       icon: <CalendarCheck className="h-4 w-4" />,
       title: 'Invite sent',
-      description: 'Scheduled verified the sent message and created a calendar invite for both parties.',
+      description: 'Calendar invite created for both parties.',
       active: step === 'complete',
       complete: false,
     },
@@ -140,8 +123,16 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
 
   return (
     <div className="space-y-5">
-      <div className="text-xs font-medium uppercase tracking-wider text-gray-400">
-        What Scheduled is doing
+      <div className="flex items-center justify-between">
+        <div className="text-xs font-medium uppercase tracking-wider text-gray-400">
+          What Scheduled is doing
+        </div>
+        {autopilot && (
+          <div className="flex items-center gap-1 rounded-full bg-[#43614a]/10 px-2 py-0.5 text-[10px] font-semibold text-[#43614a]">
+            <Zap className="h-3 w-3" />
+            Autopilot
+          </div>
+        )}
       </div>
 
       {/* Step timeline */}
@@ -150,12 +141,7 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
           const info = steps[s];
           const isLast = i === visibleSteps.length - 1;
           return (
-            <div
-              key={s}
-              className="animate-fade-in-up flex gap-3"
-              style={{ animationDelay: `${i * 50}ms` }}
-            >
-              {/* Timeline dot + line */}
+            <div key={s} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div
                   className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full transition-colors ${
@@ -172,12 +158,8 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
                     info.icon
                   )}
                 </div>
-                {!isLast && (
-                  <div className="my-1 h-5 w-px bg-gray-200" />
-                )}
+                {!isLast && <div className="my-1 h-5 w-px bg-gray-200" />}
               </div>
-
-              {/* Step content */}
               <div className="min-w-0 pb-2 pt-0.5">
                 <div
                   className={`text-sm font-medium ${
@@ -186,7 +168,7 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
                 >
                   {info.title}
                 </div>
-                <div className="mt-1 text-xs leading-relaxed text-gray-400">
+                <div className="mt-0.5 text-xs leading-relaxed text-gray-400">
                   {info.description}
                 </div>
               </div>
@@ -195,8 +177,8 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
         })}
       </div>
 
-      {/* Send draft button */}
-      {step === 'draft-ready' && onSendDraft && (
+      {/* Send draft button — only when not on autopilot */}
+      {step === 'draft-ready' && onSendDraft && !autopilot && (
         <button
           onClick={onSendDraft}
           className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[#43614a] px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#527559] active:scale-[0.98]"
@@ -205,29 +187,6 @@ export default function SidePanel({ step, events, reasoning, onSendDraft, isConv
           Send draft from Sam
         </button>
       )}
-
-      {/* Reasoning email — shown when we reach that step and conversation is complete */}
-      {isConversationComplete && events && reasoning && (
-        <div className="mt-2">
-          <ReasoningEmail events={events} reasoning={reasoning} />
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.4s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 }
