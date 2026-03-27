@@ -1,53 +1,66 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
 import ChatPhase from './ChatPhase';
-import RevealPhase from './RevealPhase';
+import SidePanel from './SidePanel';
+import type { SidePanelStep } from './SidePanel';
 import { trackPageEvent } from '@/lib/analytics';
 
-type DemoPhase = 'chat' | 'transitioning' | 'reveal';
+const SIGNUP_URL = `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/login?signup=1`;
+const BOOKING_URL = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL || 'mailto:henry@ferganalabs.com';
 
-interface CompletionData {
-  messages: { role: 'user' | 'assistant'; content: string }[];
-  events: { start: string; end: string; summary: string }[];
-  reasoning: {
+interface DemoData {
+  events?: { start: string; end: string; summary: string }[];
+  reasoning?: {
     summary: string;
     date_label: string;
     event_summary: string;
     agreed_time_start: string;
     agreed_time_end: string;
   };
-  lastReply: string;
+  lastReply?: string;
 }
 
 export default function DemoPage() {
-  const [phase, setPhase] = useState<DemoPhase>('chat');
-  const [completionData, setCompletionData] = useState<CompletionData | null>(null);
+  const [sidePanelStep, setSidePanelStep] = useState<SidePanelStep>('idle');
+  const [demoData, setDemoData] = useState<DemoData>({});
+  const [isComplete, setIsComplete] = useState(false);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const sidePanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     trackPageEvent('demo_page_view');
   }, []);
 
-  const handleChatComplete = (data: {
-    messages: { role: 'user' | 'assistant'; content: string }[];
-    events?: { start: string; end: string; summary: string }[];
-    reasoning?: CompletionData['reasoning'];
-    lastReply: string;
-  }) => {
-    setCompletionData({
-      messages: data.messages,
-      events: data.events || [],
-      reasoning: data.reasoning || {
-        summary: 'Scheduling request',
-        date_label: '',
-        event_summary: 'Meeting',
-        agreed_time_start: '',
-        agreed_time_end: '',
-      },
-      lastReply: data.lastReply,
-    });
-    setPhase('transitioning');
-    setTimeout(() => setPhase('reveal'), 800);
+  const handleStep = (
+    step: SidePanelStep,
+    data?: {
+      reply?: string;
+      is_complete?: boolean;
+      events?: { start: string; end: string; summary: string }[];
+      reasoning?: DemoData['reasoning'];
+    },
+  ) => {
+    setSidePanelStep(step);
+
+    if (data?.events) setDemoData((prev) => ({ ...prev, events: data.events }));
+    if (data?.reasoning) setDemoData((prev) => ({ ...prev, reasoning: data.reasoning }));
+    if (data?.reply) setDemoData((prev) => ({ ...prev, lastReply: data.reply }));
+
+    if (step === 'complete') {
+      setIsComplete(true);
+      setTimeout(() => {
+        ctaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 600);
+    }
+
+    // On mobile, scroll side panel into view when it updates
+    if (step !== 'idle' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        sidePanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 200);
+    }
   };
 
   return (
@@ -64,42 +77,73 @@ export default function DemoPage() {
         </nav>
       </header>
 
-      <main className="px-4 pb-20 pt-8 sm:px-6 sm:pt-12">
+      <main className="px-4 pb-20 pt-4 sm:px-6 sm:pt-8">
         {/* Title */}
-        <div className="mx-auto mb-10 max-w-lg text-center">
+        <div className="mx-auto mb-8 max-w-3xl text-center lg:mb-10">
           <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-normal italic tracking-tight text-gray-900 sm:text-4xl">
             Try scheduling with Sam
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-gray-500">
             Send a message like you&apos;re trying to schedule a meeting.
-            Scheduled will reply using Sam&apos;s real calendar availability.
+            Watch how Scheduled handles it behind the scenes.
           </p>
         </div>
 
-        {/* Phase container */}
-        <div className="relative">
-          {/* Chat phase */}
-          <div
-            className={`transition-all duration-700 ${
-              phase === 'chat'
-                ? 'opacity-100'
-                : phase === 'transitioning'
-                  ? 'pointer-events-none -translate-y-4 opacity-0'
-                  : 'hidden'
-            }`}
-          >
-            <ChatPhase onComplete={handleChatComplete} />
-          </div>
+        {/* Dual-pane layout */}
+        <div className="mx-auto max-w-5xl">
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+            {/* Left: Email thread */}
+            <div className="min-h-[500px] flex-1 lg:min-h-[600px]">
+              <ChatPhase onStep={handleStep} isComplete={isComplete} />
+            </div>
 
-          {/* Reveal phase */}
-          {phase === 'reveal' && completionData && (
-            <RevealPhase
-              events={completionData.events}
-              reasoning={completionData.reasoning}
-              lastReply={completionData.lastReply}
-            />
-          )}
+            {/* Right: Side panel */}
+            <div
+              ref={sidePanelRef}
+              className="w-full rounded-2xl border border-gray-200 bg-white/60 p-5 backdrop-blur-sm lg:w-[380px] lg:flex-shrink-0"
+            >
+              <SidePanel
+                step={sidePanelStep}
+                events={demoData.events}
+                reasoning={demoData.reasoning}
+                draftText={demoData.lastReply}
+              />
+            </div>
+          </div>
         </div>
+
+        {/* Booking CTA — appears after complete */}
+        {isComplete && (
+          <div
+            ref={ctaRef}
+            className="mx-auto mt-16 max-w-2xl text-center transition-all duration-500"
+          >
+            <h2 className="font-[family-name:var(--font-playfair)] text-3xl font-normal italic tracking-tight text-gray-900 sm:text-4xl">
+              That&apos;s Scheduled in action.
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-base leading-relaxed text-gray-500">
+              Want to see it handle your inbox?
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <a
+                href={SIGNUP_URL}
+                onClick={() => trackPageEvent('demo_cta_signup_click')}
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#43614a] px-7 py-3 text-sm font-medium text-white transition-all hover:bg-[#527559]"
+              >
+                Get Started
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href={BOOKING_URL}
+                onClick={() => trackPageEvent('demo_cta_book_click')}
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-gray-300 px-7 py-3 text-sm font-medium text-gray-700 transition-all hover:border-gray-900 hover:text-gray-900"
+              >
+                <CalendarDays className="h-4 w-4" />
+                Book a Demo Call
+              </a>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

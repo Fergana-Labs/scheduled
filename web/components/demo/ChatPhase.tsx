@@ -5,6 +5,7 @@ import { Send } from 'lucide-react';
 import ChatBubble from './ChatBubble';
 import TypingIndicator from './TypingIndicator';
 import { trackPageEvent } from '@/lib/analytics';
+import type { SidePanelStep } from './SidePanel';
 
 const API_BASE = process.env.NEXT_PUBLIC_CONTROL_PLANE_URL;
 
@@ -27,15 +28,11 @@ interface DemoResponse {
 }
 
 interface Props {
-  onComplete: (data: {
-    messages: Message[];
-    events: DemoResponse['events'];
-    reasoning: DemoResponse['reasoning'];
-    lastReply: string;
-  }) => void;
+  onStep: (step: SidePanelStep, data?: Partial<DemoResponse>) => void;
+  isComplete: boolean;
 }
 
-export default function ChatPhase({ onComplete }: Props) {
+export default function ChatPhase({ onStep, isComplete }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +44,7 @@ export default function ChatPhase({ onComplete }: Props) {
 
   const sendMessage = async () => {
     const text = input.trim();
-    if (!text || isLoading) return;
+    if (!text || isLoading || isComplete) return;
 
     trackPageEvent('demo_message_sent');
 
@@ -56,6 +53,13 @@ export default function ChatPhase({ onComplete }: Props) {
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
+
+    // Side panel: email received → checking calendar → drafting
+    onStep('received');
+    await delay(600);
+    onStep('checking-calendar');
+    await delay(800);
+    onStep('drafting');
 
     try {
       const res = await fetch(`${API_BASE}/api/v1/demo/chat`, {
@@ -76,14 +80,17 @@ export default function ChatPhase({ onComplete }: Props) {
 
       if (data.is_complete) {
         trackPageEvent('demo_conversation_complete');
-        setTimeout(() => {
-          onComplete({
-            messages: updatedMessages,
-            events: data.events,
-            reasoning: data.reasoning,
-            lastReply: data.reply,
-          });
-        }, 2000);
+        // Walk through the remaining steps with the data
+        onStep('reasoning', data);
+        await delay(1200);
+        onStep('draft-ready', data);
+        await delay(1500);
+        onStep('sent', data);
+        await delay(1200);
+        onStep('complete', data);
+      } else {
+        // Reset side panel for next exchange
+        onStep('draft-ready', data);
       }
     } catch (err) {
       console.error('Demo chat error:', err);
@@ -91,6 +98,7 @@ export default function ChatPhase({ onComplete }: Props) {
         ...newMessages,
         { role: 'assistant', content: "Sorry, I'm having trouble right now. Try again?" },
       ]);
+      onStep('idle');
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +112,7 @@ export default function ChatPhase({ onComplete }: Props) {
   };
 
   return (
-    <div className="mx-auto flex h-[min(600px,70vh)] w-full max-w-lg flex-col">
+    <div className="flex h-full flex-col">
       {/* Thread header */}
       <div className="mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
         <div className="text-xs font-medium text-gray-400">EMAIL THREAD</div>
@@ -128,7 +136,7 @@ export default function ChatPhase({ onComplete }: Props) {
             key={i}
             text={msg.content}
             align={msg.role === 'user' ? 'left' : 'right'}
-            label={msg.role === 'user' ? 'You' : 'Scheduled (for Sam)'}
+            label={msg.role === 'user' ? 'You' : 'Sam'}
             animate
           />
         ))}
@@ -142,13 +150,13 @@ export default function ChatPhase({ onComplete }: Props) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type a scheduling message..."
-          disabled={isLoading}
+          placeholder={isComplete ? 'Conversation complete' : 'Type a scheduling message...'}
+          disabled={isLoading || isComplete}
           className="flex-1 rounded-full border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 outline-none transition-colors focus:border-[#43614a] disabled:opacity-50"
         />
         <button
           onClick={sendMessage}
-          disabled={!input.trim() || isLoading}
+          disabled={!input.trim() || isLoading || isComplete}
           className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#43614a] text-white transition-all hover:bg-[#527559] disabled:opacity-40"
         >
           <Send className="h-4 w-4" />
@@ -156,4 +164,8 @@ export default function ChatPhase({ onComplete }: Props) {
       </div>
     </div>
   );
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
