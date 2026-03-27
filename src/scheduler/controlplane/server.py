@@ -1839,8 +1839,13 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
         try:
             email = gmail.get_email(message_id)
 
+            # Skip drafts — Gmail fires messageAdded when Scheduled creates a draft
+            if "DRAFT" in email.label_ids:
+                logger.info("gmail_webhook: message %s is a draft, skipping", message_id)
+                continue
+
             # User-sent messages: check if there's a pending invite for this thread
-            logger.info("gmail_webhook: message %s sender=%s user=%s thread=%s subject=%s", message_id, email.sender, email_address, email.thread_id, getattr(email, 'subject', ''))
+            logger.info("gmail_webhook: message %s sender=%s user=%s thread=%s subject=%s labels=%s", message_id, email.sender, email_address, email.thread_id, getattr(email, 'subject', ''), email.label_ids)
             if email.sender and email_address in email.sender:
                 _handle_sent_message_for_invite(user_id, email, gmail, calendar)
                 try:

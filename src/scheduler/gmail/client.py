@@ -23,6 +23,7 @@ class Email:
     date: datetime
     snippet: str
     headers: dict[str, str] = field(default_factory=dict)
+    label_ids: list[str] = field(default_factory=list)
 
 
 class GmailClient:
@@ -104,6 +105,7 @@ class GmailClient:
             date=date,
             snippet=msg_data.get("snippet", ""),
             headers=headers,
+            label_ids=msg_data.get("labelIds", []),
         )
 
     def _list_message_stubs(self, query: str | None, max_results: int) -> list[dict]:
