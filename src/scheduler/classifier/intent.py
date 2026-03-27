@@ -77,6 +77,7 @@ def classify_email(
     thread_messages: list[dict],
     recipient: str = "",
     cc: str = "",
+    user_email: str = "",
 ) -> ClassificationResult:
     """Classify whether an email is about scheduling a meeting.
 
@@ -95,8 +96,10 @@ def classify_email(
     """
     client = _get_anthropic_client()
 
+    user_line = f"The user's email address is {user_email}. " if user_email else ""
     system_prompt = (
         "You are a classifier that decides whether an email needs a scheduling draft reply.\n\n"
+        f"{user_line}"
         "Given an email subject, body, sender, and the prior thread history, "
         "decide: does this email need the user to take a scheduling action "
         "(propose times, accept/decline, reschedule, etc.)? If yes, intent is \"needs_draft\". "

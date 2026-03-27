@@ -1889,6 +1889,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 email.subject, email.body, email.sender,
                 thread_messages=thread_messages,
                 recipient=email.recipient, cc=email.cc,
+                user_email=email_address,
             )
 
             from scheduler import analytics
