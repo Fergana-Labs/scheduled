@@ -44,6 +44,7 @@ class UserRow:
     calendar_ids: list[str] | None = None
     onboarding_status: str | None = None
     display_name: str | None = None
+    draft_auto_delete_enabled: bool = True
 
 
 _USER_ROW_FIELDS.update(f.name for f in fields(UserRow))
@@ -248,6 +249,15 @@ def update_reasoning_emails_enabled(user_id: str, enabled: bool) -> None:
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             "UPDATE users SET reasoning_emails_enabled = %s, updated_at = now() WHERE id = %s",
+            (enabled, user_id),
+        )
+        conn.commit()
+
+
+def update_draft_auto_delete(user_id: str, enabled: bool) -> None:
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET draft_auto_delete_enabled = %s, updated_at = now() WHERE id = %s",
             (enabled, user_id),
         )
         conn.commit()
@@ -522,16 +532,17 @@ def store_composed_draft(
     subject: str,
     body: str,
     was_autopilot: bool = False,
+    raw_body: str | None = None,
 ) -> None:
     """Insert a row into composed_drafts with anonymized content."""
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
             INSERT INTO composed_drafts
-                (user_id, thread_id, draft_id, thread_context, original_subject, original_body, was_autopilot)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                (user_id, thread_id, draft_id, thread_context, original_subject, original_body, was_autopilot, raw_body)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """,
-            (user_id, thread_id, draft_id, json.dumps(thread_context), subject, body, was_autopilot),
+            (user_id, thread_id, draft_id, json.dumps(thread_context), subject, body, was_autopilot, raw_body),
         )
         conn.commit()
 
@@ -577,6 +588,33 @@ def update_composed_draft_sent(
         )
         conn.commit()
 
+
+def get_stale_unsent_drafts(hours: int = 48) -> list[dict]:
+    """Get unsent composed drafts older than the given hours, for users with auto-delete enabled."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT cd.id, cd.user_id, cd.draft_id, cd.thread_id, cd.original_subject
+            FROM composed_drafts cd
+            JOIN users u ON u.id = cd.user_id
+            WHERE cd.sent_at IS NULL
+              AND cd.composed_at < now() - make_interval(hours => %s)
+              AND u.draft_auto_delete_enabled = TRUE
+            """,
+            (hours,),
+        )
+        cols = [desc[0] for desc in cur.description]
+        return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+
+def mark_draft_auto_deleted(draft_id: str) -> None:
+    """Mark a composed draft as auto-deleted by setting sent_at (prevents re-processing)."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "DELETE FROM composed_drafts WHERE id = %s",
+            (draft_id,),
+        )
+        conn.commit()
 
 
 _TZ = "America/Los_Angeles"

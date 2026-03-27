@@ -14,6 +14,7 @@ import asyncio
 import base64
 import html
 import hashlib
+import re
 import hmac
 import json
 import logging
@@ -85,6 +86,30 @@ def _is_gmail_404(exc: Exception) -> bool:
     return isinstance(exc, HttpError) and exc.resp.status == 404
 
 
+def _cleanup_stale_drafts() -> int:
+    """Delete Gmail drafts older than 48 hours that we created and the user never sent."""
+    from scheduler.auth.google_auth import load_credentials
+    from scheduler.db import get_stale_unsent_drafts, mark_draft_auto_deleted
+
+    stale = get_stale_unsent_drafts(hours=48)
+    deleted = 0
+    for row in stale:
+        try:
+            creds = load_credentials(row["user_id"])
+            gmail = GmailClient(creds)
+            gmail.delete_draft(row["draft_id"])
+        except Exception:
+            logger.warning(
+                "auto_delete_draft: failed to delete draft_id=%s for user=%s",
+                row["draft_id"], row["user_id"], exc_info=True,
+            )
+        # Remove the DB row regardless — if the Gmail draft is already gone
+        # (user deleted it manually, or it was sent), we still clean up.
+        mark_draft_auto_deleted(row["id"])
+        deleted += 1
+    return deleted
+
+
 async def _watch_renewal_loop():
     """Background loop: renew Gmail watches and clean up old processed messages."""
     await asyncio.sleep(60)  # let server finish starting
@@ -102,6 +127,9 @@ async def _watch_renewal_loop():
             expired_links = await asyncio.to_thread(cleanup_expired_scheduling_links)
             if expired_links:
                 logger.info("watch_renewal_loop: expired %d scheduling links", expired_links)
+            deleted_drafts = await asyncio.to_thread(_cleanup_stale_drafts)
+            if deleted_drafts:
+                logger.info("watch_renewal_loop: auto-deleted %d stale drafts", deleted_drafts)
         except Exception:
             logger.exception("watch_renewal_loop: failed")
         await asyncio.sleep(_WATCH_RENEWAL_INTERVAL)
@@ -767,6 +795,13 @@ def get_session(authorization: str = Header()) -> dict:
 # --- Serialization helpers ---
 
 
+def _strip_html(text: str) -> str:
+    """Convert HTML to plain text: <br> → newline, strip tags, unescape entities."""
+    text = re.sub(r'<br\s*/?>', '\n', text)
+    text = re.sub(r'<[^>]+>', '', text)
+    return html.unescape(text)
+
+
 def _serialize_email(email) -> dict:
     return {
         "id": email.id,
@@ -916,7 +951,7 @@ def gmail_draft(req: CreateDraftRequest, session: dict = Depends(get_session)):
                 thread_messages.append({
                     "sender": t_email.sender,
                     "subject": t_email.subject,
-                    "body": t_email.body,
+                    "body": _strip_html(t_email.body) if t_email.body else "",
                     "date": t_email.date.isoformat() if t_email.date else "",
                 })
         except Exception:
@@ -1838,7 +1873,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                     thread_messages.append({
                         "sender": t_email.sender,
                         "subject": t_email.subject,
-                        "body": t_email.body,
+                        "body": _strip_html(t_email.body) if t_email.body else "",
                         "date": t_email.date.isoformat(),
                     })
                     if t_email.id == email.id:
@@ -2180,6 +2215,7 @@ def web_settings_get(user: dict = Depends(get_authenticated_user)):
         "process_sales_emails": db_user.process_sales_emails,
         "scheduled_branding_enabled": db_user.scheduled_branding_enabled,
         "reasoning_emails_enabled": db_user.reasoning_emails_enabled,
+        "draft_auto_delete_enabled": db_user.draft_auto_delete_enabled,
         "scheduled_calendar_id": db_user.scheduled_calendar_id,
         "calendar_ids": db_user.calendar_ids or [],
         "guides": [
@@ -2257,6 +2293,30 @@ def web_settings_reasoning_emails(req: WebUpdateReasoningEmailsRequest, user: di
     from scheduler import analytics
     analytics.track(user["user_id"], "setting_changed", {"setting": "reasoning_emails_enabled", "new_value": req.enabled})
     return {"reasoning_emails_enabled": req.enabled}
+
+
+class WebUpdateDraftAutoDeleteRequest(BaseModel):
+    enabled: bool
+
+
+@app.get("/web/api/v1/settings/draft-auto-delete")
+def web_settings_draft_auto_delete_get(user: dict = Depends(get_authenticated_user)):
+    from scheduler.db import get_user_by_id
+
+    db_user = get_user_by_id(user["user_id"])
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"draft_auto_delete_enabled": db_user.draft_auto_delete_enabled}
+
+
+@app.put("/web/api/v1/settings/draft-auto-delete")
+def web_settings_draft_auto_delete(req: WebUpdateDraftAutoDeleteRequest, user: dict = Depends(get_authenticated_user)):
+    from scheduler.db import update_draft_auto_delete
+
+    update_draft_auto_delete(user["user_id"], req.enabled)
+    from scheduler import analytics
+    analytics.track(user["user_id"], "setting_changed", {"setting": "draft_auto_delete_enabled", "new_value": req.enabled})
+    return {"draft_auto_delete_enabled": req.enabled}
 
 
 @app.get("/web/api/v1/calendars")

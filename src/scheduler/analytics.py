@@ -56,6 +56,7 @@ def record_draft_composed(
                 subject=anon_subject,
                 body=anon_body,
                 was_autopilot=was_autopilot,
+                raw_body=plain_body,
             )
         except Exception:
             logger.debug("analytics.record_draft_composed: failed for thread %s", thread_id, exc_info=True)
@@ -87,13 +88,14 @@ def record_draft_sent(
             plain_sent = re.sub(r'<br\s*/?>', '\n', sent_body)
             plain_sent = re.sub(r'<[^>]+>', '', plain_sent)
             plain_sent = html.unescape(plain_sent)
-            anon_sent_body = anonymize_text(plain_sent)
 
-            original = row["original_body"]
+            # Diff against raw (pre-anonymization) body to avoid mismatched placeholders
+            # Fall back to anonymized original_body for older drafts without raw_body
+            original_raw = row.get("raw_body") or row["original_body"]
 
             # Normalize whitespace before comparing to ignore Gmail formatting artifacts
-            original_norm = " ".join(original.split())
-            sent_norm = " ".join(anon_sent_body.split())
+            original_norm = " ".join(original_raw.split())
+            sent_norm = " ".join(plain_sent.split())
             matcher = difflib.SequenceMatcher(None, original_norm, sent_norm)
             similarity = matcher.ratio()
 
@@ -117,6 +119,9 @@ def record_draft_sent(
                     chars_removed += i2 - i1
                 elif tag == "insert":
                     chars_added += j2 - j1
+
+            # Anonymize sent body for display only
+            anon_sent_body = anonymize_text(plain_sent)
 
             update_composed_draft_sent(
                 draft_id=row["id"],
