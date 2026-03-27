@@ -35,6 +35,21 @@ export async function generateMetadata({
     description: post.metaDescription || post.description,
     keywords: post.keywords,
     authors: [{ name: post.author }],
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description: post.metaDescription || post.description,
+      publishedTime: post.date,
+      authors: [post.author],
+      siteName: 'Scheduled',
+      images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.metaDescription || post.description,
+      images: ['/opengraph-image'],
+    },
   };
 }
 

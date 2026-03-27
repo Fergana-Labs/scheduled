@@ -28,4 +28,4 @@ Allow: /
 Disallow: /api/
 
 # Sitemap location
-Sitemap: https://scheduler.ferganalabs.com/sitemap.xml
+Sitemap: https://tryscheduled.com/sitemap.xml

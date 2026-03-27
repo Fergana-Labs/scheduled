@@ -45,14 +45,14 @@ export const metadata: Metadata = {
   authors: [{ name: 'Fergana Labs' }],
   creator: 'Fergana Labs',
   publisher: 'Fergana Labs',
-  metadataBase: new URL('https://scheduler.ferganalabs.com'),
+  metadataBase: new URL('https://tryscheduled.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://scheduler.ferganalabs.com',
+    url: 'https://tryscheduled.com',
     title: 'Scheduled - AI Email Scheduling Agent',
     description:
       'AI-powered scheduling agent that reads your emails, checks your calendar, and drafts perfect replies automatically.',

@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   title: 'Blog | Scheduled',
   description:
     'Explore use cases, comparisons, and guides for AI-powered workflow automation.',
+  openGraph: {
+    title: 'Blog | Scheduled',
+    description:
+      'Explore use cases, comparisons, and guides for AI-powered workflow automation.',
+    siteName: 'Scheduled',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Scheduled Blog' }],
+  },
 };
 
 export default function BlogPage() {

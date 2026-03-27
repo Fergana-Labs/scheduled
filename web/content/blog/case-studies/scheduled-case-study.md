@@ -78,4 +78,4 @@ Scheduled is open source under the MIT license. It connects to Gmail and Google 
 If scheduling is your laundry problem too, give it a shot.
 
 - **GitHub:** [github.com/Fergana-Labs/scheduler](https://github.com/Fergana-Labs/scheduler)
-- **Product page:** [scheduler.ferganalabs.com](https://scheduler.ferganalabs.com)
+- **Product page:** [tryscheduled.com](https://tryscheduled.com)

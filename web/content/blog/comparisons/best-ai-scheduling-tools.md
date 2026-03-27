@@ -21,7 +21,7 @@ The approach matters more than the feature list. A scheduling tool that doesn't 
 
 ### Scheduled (by Fergana Labs)
 
-[Scheduled](https://scheduler.ferganalabs.com) is an AI scheduling agent that lives in Gmail. It monitors your inbox for scheduling-related emails, reads the conversation, checks availability across multiple calendars, and writes a reply proposing times.
+[Scheduled](https://tryscheduled.com) is an AI scheduling agent that lives in Gmail. It monitors your inbox for scheduling-related emails, reads the conversation, checks availability across multiple calendars, and writes a reply proposing times.
 
 The core idea is that the recipient just sees a normal email from you. No booking link, no third-party branding, no indication that AI was involved. To the other person, it looks like you're just being responsive.
 
@@ -133,7 +133,7 @@ Every other tool on this list processes email data through proprietary cloud ser
 
 ## Which Tool Is Right for You
 
-**If you want simple scheduling that just works:** [Scheduled](https://scheduler.ferganalabs.com). It sounds like you, learns your preferences, and takes minutes to set up. Free and open source. [GitHub](https://github.com/Fergana-Labs/scheduler).
+**If you want simple scheduling that just works:** [Scheduled](https://tryscheduled.com). It sounds like you, learns your preferences, and takes minutes to set up. Free and open source. [GitHub](https://github.com/Fergana-Labs/scheduler).
 
 **If you want a human in the loop:** Howie. Real people handle the edge cases that pure AI misses. Good for complex scheduling scenarios where you want a backstop.
 

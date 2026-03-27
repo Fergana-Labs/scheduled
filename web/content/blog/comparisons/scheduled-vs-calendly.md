@@ -33,7 +33,7 @@ The community is active and the feature set is competitive with Calendly's. The 
 
 ## Scheduled
 
-[Scheduled](https://scheduler.ferganalabs.com) works differently from both. There's no link and no booking page.
+[Scheduled](https://tryscheduled.com) works differently from both. There's no link and no booking page.
 
 Scheduled is an AI agent that lives in Gmail. It monitors your inbox for emails that involve scheduling, reads the conversation, checks your availability across all connected calendars, and writes a reply proposing specific times. It can operate in draft mode, where every reply lands in your Gmail drafts for you to review and send, or in full autopilot mode, where it handles everything automatically.
 
@@ -101,5 +101,5 @@ The two tools operate in different channels with very little overlap. Scheduling
 
 Scheduled is open source and free to self-host.
 
-- **Try Scheduled:** [scheduler.ferganalabs.com](https://scheduler.ferganalabs.com)
+- **Try Scheduled:** [tryscheduled.com](https://tryscheduled.com)
 - **View the source:** [github.com/Fergana-Labs/scheduler](https://github.com/Fergana-Labs/scheduler)
