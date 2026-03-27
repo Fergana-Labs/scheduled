@@ -1358,7 +1358,6 @@ def _process_scheduling_link_submission(user_id: str, link_id: str) -> None:
                     thread_id=link.thread_id,
                     subject=email_payload.subject if hasattr(email_payload, "subject") else link.event_summary,
                     classification=classification,
-                    gmail=gmail,
                     calendar=calendar,
                     invite_proposal=invite_proposal,
                 )
@@ -1967,7 +1966,6 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                             thread_id=email.thread_id,
                             subject=email.subject,
                             classification=classification,
-                            gmail=gmail,
                             calendar=calendar,
                             invite_proposal=invite_proposal,
                         )
