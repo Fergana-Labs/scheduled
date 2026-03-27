@@ -34,7 +34,7 @@ gcloud projects create $PROJECT_ID --name="Scheduled"
 gcloud config set project $PROJECT_ID
 
 # Link billing
-BILLING_ACCOUNT=$(gcloud billing accounts list --filter="open=true" --format="value(ACCOUNT_ID)" --limit=1)
+BILLING_ACCOUNT=$(gcloud billing accounts list --format="value(ACCOUNT_ID)" --filter="OPEN=True" --limit=1)
 if [ -z "$BILLING_ACCOUNT" ]; then
   echo "No billing account found. Create one at: https://console.cloud.google.com/billing/create"
   echo "Then re-run this setup."
@@ -61,7 +61,7 @@ gcloud run deploy scheduler \
   --set-env-vars="\
 ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY,\
 GOOGLE_CLIENT_ID=1098804761920-k7qgt7gvhf10pub9sisviu11puk7j4rk.apps.googleusercontent.com,\
-GOOGLE_CLIENT_SECRET=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,\
+GOOGLE_CLIENT_SECRET=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,\
 SESSION_SECRET=$SESSION_SECRET"
 
 CLOUD_RUN_URL=$(gcloud run services describe scheduler --region=us-central1 --format='value(status.url)')
@@ -80,7 +80,7 @@ sleep 1
 
 export OAUTHLIB_RELAX_TOKEN_SCOPE=1
 export GOOGLE_CLIENT_ID="1098804761920-k7qgt7gvhf10pub9sisviu11puk7j4rk.apps.googleusercontent.com"
-export GOOGLE_CLIENT_SECRET="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"
+export GOOGLE_CLIENT_SECRET="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"
 
 python3 << 'OAUTH_SCRIPT'
 import json, os, sys, socket
