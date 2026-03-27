@@ -329,7 +329,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
               ? 'Meeting booked!'
               : waitingForSend && !autopilot
                 ? 'Hit "Send draft" in the panel first'
-                : 'Write your message...'
+                : 'Hey, I\'d love to set up a meeting to learn more about Scheduled...'
           }
           disabled={isLoading || isComplete || (waitingForSend && !autopilot)}
           rows={2}

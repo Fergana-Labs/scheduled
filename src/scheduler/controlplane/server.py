@@ -2562,15 +2562,17 @@ def demo_chat(req: DemoChatRequest, request: Request):
         "- When confirming a time, ALWAYS say you will send a calendar invite. "
         "Never ask 'should I send an invite?' — just confirm you will send one.\n"
         "- This is a virtual meeting (video call), not in-person.\n\n"
-        "Respond with JSON only (no markdown fences):\n"
-        '{"reply": "...", "is_complete": false, "proposed_date": "YYYY-MM-DD", '
-        '"reasoning_summary": "one-line explanation of why you chose these times"}\n'
+        "CRITICAL: Your ENTIRE response must be a single JSON object. "
+        "No explanation, no commentary, no markdown, no code fences. "
+        "Just the raw JSON object and nothing else.\n\n"
+        "JSON schema:\n"
+        '{"reply": "your email text", "is_complete": false, "proposed_date": "YYYY-MM-DD", '
+        '"reasoning_summary": "one-line why you chose these times"}\n\n'
         "Always include proposed_date (the primary date you're suggesting).\n"
         "Set is_complete to true once a specific time is confirmed by both sides.\n"
         "When is_complete is true, also include:\n"
-        '{"reply": "...", "is_complete": true, "proposed_date": "YYYY-MM-DD", '
         '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
-        '"event_summary": "short title", "reasoning_summary": "..."}'
+        '"event_summary": "short title"'
     )
 
     llm_messages = [{"role": m["role"], "content": m["content"]} for m in req.messages]
@@ -2583,12 +2585,24 @@ def demo_chat(req: DemoChatRequest, request: Request):
     )
 
     text = response.content[0].text.strip()
+
+    # Robust JSON extraction: strip fences, find JSON object in surrounding text
     if text.startswith("```"):
         text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 
+    result = None
     try:
         result = json.loads(text)
     except json.JSONDecodeError:
+        # Try to find a JSON object embedded in the text
+        brace_start = text.find("{")
+        brace_end = text.rfind("}")
+        if brace_start != -1 and brace_end > brace_start:
+            try:
+                result = json.loads(text[brace_start : brace_end + 1])
+            except json.JSONDecodeError:
+                pass
+    if result is None:
         result = {"reply": text, "is_complete": False}
 
     reply = result.get("reply", "")
