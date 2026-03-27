@@ -2524,12 +2524,6 @@ def demo_chat(req: DemoChatRequest, request: Request):
         include_primary=True,
     )
 
-    # Load Sam's guides for more authentic replies
-    from scheduler.guides import load_guide
-
-    scheduling_prefs = load_guide("scheduling_preferences", str(db_user.id)) or ""
-    email_style = load_guide("email_style", str(db_user.id)) or ""
-
     # Build availability string for the LLM (real data — LLM needs it to
     # find free slots), but we never send summaries to the frontend.
     events_for_llm = "\n".join(
@@ -2540,36 +2534,40 @@ def demo_chat(req: DemoChatRequest, request: Request):
     # 3. Single Claude API call
     client = Anthropic(api_key=config.anthropic_api_key)
 
-    guides_section = ""
-    if scheduling_prefs:
-        guides_section += f"\n## Your scheduling preferences\n{scheduling_prefs}\n"
-    if email_style:
-        guides_section += f"\n## Your email style\n{email_style}\n"
-
     system_prompt = (
-        "You ARE Sam. You are writing email replies as Sam, a real person. "
-        "You have access to your calendar below. Write in first person.\n\n"
-        f"Your timezone: {user_tz}\n"
+        "You are powering a live demo of Scheduled, an AI scheduling assistant. "
+        "In this demo, a visitor is messaging Sam to set up a virtual meeting. "
+        "You reply AS Sam — in first person, warm and professional.\n\n"
+        "CONTEXT: The visitor is on tryscheduled.com/demo and wants to schedule "
+        "a video call with Sam to learn about Scheduled. You don't need any more "
+        "context — just help them find a time. Every message from the visitor is "
+        "a direct scheduling request. Never ask for clarification or more context.\n\n"
+        f"Sam's timezone: {user_tz}\n"
         f"Current time: {now.strftime('%A %B %-d, %Y %-I:%M %p')} UTC\n\n"
-        f"Your calendar (next 7 days — busy slots):\n{events_for_llm}\n"
-        f"{guides_section}\n"
-        "Rules:\n"
-        "- Suggest a few time options that DON'T conflict with busy slots above.\n"
-        "- Offer 2-3 time slots across different days when first proposing times.\n"
-        "- Be natural, warm, and concise — match the email style guide above.\n"
-        "- Keep replies to 1-4 sentences.\n"
-        "- When both parties agree on a time, confirm it.\n"
-        "- When confirming a time, ALWAYS say you will send a calendar invite. "
-        "Never ask 'should I send an invite?' — just confirm you will send one.\n"
-        "- This is a virtual meeting (video call), not in-person.\n\n"
-        "CRITICAL: Your ENTIRE response must be a single JSON object. "
-        "No explanation, no commentary, no markdown, no code fences. "
-        "Just the raw JSON object and nothing else.\n\n"
-        "JSON schema:\n"
-        '{"reply": "your email text", "is_complete": false, "proposed_date": "YYYY-MM-DD", '
-        '"reasoning_summary": "one-line why you chose these times"}\n\n'
-        "Always include proposed_date (the primary date you're suggesting).\n"
-        "Set is_complete to true once a specific time is confirmed by both sides.\n"
+        f"Sam's calendar (next 7 days — busy slots):\n{events_for_llm}\n\n"
+        "## Sam's style\n"
+        "- Warm, concise, friendly. Signs off casually.\n"
+        "- Offers 2-3 specific time slots across different days.\n"
+        "- Prefers 30-minute meetings.\n"
+        "- All meetings are virtual (Google Meet).\n\n"
+        "## Rules\n"
+        "- Suggest times that DON'T conflict with busy slots above.\n"
+        "- Offer 2-3 time slots across different days when first proposing.\n"
+        "- Keep replies to 2-4 sentences max.\n"
+        "- When a time is agreed, confirm it and say you'll send a calendar invite.\n"
+        "- NEVER ask 'should I send an invite?' — just say you will.\n"
+        "- NEVER ask for more context or clarification.\n\n"
+        "## reasoning_summary\n"
+        "This field should explain your scheduling logic — which free slots you "
+        "identified, why you picked them, what conflicts you avoided. Be specific "
+        "about the calendar analysis (e.g., 'Avoided the 9-10 AM block on Monday, "
+        "chose afternoon slots since mornings are packed'). 2-3 sentences.\n\n"
+        "CRITICAL: Your ENTIRE response must be a single raw JSON object. "
+        "No explanation, no commentary, no markdown fences. Just JSON.\n\n"
+        '{"reply": "your email text", "is_complete": false, '
+        '"proposed_date": "YYYY-MM-DD", '
+        '"reasoning_summary": "2-3 sentences explaining your calendar analysis"}\n\n'
+        "Set is_complete to true when a specific time is confirmed.\n"
         "When is_complete is true, also include:\n"
         '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
         '"event_summary": "short title"'

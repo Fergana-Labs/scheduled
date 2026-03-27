@@ -247,9 +247,9 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
                   <span className="text-gray-400">&lt;internal@tryscheduled.com&gt;</span>
                 </div>
                 <div className="mt-3 text-sm leading-relaxed text-gray-600">
-                  <p>Scheduled drafted a reply in this thread.</p>
-                  <p className="mt-2">
-                    <span className="text-gray-400">Why:</span> {msg.content}
+                  <p className="font-medium text-gray-700">Scheduled drafted a reply in this thread.</p>
+                  <p className="mt-2 text-xs leading-relaxed text-gray-500">
+                    <span className="font-medium text-gray-600">Reasoning:</span> {msg.content}
                   </p>
                 </div>
                 {msg.events && msg.reasoning && (
