@@ -105,6 +105,7 @@ def load_credentials(user_id: str):
                 token_uri="https://oauth2.googleapis.com/token",
                 client_id=config.google_client_id,
                 client_secret=config.google_client_secret,
+                scopes=SCOPES,
             )
             if creds.expired and creds.refresh_token:
                 creds.refresh(Request())
