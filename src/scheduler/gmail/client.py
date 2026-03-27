@@ -260,6 +260,11 @@ class GmailClient:
         )
         return draft["id"]
 
+    def delete_draft(self, draft_id: str) -> None:
+        """Delete a draft by its ID."""
+        service = self._get_service()
+        service.users().drafts().delete(userId="me", id=draft_id).execute()
+
     def send_email(self, thread_id: str, to: str, subject: str, body: str, content_type: str = "plain", cc: str = "") -> str:
         """Send an email reply in a thread (actually sends, does not create a draft).
 

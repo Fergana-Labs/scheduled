@@ -20,6 +20,7 @@ interface Settings {
   process_sales_emails: boolean;
   scheduled_branding_enabled: boolean;
   reasoning_emails_enabled: boolean;
+  draft_auto_delete_enabled: boolean;
   scheduled_calendar_id: string | null;
   guides: { name: string; content: string; updated_at: string }[];
 }
@@ -129,6 +130,7 @@ export default function SettingsPage() {
               processSalesEmails={readySettings.process_sales_emails}
               brandingEnabled={readySettings.scheduled_branding_enabled}
               reasoningEmailsEnabled={readySettings.reasoning_emails_enabled}
+              draftAutoDeleteEnabled={readySettings.draft_auto_delete_enabled}
               calendarId={readySettings.scheduled_calendar_id}
               guides={readySettings.guides}
               onDisconnected={handleDisconnected}

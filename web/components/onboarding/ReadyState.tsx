@@ -8,6 +8,7 @@ import CalendarLink from './CalendarLink';
 import BrandingToggle from './BrandingToggle';
 import ReasoningEmailToggle from './ReasoningEmailToggle';
 import CalendarPicker from './CalendarPicker';
+import DraftAutoDeleteToggle from './DraftAutoDeleteToggle';
 import DisconnectButton from './DisconnectButton';
 
 interface Guide {
@@ -22,6 +23,7 @@ interface ReadyStateProps {
   processSalesEmails: boolean;
   brandingEnabled: boolean;
   reasoningEmailsEnabled: boolean;
+  draftAutoDeleteEnabled: boolean;
   calendarId: string | null;
   guides: Guide[];
   onDisconnected: () => void;
@@ -33,6 +35,7 @@ export default function ReadyState({
   processSalesEmails,
   brandingEnabled,
   reasoningEmailsEnabled,
+  draftAutoDeleteEnabled,
   calendarId,
   guides,
   onDisconnected,
@@ -46,6 +49,7 @@ export default function ReadyState({
       <ReasoningEmailToggle initialEnabled={reasoningEmailsEnabled} />
       <AutopilotToggle initialEnabled={autopilotEnabled} />
       <SalesEmailToggle initialEnabled={processSalesEmails} />
+      <DraftAutoDeleteToggle initialEnabled={draftAutoDeleteEnabled} />
 
       {schedulingGuide && (
         <GuideEditor
