@@ -6,6 +6,7 @@ Stores credentials in token.json for reuse.
 Scopes needed:
 - gmail.readonly: Read emails to detect scheduling intent
 - gmail.compose: Create draft replies
+- gmail.insert: Insert reasoning messages into threads without sending
 - calendar: Read/write to the scheduled calendar and user's primary calendar
 """
 
@@ -25,6 +26,7 @@ from scheduler.config import config
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.compose",
+    "https://www.googleapis.com/auth/gmail.insert",
     "https://www.googleapis.com/auth/calendar",
     "https://www.googleapis.com/auth/userinfo.email",
 ]
