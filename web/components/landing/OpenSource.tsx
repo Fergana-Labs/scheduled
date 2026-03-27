@@ -18,7 +18,7 @@ export default function OpenSource() {
 
         <div className="mt-10 flex items-center justify-center gap-5">
           <a
-            href="https://github.com/Fergana-Labs/scheduler#self-host"
+            href="https://github.com/Fergana-Labs/scheduled/blob/main/docs/self-hosting.md"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-full border border-gray-900 px-7 py-3.5 text-base font-medium text-gray-900 transition-all hover:bg-gray-900 hover:text-white sm:w-auto"
