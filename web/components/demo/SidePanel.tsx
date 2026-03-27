@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Inbox, Calendar, FileEdit, Mail, Send, CheckCircle, Loader2 } from 'lucide-react';
+import { Inbox, Calendar, FileEdit, Mail, Send, CheckCircle, Loader2, CalendarCheck } from 'lucide-react';
 import ReasoningEmail from './ReasoningEmail';
 
 export type SidePanelStep =
@@ -32,8 +32,8 @@ interface Props {
   step: SidePanelStep;
   events?: MaskedEvent[];
   reasoning?: ReasoningData;
-  draftText?: string;
   onSendDraft?: () => void;
+  isConversationComplete?: boolean;
 }
 
 interface StepInfo {
@@ -54,11 +54,14 @@ const STEP_ORDER: SidePanelStep[] = [
   'complete',
 ];
 
-export default function SidePanel({ step, events, reasoning, draftText, onSendDraft }: Props) {
+export default function SidePanel({ step, events, reasoning, onSendDraft, isConversationComplete }: Props) {
   const [visibleSteps, setVisibleSteps] = useState<SidePanelStep[]>([]);
 
   useEffect(() => {
-    if (step === 'idle') return;
+    if (step === 'idle') {
+      setVisibleSteps([]);
+      return;
+    }
     const idx = STEP_ORDER.indexOf(step);
     if (idx >= 0) {
       setVisibleSteps(STEP_ORDER.slice(0, idx + 1));
@@ -72,7 +75,7 @@ export default function SidePanel({ step, events, reasoning, draftText, onSendDr
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#43614a]/10">
             <Mail className="h-5 w-5 text-[#43614a]" />
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm leading-relaxed text-gray-400">
             Send a message to see how
             <br />
             Scheduled works behind the scenes.
@@ -107,7 +110,7 @@ export default function SidePanel({ step, events, reasoning, draftText, onSendDr
     },
     reasoning: {
       icon: <Mail className="h-4 w-4" />,
-      title: 'Reasoning email',
+      title: 'Reasoning email sent',
       description: 'Sam gets an email explaining why this draft was created.',
       active: step === 'reasoning',
       complete: STEP_ORDER.indexOf(step) > 3,
@@ -121,28 +124,28 @@ export default function SidePanel({ step, events, reasoning, draftText, onSendDr
     },
     sent: {
       icon: <CheckCircle className="h-4 w-4" />,
-      title: 'Sent & invite created',
-      description: 'Sam sent the reply. Scheduled automatically created a calendar invite.',
+      title: 'Reply sent',
+      description: 'Sam sent the reply.',
       active: step === 'sent',
       complete: STEP_ORDER.indexOf(step) > 5,
     },
     complete: {
-      icon: <CheckCircle className="h-4 w-4" />,
-      title: 'Meeting booked',
-      description: 'The meeting is confirmed and on both calendars.',
+      icon: <CalendarCheck className="h-4 w-4" />,
+      title: 'Invite sent',
+      description: 'Scheduled verified the sent message and created a calendar invite for both parties.',
       active: step === 'complete',
       complete: false,
     },
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="text-xs font-medium uppercase tracking-wider text-gray-400">
         What Scheduled is doing
       </div>
 
       {/* Step timeline */}
-      <div className="space-y-0">
+      <div className="space-y-1">
         {visibleSteps.map((s, i) => {
           const info = steps[s];
           const isLast = i === visibleSteps.length - 1;
@@ -170,12 +173,12 @@ export default function SidePanel({ step, events, reasoning, draftText, onSendDr
                   )}
                 </div>
                 {!isLast && (
-                  <div className="my-1 h-4 w-px bg-gray-200" />
+                  <div className="my-1 h-5 w-px bg-gray-200" />
                 )}
               </div>
 
               {/* Step content */}
-              <div className="min-w-0 pb-3">
+              <div className="min-w-0 pb-2 pt-0.5">
                 <div
                   className={`text-sm font-medium ${
                     info.active ? 'text-gray-900' : info.complete ? 'text-gray-600' : 'text-gray-400'
@@ -183,7 +186,7 @@ export default function SidePanel({ step, events, reasoning, draftText, onSendDr
                 >
                   {info.title}
                 </div>
-                <div className="mt-0.5 text-xs leading-relaxed text-gray-400">
+                <div className="mt-1 text-xs leading-relaxed text-gray-400">
                   {info.description}
                 </div>
               </div>
@@ -192,33 +195,21 @@ export default function SidePanel({ step, events, reasoning, draftText, onSendDr
         })}
       </div>
 
-      {/* Reasoning email card — shown when we reach that step */}
-      {STEP_ORDER.indexOf(step) >= STEP_ORDER.indexOf('reasoning') && events && reasoning && (
-        <div className="mt-4">
-          <ReasoningEmail events={events} reasoning={reasoning} />
-        </div>
+      {/* Send draft button */}
+      {step === 'draft-ready' && onSendDraft && (
+        <button
+          onClick={onSendDraft}
+          className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[#43614a] px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#527559] active:scale-[0.98]"
+        >
+          <Send className="h-3.5 w-3.5" />
+          Send draft from Sam
+        </button>
       )}
 
-      {/* Draft preview — shown when draft is ready */}
-      {STEP_ORDER.indexOf(step) >= STEP_ORDER.indexOf('draft-ready') && draftText && (
-        <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-gray-400">
-            <FileEdit className="h-3.5 w-3.5" />
-            Draft in Sam&apos;s inbox
-          </div>
-          <p className="text-sm leading-relaxed text-gray-700">{draftText}</p>
-          <div className="mt-3 border-t border-dashed border-gray-200 pt-2 text-xs text-gray-400">
-            Includes a scheduling link so the other person can pick a different time if needed.
-          </div>
-          {step === 'draft-ready' && onSendDraft && (
-            <button
-              onClick={onSendDraft}
-              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-[#43614a] px-4 py-2 text-sm font-medium text-white transition-all hover:bg-[#527559] active:scale-[0.98]"
-            >
-              <Send className="h-3.5 w-3.5" />
-              Send as Sam
-            </button>
-          )}
+      {/* Reasoning email — shown when we reach that step and conversation is complete */}
+      {isConversationComplete && events && reasoning && (
+        <div className="mt-2">
+          <ReasoningEmail events={events} reasoning={reasoning} />
         </div>
       )}
 

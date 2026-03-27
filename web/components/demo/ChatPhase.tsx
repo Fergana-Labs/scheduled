@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send } from 'lucide-react';
 import TypingIndicator from './TypingIndicator';
 import { trackPageEvent } from '@/lib/analytics';
@@ -8,12 +8,13 @@ import type { SidePanelStep } from './SidePanel';
 
 const API_BASE = process.env.NEXT_PUBLIC_CONTROL_PLANE_URL;
 
-interface Message {
+export interface Message {
   role: 'user' | 'assistant';
   content: string;
+  isDraft?: boolean; // assistant messages start as drafts
 }
 
-interface DemoResponse {
+export interface DemoResponse {
   reply: string;
   is_complete: boolean;
   events?: { start: string; end: string; summary: string }[];
@@ -28,22 +29,35 @@ interface DemoResponse {
 
 interface Props {
   onStep: (step: SidePanelStep, data?: Partial<DemoResponse>) => void;
+  onDraftReady: (data: DemoResponse) => void;
+  draftSent: boolean; // true when user clicked "Send" in side panel
   isComplete: boolean;
 }
 
-export default function ChatPhase({ onStep, isComplete }: Props) {
+export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [waitingForSend, setWaitingForSend] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const sendMessage = async () => {
+  // When draftSent becomes true, mark the draft as sent
+  useEffect(() => {
+    if (draftSent && waitingForSend) {
+      setMessages((prev) =>
+        prev.map((m) => (m.isDraft ? { ...m, isDraft: false } : m)),
+      );
+      setWaitingForSend(false);
+    }
+  }, [draftSent, waitingForSend]);
+
+  const sendMessage = useCallback(async () => {
     const text = input.trim();
-    if (!text || isLoading || isComplete) return;
+    if (!text || isLoading || isComplete || waitingForSend) return;
 
     trackPageEvent('demo_message_sent');
 
@@ -61,10 +75,13 @@ export default function ChatPhase({ onStep, isComplete }: Props) {
     onStep('drafting');
 
     try {
+      // Build API messages (strip isDraft field)
+      const apiMessages = newMessages.map((m) => ({ role: m.role, content: m.content }));
+
       const res = await fetch(`${API_BASE}/api/v1/demo/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ messages: apiMessages }),
       });
 
       if (!res.ok) {
@@ -73,20 +90,21 @@ export default function ChatPhase({ onStep, isComplete }: Props) {
       }
 
       const data: DemoResponse = await res.json();
-      const assistantMsg: Message = { role: 'assistant', content: data.reply };
-      const updatedMessages = [...newMessages, assistantMsg];
-      setMessages(updatedMessages);
 
+      // Add the reply as a draft (visually distinct, needs "Send" click)
+      const assistantMsg: Message = { role: 'assistant', content: data.reply, isDraft: true };
+      setMessages([...newMessages, assistantMsg]);
+      setWaitingForSend(true);
+
+      // Show reasoning on final message
       if (data.is_complete) {
         trackPageEvent('demo_conversation_complete');
-        // Show reasoning, then stop at draft-ready and wait for user to click Send
         onStep('reasoning', data);
-        await delay(1200);
-        onStep('draft-ready', data);
-        // Don't auto-advance past here — user clicks "Send" in side panel
-      } else {
-        onStep('draft-ready', data);
+        await delay(1000);
       }
+
+      onStep('draft-ready', data);
+      onDraftReady(data);
     } catch (err) {
       console.error('Demo chat error:', err);
       setMessages([
@@ -97,7 +115,7 @@ export default function ChatPhase({ onStep, isComplete }: Props) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, isComplete, waitingForSend, messages, onStep, onDraftReady]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -109,7 +127,7 @@ export default function ChatPhase({ onStep, isComplete }: Props) {
   return (
     <div className="flex h-full flex-col">
       {/* Thread header */}
-      <div className="mb-4 rounded-t-xl border border-gray-200 bg-white px-5 py-3">
+      <div className="rounded-t-xl border border-gray-200 bg-white px-5 py-3">
         <div className="text-xs font-medium text-gray-400">EMAIL THREAD</div>
         <div className="mt-1 text-sm font-medium text-gray-800">
           Schedule a meeting with Sam
@@ -117,9 +135,9 @@ export default function ChatPhase({ onStep, isComplete }: Props) {
       </div>
 
       {/* Email messages */}
-      <div ref={scrollRef} className="flex-1 space-y-0 overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {messages.length === 0 && (
-          <div className="flex h-full items-center justify-center rounded-b-xl border border-t-0 border-gray-200 bg-white">
+          <div className="flex h-full items-center justify-center border-x border-b border-gray-200 bg-white">
             <p className="max-w-xs px-4 py-12 text-center text-sm text-gray-400">
               Type a message to start scheduling. Try something like
               &ldquo;Hey, can we grab coffee next week?&rdquo;
@@ -129,25 +147,34 @@ export default function ChatPhase({ onStep, isComplete }: Props) {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className="animate-fade-in border border-t-0 border-gray-200 bg-white px-5 py-4"
+            className={`animate-fade-in border-x border-b border-gray-200 px-5 py-4 ${
+              msg.isDraft ? 'bg-amber-50/50' : 'bg-white'
+            }`}
             style={{ animationDelay: '50ms' }}
           >
-            <div className="mb-2 flex items-baseline justify-between">
-              <div className="text-xs">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs">
                 <span className="font-medium text-gray-800">
                   {msg.role === 'user' ? 'You' : 'Sam'}
                 </span>
                 {msg.role === 'assistant' && (
-                  <span className="ml-1.5 text-gray-400">&lt;sam@ferganalabs.com&gt;</span>
+                  <span className="text-gray-400">&lt;sam@ferganalabs.com&gt;</span>
+                )}
+                {msg.isDraft && (
+                  <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-600">
+                    DRAFT
+                  </span>
                 )}
               </div>
               <span className="text-[10px] text-gray-300">just now</span>
             </div>
-            <p className="text-sm leading-relaxed text-gray-700">{msg.content}</p>
+            <div className="whitespace-pre-line text-sm leading-relaxed text-gray-700">
+              {msg.content}
+            </div>
           </div>
         ))}
         {isLoading && (
-          <div className="border border-t-0 border-gray-200 bg-white px-5 py-4">
+          <div className="border-x border-b border-gray-200 bg-white px-5 py-4">
             <div className="mb-2 text-xs">
               <span className="font-medium text-gray-800">Sam</span>
               <span className="ml-1.5 text-gray-400">&lt;sam@ferganalabs.com&gt;</span>
@@ -168,13 +195,19 @@ export default function ChatPhase({ onStep, isComplete }: Props) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isComplete ? 'Conversation complete' : 'Write your message...'}
-            disabled={isLoading || isComplete}
+            placeholder={
+              isComplete
+                ? 'Meeting booked!'
+                : waitingForSend
+                  ? 'Hit "Send draft" in the panel first →'
+                  : 'Write your message...'
+            }
+            disabled={isLoading || isComplete || waitingForSend}
             className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none disabled:opacity-50"
           />
           <button
             onClick={sendMessage}
-            disabled={!input.trim() || isLoading || isComplete}
+            disabled={!input.trim() || isLoading || isComplete || waitingForSend}
             className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#43614a] text-white transition-all hover:bg-[#527559] disabled:opacity-40"
           >
             <Send className="h-3.5 w-3.5" />

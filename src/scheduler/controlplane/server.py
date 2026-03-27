@@ -2630,6 +2630,52 @@ def demo_chat(req: DemoChatRequest, request: Request):
     return resp
 
 
+class DemoBookRequest(BaseModel):
+    attendee_email: str
+    event_summary: str
+    agreed_time_start: str
+    agreed_time_end: str
+
+
+@app.post("/api/v1/demo/book")
+def demo_book(req: DemoBookRequest, request: Request):
+    """Book a real meeting from the demo — creates a calendar invite."""
+    from dateutil import parser as dateutil_parser
+
+    from scheduler.auth.google_auth import load_credentials
+    from scheduler.db import get_user_by_email
+
+    _demo_rate_check(request.client.host if request.client else "unknown")
+
+    db_user = get_user_by_email(DEMO_USER_EMAIL)
+    if not db_user:
+        raise HTTPException(status_code=500, detail="Demo user not configured")
+
+    creds = load_credentials(str(db_user.id))
+    calendar = CalendarClient(
+        credentials=creds,
+        scheduled_calendar_name=config.scheduled_calendar_name,
+        extra_calendar_ids=db_user.calendar_ids or [],
+    )
+
+    try:
+        start = dateutil_parser.parse(req.agreed_time_start)
+        end = dateutil_parser.parse(req.agreed_time_end)
+    except (ValueError, OverflowError) as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid time: {exc}")
+
+    event_id = calendar.create_invite_event(
+        summary=req.event_summary,
+        start=start,
+        end=end,
+        attendee_emails=[req.attendee_email],
+        description="Booked via Scheduled demo — tryscheduled.com/demo",
+        add_google_meet=True,
+    )
+
+    return {"status": "booked", "event_id": event_id}
+
+
 @app.post("/api/v1/gmail/watch/renew")
 def gmail_watch_renew():
     """Renew Gmail push notification watches for all users.
