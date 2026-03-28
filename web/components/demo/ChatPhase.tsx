@@ -26,6 +26,7 @@ export interface DemoResponse {
   reply: string;
   is_complete: boolean;
   events?: MaskedEvent[];
+  proposed_slots?: { start: string; end: string }[];
   reasoning?: ReasoningData;
   event_summary?: string;
   agreed_time_start?: string;
@@ -39,6 +40,7 @@ interface Message {
   content: string;
   isDraft?: boolean;
   events?: MaskedEvent[];
+  proposedSlots?: { start: string; end: string }[];
   reasoning?: ReasoningData;
   eventSummary?: string;
   agreedTimeStart?: string;
@@ -92,12 +94,9 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
           ]);
         }, 800);
       } else {
-        // Highlight compose area to guide user
+        // Highlight compose area to guide user — stays until they type
         setHighlightCompose(true);
-        setTimeout(() => {
-          textareaRef.current?.focus();
-          setHighlightCompose(false);
-        }, 2000);
+        textareaRef.current?.focus();
       }
     }
   }, [draftSent, waitingForSend]);
@@ -128,12 +127,9 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
             ]);
           }, 800);
         } else {
-          // Highlight compose area
+          // Highlight compose area — stays until they type
           setHighlightCompose(true);
-          setTimeout(() => {
-            textareaRef.current?.focus();
-            setHighlightCompose(false);
-          }, 2000);
+          textareaRef.current?.focus();
         }
       }, 1500);
       return () => clearTimeout(timer);
@@ -145,7 +141,6 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
     if (!text || isLoading || isComplete || waitingForSend) return;
 
     trackPageEvent('demo_message_sent');
-    setHighlightCompose(false);
 
     const userMsg: Message = { type: 'user', content: text };
     const newMessages = [...messages, userMsg];
@@ -187,6 +182,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
           type: 'reasoning',
           content: data.reasoning.summary,
           events: data.events,
+          proposedSlots: data.proposed_slots,
           reasoning: data.reasoning,
         });
       }
@@ -234,7 +230,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
       {/* Thread header */}
       <div className="border-b border-gray-200 px-5 py-3">
         <div className="text-sm font-semibold text-gray-900">
-          Let&apos;s set up time to chat about Scheduled
+          Scheduled Demo Request
         </div>
         <div className="mt-0.5 text-xs text-gray-400">
           To: sam@ferganalabs.com
@@ -246,7 +242,8 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
         {!hasMessages && !isLoading && (
           <div className="flex h-full items-center justify-center px-6">
             <p className="max-w-xs text-center text-sm leading-relaxed text-gray-400">
-              Type a message to start scheduling a virtual meeting with Sam.
+              Send a message like you&apos;re trying to schedule a virtual meeting.
+              Watch how Scheduled handles it behind the scenes.
             </p>
           </div>
         )}
@@ -271,6 +268,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
                 {msg.events && msg.reasoning && (
                   <CalendarDayView
                     events={msg.events}
+                    proposedTimes={msg.proposedSlots}
                     dateLabel={msg.reasoning.date_label}
                   />
                 )}
@@ -351,7 +349,7 @@ export default function ChatPhase({ onStep, onDraftReady, draftSent, isComplete,
           <textarea
             ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => { setInput(e.target.value); setHighlightCompose(false); }}
             onKeyDown={handleKeyDown}
             placeholder={
               waitingForSend && !autopilot

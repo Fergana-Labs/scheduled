@@ -95,10 +95,8 @@ export default function SidePanel({ step, onSendDraft, autopilot }: Props) {
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#43614a]/10">
             <Mail className="h-5 w-5 text-[#43614a]" />
           </div>
-          <p className="text-sm leading-relaxed text-gray-400">
-            Send a message to see how
-            <br />
-            Scheduled works behind the scenes.
+          <p className="text-xs text-gray-400">
+            Waiting for first message...
           </p>
         </div>
       </div>

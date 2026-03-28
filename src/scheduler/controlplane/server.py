@@ -2560,7 +2560,9 @@ def demo_chat(req: DemoChatRequest, request: Request):
         "## Rules\n"
         "- Suggest times that DON'T conflict with busy slots above.\n"
         "- Offer 2-3 time slots across different days when first proposing.\n"
-        "- Keep replies to 2-4 sentences max.\n"
+        "- Format the reply like a real email: use line breaks (\\n) between "
+        "paragraphs, use bullet points (- ) for listing time options.\n"
+        "- Keep replies concise but well-formatted.\n"
         "- When a time is agreed, confirm it and say you'll send a calendar invite.\n"
         "- NEVER ask 'should I send an invite?' — just say you will.\n"
         "- NEVER ask for more context or clarification.\n\n"
@@ -2577,8 +2579,10 @@ def demo_chat(req: DemoChatRequest, request: Request):
         "No explanation, no commentary, no markdown fences. Just JSON.\n\n"
         '{"reply": "your email text", "is_complete": false, '
         '"proposed_dates": ["YYYY-MM-DD", ...], '
+        '"proposed_slots": [{"start": "ISO8601", "end": "ISO8601"}, ...], '
         '"reasoning_summary": "2-3 sentences explaining your calendar analysis"}\n\n'
-        "proposed_dates should list ALL dates you mention in the reply.\n"
+        "proposed_dates: ALL dates mentioned in the reply.\n"
+        "proposed_slots: the exact time windows you suggest (ISO8601 with timezone).\n"
         "Set is_complete to true when a specific time is confirmed.\n"
         "When is_complete is true, also include:\n"
         '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
@@ -2668,7 +2672,11 @@ def demo_chat(req: DemoChatRequest, request: Request):
     date_labels = [d.strftime("%B %-d") for d in sorted(set(d.date() for d in parsed_dates))]
     date_label = " & ".join(date_labels) + f", {parsed_dates[0].year}"
 
+    # Pass through proposed_slots for calendar highlighting
+    proposed_slots = result.get("proposed_slots", [])
+
     resp["events"] = masked_events
+    resp["proposed_slots"] = proposed_slots
     resp["reasoning"] = {
         "summary": result.get("reasoning_summary", "Scheduling request"),
         "date_label": date_label,

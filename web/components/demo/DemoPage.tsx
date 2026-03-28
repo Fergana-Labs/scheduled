@@ -93,10 +93,6 @@ export default function DemoPage() {
           <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-normal italic tracking-tight text-gray-900 sm:text-4xl">
             Try scheduling with Sam
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-gray-500">
-            Send a message like you&apos;re trying to schedule a virtual meeting.
-            Watch how Scheduled handles it behind the scenes.
-          </p>
         </div>
 
         {/* Dual-pane layout */}
