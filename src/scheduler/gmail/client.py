@@ -395,6 +395,12 @@ class GmailClient:
         )
         return {"historyId": result["historyId"], "expiration": result["expiration"]}
 
+    def get_current_history_id(self) -> str:
+        """Get the current history ID from the user's Gmail profile."""
+        service = self._get_service()
+        profile = service.users().getProfile(userId="me").execute()
+        return str(profile["historyId"])
+
     def get_history(self, start_history_id: str) -> list[str]:
         """Get message IDs added to the inbox since a given history ID.
 

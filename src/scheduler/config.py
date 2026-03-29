@@ -116,5 +116,15 @@ class Config:
         ]
     )
 
+    # Self-hosted fields (only used when deployment_mode == "self_hosted")
+    sqlite_db_path: str = field(
+        default_factory=lambda: os.environ.get("SQLITE_DB_PATH", "/tmp/scheduler.db")
+    )
+    gcs_bucket: str = field(default_factory=lambda: os.environ.get("GCS_BUCKET", ""))
+    user_email: str = field(default_factory=lambda: os.environ.get("USER_EMAIL", ""))
+    google_refresh_token: str = field(
+        default_factory=lambda: os.environ.get("GOOGLE_REFRESH_TOKEN", "")
+    )
+
 
 config = Config()

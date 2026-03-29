@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def _use_database() -> bool:
     """Whether to use the database for guide storage (production mode)."""
-    return bool(config.database_url)
+    return bool(config.database_url) or config.deployment_mode == "self_hosted"
 
 
 def load_guide(name: str, user_id: str | None = None) -> str | None:

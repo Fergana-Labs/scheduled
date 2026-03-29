@@ -14,6 +14,7 @@ import asyncio
 import base64
 import html
 import hashlib
+import os
 import re
 import hmac
 import json
@@ -24,12 +25,13 @@ import time
 import urllib.parse
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 
 import jwt
 from jwt import PyJWKClient
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from scheduler.auth.google_auth import SCOPES, load_credentials
@@ -135,9 +137,96 @@ async def _watch_renewal_loop():
         await asyncio.sleep(_WATCH_RENEWAL_INTERVAL)
 
 
+async def _gmail_poll_loop():
+    """Background loop (self-hosted): poll Gmail for new messages via History API."""
+    await asyncio.sleep(10)  # let server finish starting
+
+    last_cleanup_at = 0.0
+
+    while True:
+        try:
+            from scheduler.db import get_all_user_ids, get_user_by_id
+
+            user_ids = await asyncio.to_thread(get_all_user_ids)
+            for user_id in user_ids:
+                try:
+                    user = await asyncio.to_thread(get_user_by_id, user_id)
+                    if not user or not user.google_refresh_token:
+                        continue
+                    if not user.system_enabled:
+                        continue
+                    if not user.gmail_history_id:
+                        continue
+                    await asyncio.to_thread(
+                        _process_new_messages, str(user.id), user.email
+                    )
+                except Exception:
+                    logger.exception("gmail_poll: failed for user=%s", user_id)
+        except Exception:
+            logger.exception("gmail_poll: failed to list users")
+
+        # Periodic cleanup (every hour, not every poll cycle)
+        if time.time() - last_cleanup_at >= 3600:
+            last_cleanup_at = time.time()
+            try:
+                from scheduler.db import cleanup_processed_messages
+                deleted = await asyncio.to_thread(cleanup_processed_messages)
+                if deleted:
+                    logger.info("gmail_poll: cleaned up %d old processed_messages rows", deleted)
+            except Exception:
+                logger.exception("gmail_poll: cleanup failed")
+
+        await asyncio.sleep(config.watcher_poll_interval)
+
+
+async def _self_heal_on_startup():
+    """Reconstruct user state from env vars if SQLite DB is empty (self-hosted cold start)."""
+    email = config.user_email
+    refresh_token = config.google_refresh_token
+    if not email or not refresh_token:
+        logger.info("self_heal: USER_EMAIL or GOOGLE_REFRESH_TOKEN not set, skipping")
+        return
+
+    from scheduler.db import (
+        get_user_by_email, upsert_user, update_gmail_history_id,
+        update_scheduled_calendar_id, update_system_enabled,
+    )
+
+    user = get_user_by_email(email)
+    if user and user.gmail_history_id:
+        logger.info("self_heal: user %s already exists with history_id, skipping", email)
+        return
+
+    logger.info("self_heal: reconstructing user %s from env vars", email)
+    user, _ = upsert_user(email, refresh_token)
+    creds = load_credentials(user.id)
+
+    try:
+        history_id = GmailClient(creds).get_current_history_id()
+        update_gmail_history_id(user.id, history_id)
+        logger.info("self_heal: gmail history_id=%s", history_id)
+    except Exception:
+        logger.exception("self_heal: failed to get gmail history_id")
+
+    try:
+        cal_id = CalendarClient(creds, config.scheduled_calendar_name).get_or_create_scheduled_calendar()
+        if cal_id:
+            update_scheduled_calendar_id(user.id, cal_id)
+            logger.info("self_heal: scheduled_calendar_id=%s", cal_id)
+    except Exception:
+        logger.exception("self_heal: failed to set up calendar")
+
+    update_system_enabled(user.id, True)
+    logger.info("self_heal: user %s ready for polling", email)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    task = asyncio.create_task(_watch_renewal_loop())
+    if _is_self_hosted_mode():
+        await _self_heal_on_startup()
+        task = asyncio.create_task(_gmail_poll_loop())
+    else:
+        task = asyncio.create_task(_watch_renewal_loop())
     yield
     task.cancel()
 
@@ -162,6 +251,65 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+
+# --- Self-hosted setup + settings (only active in self-hosted mode) ---
+
+_STATIC_DIR = Path(__file__).parent / "static"
+_setup_completed = False
+
+
+class SetupInitRequest(BaseModel):
+    email: str
+    refresh_token: str
+
+
+@app.post("/api/setup/init")
+async def setup_init(body: SetupInitRequest, authorization: str = Header(default="")):
+    """One-time endpoint: accepts OAuth refresh token from the setup prompt."""
+    if not _is_self_hosted_mode():
+        raise HTTPException(status_code=404, detail="Not found")
+
+    global _setup_completed
+    if _setup_completed:
+        raise HTTPException(status_code=410, detail="Setup already completed")
+
+    setup_token = os.environ.get("SETUP_TOKEN", "")
+    if not setup_token:
+        raise HTTPException(status_code=403, detail="SETUP_TOKEN not configured")
+
+    expected = f"Bearer {setup_token}"
+    if not hmac.compare_digest(authorization, expected):
+        raise HTTPException(status_code=403, detail="Invalid setup token")
+
+    from scheduler.db import upsert_user, update_gmail_history_id
+
+    user, is_new = await asyncio.to_thread(
+        upsert_user, body.email, body.refresh_token
+    )
+    logger.info("setup_init: user %s (%s), is_new=%s", user.email, user.id, is_new)
+
+    try:
+        creds = await asyncio.to_thread(load_credentials, user.id)
+        if creds:
+            gmail = GmailClient(creds)
+            history_id = await asyncio.to_thread(gmail.get_current_history_id)
+            await asyncio.to_thread(update_gmail_history_id, user.id, history_id)
+            logger.info("setup_init: gmail history_id=%s for %s", history_id, user.email)
+    except Exception:
+        logger.exception("setup_init: failed to init gmail history_id")
+
+    _setup_completed = True
+    return {"status": "ok", "user_id": user.id, "email": user.email}
+
+
+@app.get("/settings", response_class=HTMLResponse)
+def settings_page():
+    """Serve the bundled settings UI (self-hosted mode)."""
+    html_path = _STATIC_DIR / "settings.html"
+    if not html_path.exists():
+        raise HTTPException(status_code=404, detail="Settings page not available")
+    return html_path.read_text()
 
 
 # --- Auth0 JWT validation ---
@@ -1782,10 +1930,11 @@ def _handle_sent_message_for_invite(user_id: str, email, gmail: GmailClient, cal
     delete_pending_invite(pending.id)
 
 
-def _process_new_messages(user_id: str, email_address: str, history_id: str) -> None:
-    """Background task: fetch new messages since last history ID and log them.
+def _process_new_messages(user_id: str, email_address: str, history_id: str | None = None) -> None:
+    """Fetch new messages since last history ID and process them.
 
-    This is the hook point where the classifier agent will be triggered.
+    When history_id is provided (webhook/push mode), it's used as the new baseline.
+    When history_id is None (polling mode), the current history ID is fetched from Gmail.
     """
     from scheduler.db import get_user_by_id, update_gmail_history_id
 
@@ -1793,12 +1942,13 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
     if not user:
         return
     if not user.system_enabled:
-        logger.info("gmail_webhook: system disabled for user=%s, skipping", email_address)
+        logger.info("gmail: system disabled for user=%s, skipping", email_address)
         return
     if not user.gmail_history_id:
-        # First notification — just store the history ID baseline
-        update_gmail_history_id(user_id, history_id)
-        logger.info("gmail_webhook: stored initial history_id=%s for user=%s", history_id, email_address)
+        if history_id:
+            # First webhook notification — just store the history ID baseline
+            update_gmail_history_id(user_id, history_id)
+            logger.info("gmail: stored initial history_id=%s for user=%s", history_id, email_address)
         return
 
     creds = load_credentials(user_id)
@@ -1808,17 +1958,20 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
         new_message_ids = gmail.get_history(user.gmail_history_id)
     except Exception:
         # History ID may be too old (> 7 days). Reset baseline.
-        logger.warning("gmail_webhook: history expired for user=%s, resetting", email_address)
-        update_gmail_history_id(user_id, history_id)
+        logger.warning("gmail: history expired for user=%s, resetting", email_address)
+        reset_id = history_id or gmail.get_current_history_id()
+        update_gmail_history_id(user_id, reset_id)
         return
 
-    update_gmail_history_id(user_id, history_id)
+    # Update history ID to current so next check starts from here
+    new_baseline = history_id or gmail.get_current_history_id()
+    update_gmail_history_id(user_id, new_baseline)
 
     if not new_message_ids:
         return
 
     logger.info(
-        "gmail_webhook: %d new message(s) for user=%s: %s",
+        "gmail: %d new message(s) for user=%s: %s",
         len(new_message_ids),
         email_address,
         new_message_ids,
