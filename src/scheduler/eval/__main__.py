@@ -201,7 +201,8 @@ def run_draft_eval(fixture: dict, thread_ids: list[str] | None = None) -> list[d
 
         backend = ReplayDraftBackend(scoped_fixture)
         composer = DraftComposer(backend, user_id="eval", user_email=user_email)
-        composer.compose_and_create_draft(trigger, classification, current_datetime=trigger["date"])
+        eval_datetime = (case.get("current_datetime") if case else None) or trigger["date"]
+        composer.compose_and_create_draft(trigger, classification, current_datetime=eval_datetime)
 
         eval_id = case["eval_id"] if case else trigger.get("thread_id", "")
         print(f"  Draft done: {eval_id}", file=sys.stderr)
@@ -213,6 +214,7 @@ def run_draft_eval(fixture: dict, thread_ids: list[str] | None = None) -> list[d
             "messages": thread_msgs,
             "trigger_message_index": trigger_idx,
             "user_email": user_email,
+            "current_datetime": eval_datetime,
             "classification": classification,
             "draft": backend.captured_draft,
             "sent": backend.captured_sent,
