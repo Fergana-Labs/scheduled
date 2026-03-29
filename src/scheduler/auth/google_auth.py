@@ -91,7 +91,7 @@ def load_credentials(user_id: str):
     from stored tokens (refreshing if expired). Otherwise falls back to
     the local token.json OAuth flow for development.
     """
-    if config.database_url:
+    if config.database_url or config.deployment_mode == "self_hosted":
         from scheduler.db import get_user_by_id, update_user_tokens
 
         user = get_user_by_id(user_id)

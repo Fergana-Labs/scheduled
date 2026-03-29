@@ -14,6 +14,7 @@ import asyncio
 import base64
 import html
 import hashlib
+import os
 import re
 import hmac
 import json
@@ -23,13 +24,14 @@ import threading
 import time
 import urllib.parse
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 
 import jwt
 from jwt import PyJWKClient
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from scheduler.auth.google_auth import SCOPES, load_credentials
@@ -138,11 +140,10 @@ def _draft_body_matches(raw_body: str | None, gmail_body: str) -> bool:
 
 
 def _draft_needs_refresh_today(windows: list[dict], user_tz_str: str) -> bool:
-    """Return True if the earliest suggested time is today or earlier.
+    """Return True if any suggested time is today or earlier.
 
-    The idea: if a draft proposes 2pm Thursday, it should be refreshed by 9am
-    Thursday morning — the user shouldn't wake up and see a draft with a time
-    that's later today (or already passed). Times for tomorrow or later are fine.
+    If a draft proposes 2pm Thursday, it should be refreshed by 9am Thursday —
+    the user shouldn't wake up and see a draft proposing a time later that day.
     """
     from zoneinfo import ZoneInfo
 
@@ -156,16 +157,14 @@ def _draft_needs_refresh_today(windows: list[dict], user_tz_str: str) -> bool:
 
     today = datetime.now(timezone.utc).astimezone(tz).date()
 
-    from datetime import date as date_type
     for w in windows:
         try:
-            window_date = date_type.fromisoformat(w["date"])
-            if window_date <= today:
-                return True  # at least one proposed time is today or earlier
+            if date.fromisoformat(w["date"]) <= today:
+                return True
         except (KeyError, ValueError):
             continue
 
-    return False  # all proposed times are tomorrow or later
+    return False
 
 
 def _refresh_stale_drafts() -> int:
@@ -199,17 +198,15 @@ def _refresh_stale_drafts() -> int:
             continue
 
         # Check if any suggested time is today or earlier (needs refresh before user's day)
+        composed_at = row.get("composed_at")
         windows = row.get("suggested_windows") or []
         if isinstance(windows, str):
-            import json as _json
-            windows = _json.loads(windows)
+            windows = json.loads(windows)
         if windows:
             if not _draft_needs_refresh_today(windows, user_tz):
                 continue  # all proposed times are tomorrow or later, still valid
         else:
             # No suggested windows (availability mode) — fall back to 24h age check
-            from datetime import timedelta
-            composed_at = row.get("composed_at")
             if composed_at and (datetime.now(timezone.utc) - composed_at.replace(tzinfo=timezone.utc)) < timedelta(hours=24):
                 continue
 
@@ -249,17 +246,14 @@ def _refresh_stale_drafts() -> int:
             mark_draft_auto_deleted(row["id"])
             continue
 
-        # Check if thread was resolved (user sent a reply)
-        resolved = False
-        for t_email in thread_emails:
-            if t_email.sender and user_email in t_email.sender:
-                composed_at = row.get("composed_at")
-                if composed_at and t_email.date > composed_at:
-                    logger.info("draft_refresh: thread %s resolved (user replied), cleaning up", thread_id)
-                    mark_draft_auto_deleted(row["id"])
-                    resolved = True
-                    break
-        if resolved:
+        # Check if thread was resolved (user sent a reply after we composed)
+        user_replied = any(
+            t_email.sender and user_email in t_email.sender and composed_at and t_email.date > composed_at
+            for t_email in thread_emails
+        )
+        if user_replied:
+            logger.info("draft_refresh: thread %s resolved (user replied), cleaning up", thread_id)
+            mark_draft_auto_deleted(row["id"])
             continue
 
         # Build thread_messages context (same as webhook handler)
@@ -356,9 +350,57 @@ async def _watch_renewal_loop():
         await asyncio.sleep(_WATCH_RENEWAL_INTERVAL)
 
 
+async def _gmail_poll_loop():
+    """Background loop (self-hosted): poll Gmail for new messages via History API."""
+    await asyncio.sleep(10)  # let server finish starting
+
+    last_cleanup_at = 0.0
+
+    while True:
+        try:
+            from scheduler.db import get_all_user_ids, get_user_by_id
+
+            user_ids = await asyncio.to_thread(get_all_user_ids)
+            for user_id in user_ids:
+                try:
+                    user = await asyncio.to_thread(get_user_by_id, user_id)
+                    if not user or not user.google_refresh_token:
+                        continue
+                    if not user.system_enabled:
+                        continue
+                    if not user.gmail_history_id:
+                        continue
+
+                    message_ids = await asyncio.to_thread(_get_new_message_ids, str(user.id))
+                    if message_ids:
+                        await asyncio.to_thread(
+                            _process_messages, str(user.id), user.email, message_ids
+                        )
+                except Exception:
+                    logger.exception("gmail_poll: failed for user=%s", user_id)
+        except Exception:
+            logger.exception("gmail_poll: failed to list users")
+
+        # Periodic cleanup (every hour, not every poll cycle)
+        if time.time() - last_cleanup_at >= 3600:
+            last_cleanup_at = time.time()
+            try:
+                from scheduler.db import cleanup_processed_messages
+                deleted = await asyncio.to_thread(cleanup_processed_messages)
+                if deleted:
+                    logger.info("gmail_poll: cleaned up %d old processed_messages rows", deleted)
+            except Exception:
+                logger.exception("gmail_poll: cleanup failed")
+
+        await asyncio.sleep(config.watcher_poll_interval)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    task = asyncio.create_task(_watch_renewal_loop())
+    if _is_self_hosted_mode():
+        task = asyncio.create_task(_gmail_poll_loop())
+    else:
+        task = asyncio.create_task(_watch_renewal_loop())
     refresh_task = asyncio.create_task(_draft_refresh_loop())
     yield
     task.cancel()
@@ -385,6 +427,65 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+
+# --- Self-hosted setup + settings (only active in self-hosted mode) ---
+
+_STATIC_DIR = Path(__file__).parent / "static"
+_setup_completed = False
+
+
+class SetupInitRequest(BaseModel):
+    email: str
+    refresh_token: str
+
+
+@app.post("/api/setup/init")
+async def setup_init(body: SetupInitRequest, authorization: str = Header(default="")):
+    """One-time endpoint: accepts OAuth refresh token from the setup prompt."""
+    if not _is_self_hosted_mode():
+        raise HTTPException(status_code=404, detail="Not found")
+
+    global _setup_completed
+    if _setup_completed:
+        raise HTTPException(status_code=410, detail="Setup already completed")
+
+    setup_token = os.environ.get("SETUP_TOKEN", "")
+    if not setup_token:
+        raise HTTPException(status_code=403, detail="SETUP_TOKEN not configured")
+
+    expected = f"Bearer {setup_token}"
+    if not hmac.compare_digest(authorization, expected):
+        raise HTTPException(status_code=403, detail="Invalid setup token")
+
+    from scheduler.db import upsert_user, update_gmail_history_id
+
+    user, is_new = await asyncio.to_thread(
+        upsert_user, body.email, body.refresh_token
+    )
+    logger.info("setup_init: user %s (%s), is_new=%s", user.email, user.id, is_new)
+
+    try:
+        creds = await asyncio.to_thread(load_credentials, user.id)
+        gmail = GmailClient(creds)
+        history_id = await asyncio.to_thread(gmail.get_current_history_id)
+        await asyncio.to_thread(update_gmail_history_id, user.id, history_id)
+        logger.info("setup_init: gmail history_id=%s for %s", history_id, user.email)
+    except Exception:
+        logger.exception("setup_init: failed to init gmail history_id")
+        raise HTTPException(status_code=500, detail="Gmail initialization failed — retry setup")
+
+    _setup_completed = True
+    return {"status": "ok", "user_id": user.id, "email": user.email}
+
+
+@app.get("/settings", response_class=HTMLResponse)
+def settings_page():
+    """Serve the bundled settings UI (self-hosted mode)."""
+    html_path = _STATIC_DIR / "settings.html"
+    if not html_path.exists():
+        raise HTTPException(status_code=404, detail="Settings page not available")
+    return html_path.read_text()
 
 
 # --- Auth0 JWT validation ---
@@ -2075,58 +2176,55 @@ def _handle_sent_message_for_invite(user_id: str, email, gmail: GmailClient, cal
     delete_pending_invite(pending.id)
 
 
-def _process_new_messages(user_id: str, email_address: str, history_id: str) -> None:
-    """Background task: fetch new messages since last history ID and log them.
+def _get_new_message_ids(user_id: str) -> list[str]:
+    """Get new Gmail message IDs since the stored history ID and advance the baseline.
 
-    This is the hook point where the classifier agent will be triggered.
+    Uses the history ID returned by Gmail's History API as the new baseline,
+    so no messages are lost between fetching and advancing.
     """
     from scheduler.db import get_user_by_id, update_gmail_history_id
 
     user = get_user_by_id(user_id)
-    if not user:
-        return
-    if not user.system_enabled:
-        logger.info("gmail_webhook: system disabled for user=%s, skipping", email_address)
-        return
-    if not user.gmail_history_id:
-        # First notification — just store the history ID baseline
-        update_gmail_history_id(user_id, history_id)
-        logger.info("gmail_webhook: stored initial history_id=%s for user=%s", history_id, email_address)
-        return
+    if not user or not user.gmail_history_id:
+        return []
 
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
 
     try:
-        new_message_ids = gmail.get_history(user.gmail_history_id)
+        new_message_ids, new_history_id = gmail.get_history(user.gmail_history_id)
     except Exception:
-        # History ID may be too old (> 7 days). Reset baseline.
-        logger.warning("gmail_webhook: history expired for user=%s, resetting", email_address)
-        update_gmail_history_id(user_id, history_id)
-        return
+        logger.warning("gmail: history expired for user=%s, resetting", user.email)
+        new_history_id = gmail.get_current_history_id()
+        update_gmail_history_id(user_id, new_history_id)
+        return []
 
-    update_gmail_history_id(user_id, history_id)
+    update_gmail_history_id(user_id, new_history_id)
+    return new_message_ids
 
-    if not new_message_ids:
-        return
 
-    logger.info(
-        "gmail_webhook: %d new message(s) for user=%s: %s",
-        len(new_message_ids),
-        email_address,
-        new_message_ids,
-    )
-
+def _process_messages(user_id: str, email_address: str, message_ids: list[str]) -> None:
+    """Filter, classify, and draft replies for a list of Gmail message IDs."""
+    from scheduler.db import get_user_by_id, try_claim_message
     from scheduler.classifier.intent import classify_email, SchedulingIntent
     from scheduler.classifier.newsletter import is_mass_email
-    from scheduler.db import try_claim_message
 
+    user = get_user_by_id(user_id)
+    if not user:
+        return
+    if not user.system_enabled:
+        logger.info("gmail: system disabled for user=%s, skipping", email_address)
+        return
+
+    logger.info("gmail: %d new message(s) for user=%s: %s", len(message_ids), email_address, message_ids)
+
+    creds = load_credentials(user_id)
+    gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=user.calendar_ids or [])
 
-    for message_id in new_message_ids:
-        # Atomic claim: prevents duplicate processing from concurrent webhooks
+    for message_id in message_ids:
         if not try_claim_message(user_id, message_id):
-            logger.info("gmail_webhook: message %s already claimed, skipping", message_id)
+            logger.info("gmail: message %s already claimed, skipping", message_id)
             continue
 
         try:
@@ -2134,11 +2232,11 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
 
             # Skip drafts — Gmail fires messageAdded when Scheduled creates a draft
             if "DRAFT" in email.label_ids:
-                logger.info("gmail_webhook: message %s is a draft, skipping", message_id)
+                logger.info("gmail: message %s is a draft, skipping", message_id)
                 continue
 
             # User-sent messages: check if there's a pending invite for this thread
-            logger.info("gmail_webhook: message %s sender=%s user=%s thread=%s subject=%s labels=%s", message_id, email.sender, email_address, email.thread_id, getattr(email, 'subject', ''), email.label_ids)
+            logger.info("gmail: message %s sender=%s user=%s thread=%s subject=%s labels=%s", message_id, email.sender, email_address, email.thread_id, getattr(email, 'subject', ''), email.label_ids)
             if email.sender and email_address in email.sender:
                 _handle_sent_message_for_invite(user_id, email, gmail, calendar)
                 try:
@@ -2146,7 +2244,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                     analytics.record_draft_sent(user_id, email.thread_id, email.body, email.date, message_id=message_id, sender=email.sender)
                 except Exception:
                     logger.debug("analytics: failed to check sent draft for message %s", message_id, exc_info=True)
-                logger.info("gmail_webhook: message %s is from the user (matched sender), skipping", message_id)
+                logger.info("gmail: message %s is from the user (matched sender), skipping", message_id)
                 continue
 
             # Skip emails from Scheduled's own sending addresses (e.g. reasoning emails)
@@ -2155,12 +2253,12 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                (config.postmark_bot_email and config.postmark_bot_email in sender_str) or \
                "@tryscheduled.com" in sender_str or \
                "scheduled@ferganalabs.com" in sender_str:
-                logger.info("gmail_webhook: message %s is from Scheduled, skipping", message_id)
+                logger.info("gmail: message %s is from Scheduled, skipping", message_id)
                 continue
 
             # Skip newsletters / mass emails (before classifier, saves API cost)
             if is_mass_email(email.headers, email.sender):
-                logger.info("gmail_webhook: message %s is a mass email/newsletter, skipping", message_id)
+                logger.info("gmail: message %s is a mass email/newsletter, skipping", message_id)
                 continue
 
             # Fetch full thread for classifier context
@@ -2179,7 +2277,7 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                     if t_email.id == email.id:
                         break  # include the triggering email, then stop
             except Exception:
-                logger.warning("gmail_webhook: failed to fetch thread %s for context, classifying without", email.thread_id)
+                logger.warning("gmail: failed to fetch thread %s for context, classifying without", email.thread_id)
 
             classification = classify_email(
                 email.subject, email.body, email.sender,
@@ -2196,19 +2294,19 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                 "message_id": message_id,
             })
 
-            logger.info("gmail_webhook: message %s classified as %s confidence=%.2f summary=%r", message_id, classification.intent.value, classification.confidence, classification.summary)
+            logger.info("gmail: message %s classified as %s confidence=%.2f summary=%r", message_id, classification.intent.value, classification.confidence, classification.summary)
 
             if classification.intent == SchedulingIntent.DOESNT_NEED_DRAFT:
-                logger.info("gmail_webhook: message %s is not scheduling-related, skipping", message_id)
+                logger.info("gmail: message %s is not scheduling-related, skipping", message_id)
                 continue
 
             # Skip cold outreach unless user opted in
             if classification.is_sales_email and not user.process_sales_emails:
-                logger.info("gmail_webhook: message %s is cold outreach, skipping", message_id)
+                logger.info("gmail: message %s is cold outreach, skipping", message_id)
                 continue
 
             logger.info(
-                "gmail_webhook: message %s classified as %s (confidence=%.2f), composing draft",
+                "gmail: message %s classified as %s (confidence=%.2f), composing draft",
                 message_id,
                 classification.intent.value,
                 classification.confidence,
@@ -2230,9 +2328,9 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
             invite_proposal = compose_result.get("invite_proposal")
 
             if draft_id is None:
-                logger.info("gmail_webhook: thread for message %s already resolved, no draft created", message_id)
+                logger.info("gmail: thread for message %s already resolved, no draft created", message_id)
             else:
-                logger.info("gmail_webhook: created draft %s for message %s", draft_id, message_id)
+                logger.info("gmail: created draft %s for message %s", draft_id, message_id)
 
                 # Store pending invite if the composer proposed one
                 if invite_proposal:
@@ -2248,9 +2346,9 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                             add_google_meet=invite_proposal.get("add_google_meet", False),
                             location=invite_proposal.get("location", ""),
                         )
-                        logger.info("gmail_webhook: created pending invite for thread %s", email.thread_id)
+                        logger.info("gmail: created pending invite for thread %s", email.thread_id)
                     except Exception:
-                        logger.exception("gmail_webhook: failed to create pending invite for thread %s", email.thread_id)
+                        logger.exception("gmail: failed to create pending invite for thread %s", email.thread_id)
 
                 analytics.track(user_id, "draft_composed", {
                     "thread_id": email.thread_id,
@@ -2270,14 +2368,13 @@ def _process_new_messages(user_id: str, email_address: str, history_id: str) -> 
                             invite_proposal=invite_proposal,
                         )
                     except Exception:
-                        logger.exception("gmail_webhook: failed to send reasoning email for message %s", message_id)
+                        logger.exception("gmail: failed to send reasoning email for message %s", message_id)
 
         except Exception as exc:
-            # If Gmail returns 404, the message was deleted/moved — don't retry
             if _is_gmail_404(exc):
-                logger.warning("gmail_webhook: message %s not found (deleted?), skipping", message_id)
+                logger.warning("gmail: message %s not found (deleted?), skipping", message_id)
             else:
-                logger.exception("gmail_webhook: failed to process message %s for user=%s", message_id, email_address)
+                logger.exception("gmail: failed to process message %s for user=%s", message_id, email_address)
 
 
 @app.post("/webhooks/gmail")
@@ -2327,7 +2424,9 @@ async def gmail_webhook(request: Request, background_tasks: BackgroundTasks):
         # Return 200 so Pub/Sub doesn't retry for unknown users
         return {"status": "ignored", "reason": "unknown user"}
 
-    background_tasks.add_task(_process_new_messages, str(user.id), email_address, history_id)
+    message_ids = await asyncio.to_thread(_get_new_message_ids, str(user.id))
+    if message_ids:
+        background_tasks.add_task(_process_messages, str(user.id), email_address, message_ids)
 
     return {"status": "ok"}
 

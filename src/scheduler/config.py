@@ -116,5 +116,11 @@ class Config:
         ]
     )
 
+    # Self-hosted fields (only used when deployment_mode == "self_hosted")
+    sqlite_db_path: str = field(
+        default_factory=lambda: os.environ.get("SQLITE_DB_PATH", "/tmp/scheduler.db")
+    )
+    gcs_bucket: str = field(default_factory=lambda: os.environ.get("GCS_BUCKET", ""))
+
 
 config = Config()
