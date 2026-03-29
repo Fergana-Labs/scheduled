@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Loader2, LogOut } from 'lucide-react';
-import { api, captureSessionFromURL, clearSession } from '@/lib/api';
+import { api, captureSessionFromURL, clearSession, getSession } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import ReadyState from '@/components/onboarding/ReadyState';
 import DisconnectedState from '@/components/onboarding/DisconnectedState';
@@ -12,6 +12,7 @@ import DisconnectedState from '@/components/onboarding/DisconnectedState';
 interface UserInfo {
   user_id: string;
   email: string;
+  needs_reauth?: boolean;
 }
 
 interface Settings {
@@ -39,6 +40,12 @@ export default function SettingsPage() {
         const userInfo = await api<UserInfo>('/auth/me');
         setUser(userInfo);
         track('page_view', { page: 'settings' });
+
+        if (userInfo.needs_reauth) {
+          const connectUrl = `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google/connect?token=${getSession()}`;
+          router.replace(`/permissions-required?retry_url=${encodeURIComponent(connectUrl)}`);
+          return;
+        }
 
         const status = await api<{ ready: boolean; connected: boolean }>('/web/api/v1/onboarding/status');
         if (!status.connected) {

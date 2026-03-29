@@ -673,9 +673,17 @@ def auth_google_connect(token: str | None = None):
     return RedirectResponse(url)
 
 
+_REQUIRED_GOOGLE_SCOPES = {
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.compose",
+    "https://www.googleapis.com/auth/calendar",
+}
+
+
 @app.get("/auth/google/callback")
 def auth_google_connect_callback(
-    code: str | None = None, state: str | None = None, error: str | None = None
+    code: str | None = None, state: str | None = None, error: str | None = None,
+    scope: str | None = None,
 ):
     """Handle Google OAuth callback for the Connect flow."""
     if error:
@@ -688,6 +696,27 @@ def auth_google_connect_callback(
     issued_at = _google_connect_states.pop(state, None)
     if not issued_at or (time.time() - issued_at > 600):
         return RedirectResponse(f"{config.web_app_url}?error=invalid_state")
+
+    # Check that user granted all required scopes
+    granted_scopes = set(scope.split()) if scope else set()
+    missing_scopes = _REQUIRED_GOOGLE_SCOPES - granted_scopes
+    if missing_scopes:
+        logger.warning("google_connect: missing scopes %s, re-prompting", missing_scopes)
+        # Re-store state so the next callback can use it
+        _google_connect_states[state] = time.time()
+        params = {
+            "client_id": config.google_client_id,
+            "redirect_uri": f"{config.google_web_redirect_uri}/auth/google/callback",
+            "response_type": "code",
+            "scope": " ".join(SCOPES),
+            "access_type": "offline",
+            "prompt": "consent",
+            "state": state,
+            "include_granted_scopes": "true",
+        }
+        return RedirectResponse(
+            f"{config.web_app_url}/permissions-required?retry_url={urllib.parse.quote(f'https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}')}"
+        )
 
     # Extract user_id and auth_token from state
     parts = state.split("|")
@@ -816,17 +845,20 @@ def auth_google_redirect(signin: str | None = None):
 
 
 @app.get("/")
-def root_callback(code: str | None = None, state: str | None = None, error: str | None = None):
+def root_callback(code: str | None = None, state: str | None = None, error: str | None = None, scope: str | None = None):
     """Handle the OAuth callback at the root path (Google redirects to http://localhost:8080).
 
     If no OAuth query params are present, returns a simple health check.
     """
     if not code and not state and not error:
         return {"status": "ok", "service": "scheduler-control-plane"}
-    return auth_google_callback(code=code, state=state, error=error)
+    return auth_google_callback(code=code, state=state, error=error, scope=scope)
 
 
-def auth_google_callback(code: str | None = None, state: str | None = None, error: str | None = None):
+def auth_google_callback(
+    code: str | None = None, state: str | None = None, error: str | None = None,
+    scope: str | None = None,
+):
     """Handle the OAuth callback from Google (legacy flow).
 
     Exchanges the authorization code for tokens, upserts the user in the
@@ -842,6 +874,26 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
     issued_at = _oauth_states.pop(state, None)
     if not issued_at or (time.time() - issued_at > 600):
         return RedirectResponse(f"{config.web_app_url}?error=invalid_state")
+
+    # Check that user granted all required scopes
+    granted_scopes = set(scope.split()) if scope else set()
+    missing_scopes = _REQUIRED_GOOGLE_SCOPES - granted_scopes
+    if missing_scopes:
+        logger.warning("google_callback_legacy: missing scopes %s, re-prompting", missing_scopes)
+        _oauth_states[state] = time.time()
+        params = {
+            "client_id": config.google_client_id,
+            "redirect_uri": config.google_web_redirect_uri,
+            "response_type": "code",
+            "scope": " ".join(SCOPES),
+            "access_type": "offline",
+            "prompt": "consent",
+            "state": state,
+            "include_granted_scopes": "true",
+        }
+        return RedirectResponse(
+            f"{config.web_app_url}/permissions-required?retry_url={urllib.parse.quote(f'https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}')}"
+        )
 
     is_signin = state.endswith("|signin=1")
 
@@ -954,7 +1006,16 @@ def auth_google_callback(code: str | None = None, state: str | None = None, erro
 @app.get("/auth/me")
 def auth_me(session: dict = Depends(get_authenticated_user)):
     """Return the current user's info."""
-    return {"user_id": session["user_id"], "email": session["email"]}
+    user_id = session["user_id"]
+    # Check if user has failed onboarding (likely missing scopes)
+    from scheduler.db import get_user_by_id as _get_user_me
+    db_user = _get_user_me(user_id)
+    needs_reauth = db_user is not None and db_user.onboarding_status == "failed"
+    return {
+        "user_id": user_id,
+        "email": session["email"],
+        "needs_reauth": needs_reauth,
+    }
 
 
 # --- Session store ---

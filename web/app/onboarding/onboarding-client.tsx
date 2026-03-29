@@ -12,6 +12,7 @@ import FailedState from '@/components/onboarding/FailedState';
 interface UserInfo {
   user_id: string;
   email: string;
+  needs_reauth?: boolean;
 }
 
 interface OnboardingClientProps {
@@ -33,6 +34,11 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
     captureSessionFromURL();
     api<UserInfo>('/auth/me')
       .then((data) => {
+        if (data.needs_reauth) {
+          const connectUrl = `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google/connect?token=${getSession()}`;
+          window.location.href = `/permissions-required?retry_url=${encodeURIComponent(connectUrl)}`;
+          return;
+        }
         setUser(data);
         track('page_view', { page: 'onboarding' });
         setLoading(false);
