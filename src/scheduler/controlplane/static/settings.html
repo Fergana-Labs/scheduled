@@ -172,27 +172,19 @@
       if (urlToken) {
         TOKEN = urlToken;
         localStorage.setItem('scheduled_session', urlToken);
-        // Clean URL
         window.history.replaceState({}, '', '/settings');
       } else {
         TOKEN = localStorage.getItem('scheduled_session');
       }
-      if (!TOKEN) {
-        window.location.href = BASE + '/auth/google';
-        return;
-      }
+      // Try loading settings — self-hosted mode works without a token
       loadSettings();
     }
 
     async function api(path, options = {}) {
-      const res = await fetch(BASE + path, {
-        ...options,
-        headers: {
-          'Authorization': 'Bearer ' + TOKEN,
-          'Content-Type': 'application/json',
-          ...(options.headers || {}),
-        },
-      });
+      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+      if (TOKEN) headers['Authorization'] = 'Bearer ' + TOKEN;
+
+      const res = await fetch(BASE + path, { ...options, headers });
       if (res.status === 401 || res.status === 403) {
         localStorage.removeItem('scheduled_session');
         window.location.href = BASE + '/auth/google';

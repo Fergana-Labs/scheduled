@@ -544,8 +544,29 @@ def _verify_session(token: str) -> dict | None:
 # --- Unified auth dependency ---
 
 
+def _get_self_hosted_user() -> dict | None:
+    """Return the single user in self-hosted mode, or None."""
+    from scheduler.db import get_all_user_ids, get_user_by_id
+    user_ids = get_all_user_ids()
+    if not user_ids:
+        return None
+    user = get_user_by_id(user_ids[0])
+    if not user:
+        return None
+    return {"user_id": str(user.id), "email": user.email}
+
+
 def get_authenticated_user(request: Request) -> dict:
-    """Validate Auth0 JWT from Authorization header, with legacy HMAC fallback."""
+    """Validate Auth0 JWT from Authorization header, with legacy HMAC fallback.
+
+    In self-hosted mode, returns the single user without auth.
+    """
+    if _is_self_hosted_mode():
+        user = _get_self_hosted_user()
+        if user:
+            return user
+        raise HTTPException(status_code=401, detail="No user configured")
+
     auth_header = request.headers.get("authorization", "")
     if not auth_header.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -1202,8 +1223,17 @@ def _cleanup_expired_sessions() -> None:
         del sessions[tok]
 
 
-def get_session(authorization: str = Header()) -> dict:
-    """Validate the session token from the Authorization header."""
+def get_session(authorization: str = Header(default="")) -> dict:
+    """Validate the session token from the Authorization header.
+
+    In self-hosted mode, returns the single user without auth.
+    """
+    if _is_self_hosted_mode():
+        user = _get_self_hosted_user()
+        if user:
+            return user
+        raise HTTPException(status_code=401, detail="No user configured")
+
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid authorization header")
 
