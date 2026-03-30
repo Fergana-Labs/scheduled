@@ -2401,18 +2401,15 @@ def _process_messages(user_id: str, email_address: str, message_ids: list[str]) 
                 logger.info("gmail: message %s is a draft, skipping", message_id)
                 continue
 
-            # Sync scheduling link windows for any message that contains one
-            # (handles both user-sent messages and incoming messages on other accounts)
-            try:
-                user_tz = calendar.get_user_timezone()
-                _sync_scheduling_link_on_send(user_id, email, user_tz)
-            except Exception:
-                logger.debug("gmail: failed to sync scheduling link for message %s", message_id, exc_info=True)
-
             # User-sent messages: check if there's a pending invite for this thread
             logger.info("gmail: message %s sender=%s user=%s thread=%s subject=%s labels=%s", message_id, email.sender, email_address, email.thread_id, getattr(email, 'subject', ''), email.label_ids)
             if email.sender and email_address in email.sender:
                 _handle_sent_message_for_invite(user_id, email, gmail, calendar)
+                try:
+                    user_tz = calendar.get_user_timezone()
+                    _sync_scheduling_link_on_send(user_id, email, user_tz)
+                except Exception:
+                    logger.debug("gmail: failed to sync scheduling link for message %s", message_id, exc_info=True)
                 try:
                     from scheduler import analytics
                     analytics.record_draft_sent(user_id, email.thread_id, email.body, email.date, message_id=message_id, sender=email.sender)
