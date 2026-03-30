@@ -555,7 +555,7 @@ def get_composed_draft_by_thread(user_id: str, thread_id: str) -> dict | None:
     """Get the most recent unsent composed draft for a user+thread pair."""
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
-            "SELECT * FROM composed_drafts WHERE user_id = %s AND thread_id = %s AND sent_at IS NULL ORDER BY composed_at DESC LIMIT 1",
+            "SELECT * FROM composed_drafts WHERE user_id = %s AND thread_id = %s AND sent_at IS NULL AND auto_deleted_at IS NULL ORDER BY composed_at DESC LIMIT 1",
             (user_id, thread_id),
         )
         row = cur.fetchone()
@@ -606,6 +606,7 @@ def get_stale_unsent_drafts(hours: int = 48) -> list[dict]:
             FROM composed_drafts cd
             JOIN users u ON u.id = cd.user_id
             WHERE cd.sent_at IS NULL
+              AND cd.auto_deleted_at IS NULL
               AND cd.composed_at < now() - make_interval(hours => %s)
               AND u.draft_auto_delete_enabled = TRUE
               AND cd.refresh_count >= 3
@@ -617,10 +618,10 @@ def get_stale_unsent_drafts(hours: int = 48) -> list[dict]:
 
 
 def mark_draft_auto_deleted(draft_id: str) -> None:
-    """Mark a composed draft as auto-deleted by setting sent_at (prevents re-processing)."""
+    """Soft-delete a composed draft so it's excluded from active queries but preserved for analytics."""
     with _conn() as conn, conn.cursor() as cur:
         cur.execute(
-            "DELETE FROM composed_drafts WHERE id = %s",
+            "UPDATE composed_drafts SET auto_deleted_at = now() WHERE id = %s",
             (draft_id,),
         )
         conn.commit()
@@ -642,6 +643,7 @@ def get_drafts_eligible_for_refresh(max_refresh_count: int = 3) -> list[dict]:
             FROM composed_drafts cd
             JOIN users u ON u.id = cd.user_id
             WHERE cd.sent_at IS NULL
+              AND cd.auto_deleted_at IS NULL
               AND cd.refresh_count < %s
               AND u.draft_auto_delete_enabled = TRUE
               AND u.system_enabled = TRUE

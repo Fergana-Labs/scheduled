@@ -12,8 +12,10 @@ Prerequisites:
 
 import logging
 
+from google.auth.exceptions import RefreshError
+
 from scheduler.config import config
-from scheduler.db import get_all_user_ids, get_user_by_id, update_gmail_history_id
+from scheduler.db import get_all_user_ids, get_user_by_id, update_gmail_history_id, update_onboarding_status
 from scheduler.gmail.client import GmailClient
 
 logger = logging.getLogger(__name__)
@@ -76,10 +78,23 @@ def renew_all_watches() -> dict:
         if not user or not user.google_refresh_token:
             logger.info("gmail_watch: skipping disconnected user=%s", user_id)
             continue
+        if not user.system_enabled:
+            logger.info("gmail_watch: skipping disabled user=%s", user_id)
+            continue
+        if not user.gmail_history_id:
+            logger.info("gmail_watch: skipping user=%s with no gmail_history_id (incomplete onboarding)", user_id)
+            continue
+        if user.onboarding_status == "failed":
+            logger.info("gmail_watch: skipping user=%s pending re-auth", user_id)
+            continue
 
         try:
             setup_gmail_watch(user_id)
             renewed += 1
+        except RefreshError as e:
+            logger.warning("gmail_watch: invalid_grant for user=%s, marking for re-auth: %s", user_id, e)
+            update_onboarding_status(str(user_id), "failed")
+            failed.append((user_id, str(e)))
         except Exception as e:
             logger.error("gmail_watch: failed to renew for user=%s: %s", user_id, e)
             failed.append((user_id, str(e)))
