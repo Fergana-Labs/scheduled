@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scheduled</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fafafa;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      padding: 32px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .status-row:last-child { border-bottom: none; }
+    .label {
+      font-size: 14px;
+      color: #666;
+    }
+    .value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .dot.green { background: #22c55e; }
+    .dot.yellow { background: #eab308; }
+    .dot.red { background: #ef4444; }
+    .dot.gray { background: #9ca3af; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 20px;
+      margin-bottom: 4px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .badge.on { background: #f0fdf4; color: #166534; }
+    .badge.off { background: #fef2f2; color: #991b1b; }
+    .badge.pending { background: #fffbeb; color: #92400e; }
+    .footer {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      gap: 12px;
+    }
+    .footer a {
+      font-size: 13px;
+      color: #666;
+      text-decoration: none;
+    }
+    .footer a:hover { color: #111; }
+    #loading {
+      text-align: center;
+      padding: 40px 0;
+      color: #999;
+    }
+    #error {
+      text-align: center;
+      padding: 40px 0;
+      color: #991b1b;
+      display: none;
+    }
+    #dashboard { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="loading">Loading...</div>
+    <div id="error">Failed to load status. Is the server running?</div>
+    <div id="dashboard">
+      <h1>Scheduled</h1>
+
+      <div class="section-label">System</div>
+      <div class="status-row">
+        <span class="label">Status</span>
+        <span class="value" id="sys-status"></span>
+      </div>
+      <div class="status-row">
+        <span class="label">Last poll</span>
+        <span class="value" id="last-poll"></span>
+      </div>
+      <div class="status-row">
+        <span class="label">Poll interval</span>
+        <span class="value" id="poll-interval"></span>
+      </div>
+
+      <div class="section-label">Account</div>
+      <div class="status-row">
+        <span class="label">Email</span>
+        <span class="value" id="user-email"></span>
+      </div>
+      <div class="status-row">
+        <span class="label">Gmail connected</span>
+        <span class="value" id="gmail-status"></span>
+      </div>
+      <div class="status-row">
+        <span class="label">Autopilot</span>
+        <span class="value" id="autopilot"></span>
+      </div>
+
+      <div class="section-label">Guides</div>
+      <div class="status-row">
+        <span class="label">Email style</span>
+        <span class="value" id="guide-style"></span>
+      </div>
+      <div class="status-row">
+        <span class="label">Scheduling preferences</span>
+        <span class="value" id="guide-prefs"></span>
+      </div>
+
+      <div class="footer">
+        <a href="/settings">Settings</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function load() {
+      try {
+        const res = await fetch('/api/status');
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        render(data);
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+      }
+    }
+
+    function render(data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+
+      const user = data.user;
+
+      // System status
+      if (data.last_poll_seconds_ago !== null && data.last_poll_seconds_ago < data.polling_interval_seconds * 2) {
+        document.getElementById('sys-status').innerHTML = '<span class="dot green"></span>Running';
+      } else if (data.last_poll_seconds_ago !== null) {
+        document.getElementById('sys-status').innerHTML = '<span class="dot yellow"></span>Slow';
+      } else {
+        document.getElementById('sys-status').innerHTML = '<span class="dot gray"></span>Starting up';
+      }
+
+      // Last poll
+      if (data.last_poll_seconds_ago !== null) {
+        const ago = data.last_poll_seconds_ago;
+        if (ago < 60) {
+          document.getElementById('last-poll').textContent = ago + 's ago';
+        } else {
+          document.getElementById('last-poll').textContent = Math.floor(ago / 60) + 'm ago';
+        }
+      } else {
+        document.getElementById('last-poll').textContent = 'Not yet';
+      }
+
+      // Poll interval
+      const mins = Math.floor(data.polling_interval_seconds / 60);
+      document.getElementById('poll-interval').textContent = mins + ' min';
+
+      if (!user) {
+        document.getElementById('user-email').textContent = 'Not set up';
+        document.getElementById('gmail-status').innerHTML = '<span class="badge off">No</span>';
+        document.getElementById('autopilot').innerHTML = '<span class="badge off">Off</span>';
+        document.getElementById('guide-style').innerHTML = '<span class="badge pending">Missing</span>';
+        document.getElementById('guide-prefs').innerHTML = '<span class="badge pending">Missing</span>';
+        return;
+      }
+
+      // Account
+      document.getElementById('user-email').textContent = user.email;
+      document.getElementById('gmail-status').innerHTML = user.has_gmail_history
+        ? '<span class="badge on">Connected</span>'
+        : '<span class="badge off">Not connected</span>';
+      document.getElementById('autopilot').innerHTML = user.autopilot_enabled
+        ? '<span class="badge on">On</span>'
+        : '<span class="badge off">Off</span>';
+
+      // Guides
+      const guides = user.guides || [];
+      document.getElementById('guide-style').innerHTML = guides.includes('email_style')
+        ? '<span class="badge on">Learned</span>'
+        : '<span class="badge pending">Not yet</span>';
+      document.getElementById('guide-prefs').innerHTML = guides.includes('scheduling_preferences')
+        ? '<span class="badge on">Learned</span>'
+        : '<span class="badge pending">Not yet</span>';
+    }
+
+    load();
+    setInterval(load, 30000);
+  </script>
+</body>
+</html>

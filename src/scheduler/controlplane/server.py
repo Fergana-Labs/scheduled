@@ -953,23 +953,31 @@ def auth_google_redirect(signin: str | None = None):
     return RedirectResponse(url)
 
 
-def _get_self_hosted_status() -> dict:
-    from scheduler.db import get_all_user_ids, get_user_by_id
+@app.get("/api/status")
+def api_status():
+    """Status API for the self-hosted dashboard."""
+    from scheduler.db import get_all_user_ids, get_user_by_id, get_guides_for_user
 
     user_ids = get_all_user_ids()
     user = get_user_by_id(user_ids[0]) if user_ids else None
 
-    last_poll_seconds_ago = int(time.time() - _last_poll_at) if _last_poll_at else None
+    user_data = None
+    if user:
+        guides = get_guides_for_user(user.id)
+        user_data = {
+            "email": user.email,
+            "system_enabled": user.system_enabled,
+            "has_gmail_history": user.gmail_history_id is not None,
+            "onboarding_status": user.onboarding_status,
+            "autopilot_enabled": user.autopilot_enabled,
+            "guides": [g.name for g in guides],
+        }
 
     return {
         "status": "running",
-        "service": "scheduled (self-hosted)",
         "polling_interval_seconds": config.watcher_poll_interval,
-        "last_poll_seconds_ago": last_poll_seconds_ago,
-        "user": user.email if user else None,
-        "system_enabled": user.system_enabled if user else None,
-        "has_gmail_history": user.gmail_history_id is not None if user else None,
-        "onboarding_status": user.onboarding_status if user else None,
+        "last_poll_seconds_ago": int(time.time() - _last_poll_at) if _last_poll_at else None,
+        "user": user_data,
     }
 
 
@@ -977,13 +985,17 @@ def _get_self_hosted_status() -> dict:
 def root_callback(code: str | None = None, state: str | None = None, error: str | None = None, scope: str | None = None):
     """Handle the OAuth callback at the root path (Google redirects to http://localhost:8080).
 
-    If no OAuth query params are present, returns a simple health check.
+    If no OAuth query params are present, serves the dashboard (self-hosted) or health check.
     """
-    if not code and not state and not error:
-        if _is_self_hosted_mode():
-            return _get_self_hosted_status()
-        return {"status": "ok", "service": "scheduler-control-plane"}
-    return auth_google_callback(code=code, state=state, error=error, scope=scope)
+    if code or state or error:
+        return auth_google_callback(code=code, state=state, error=error, scope=scope)
+
+    if _is_self_hosted_mode():
+        dashboard = _STATIC_DIR / "dashboard.html"
+        if dashboard.exists():
+            return HTMLResponse(dashboard.read_text())
+
+    return {"status": "ok", "service": "scheduler-control-plane"}
 
 
 def auth_google_callback(
