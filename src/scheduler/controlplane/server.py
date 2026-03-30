@@ -2215,14 +2215,13 @@ def onboarding_run(request: Request, background_tasks: BackgroundTasks):
 def _sync_scheduling_link_on_send(user_id: str, email, user_timezone: str) -> None:
     """If the sent email contains a scheduling link, re-analyze the body and update the link's windows."""
     import re
-    from scheduler.config import config
     from scheduler.db import get_scheduling_link, update_scheduling_link_windows
     from scheduler.drafts.composer import _analyze_draft_for_scheduling
 
     body = email.body or ""
-    # Extract scheduling link ID from the email body
-    pattern = re.escape(config.web_app_url) + r"/schedule/([0-9a-f\-]{36})"
-    match = re.search(pattern, body)
+    # Extract scheduling link ID from the email body.
+    # Match /schedule/<uuid> regardless of the domain (www vs non-www, etc.)
+    match = re.search(r"/schedule/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})", body)
     if not match:
         return
 
@@ -2402,15 +2401,18 @@ def _process_messages(user_id: str, email_address: str, message_ids: list[str]) 
                 logger.info("gmail: message %s is a draft, skipping", message_id)
                 continue
 
+            # Sync scheduling link windows for any message that contains one
+            # (handles both user-sent messages and incoming messages on other accounts)
+            try:
+                user_tz = calendar.get_user_timezone()
+                _sync_scheduling_link_on_send(user_id, email, user_tz)
+            except Exception:
+                logger.debug("gmail: failed to sync scheduling link for message %s", message_id, exc_info=True)
+
             # User-sent messages: check if there's a pending invite for this thread
             logger.info("gmail: message %s sender=%s user=%s thread=%s subject=%s labels=%s", message_id, email.sender, email_address, email.thread_id, getattr(email, 'subject', ''), email.label_ids)
             if email.sender and email_address in email.sender:
                 _handle_sent_message_for_invite(user_id, email, gmail, calendar)
-                try:
-                    user_tz = calendar.get_user_timezone()
-                    _sync_scheduling_link_on_send(user_id, email, user_tz)
-                except Exception:
-                    logger.debug("gmail: failed to sync scheduling link for message %s", message_id, exc_info=True)
                 try:
                     from scheduler import analytics
                     analytics.record_draft_sent(user_id, email.thread_id, email.body, email.date, message_id=message_id, sender=email.sender)
