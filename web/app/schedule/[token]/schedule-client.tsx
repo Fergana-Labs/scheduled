@@ -281,33 +281,67 @@ function CalendarPicker({
 }) {
   const allSlots = generateSlots(windows, durationMinutes, hostTimezone);
   const availableDates = new Set(allSlots.map((s) => s.dateKey));
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [viewMonth, setViewMonth] = useState<Date>(() => {
-    // Start on the month of the first available date
+
+  // Week-based navigation: start on the week containing the first available slot
+  const getWeekStart = (date: Date) => {
+    const d = new Date(date);
+    d.setDate(d.getDate() - d.getDay()); // Sunday
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  const [weekStart, setWeekStart] = useState<Date>(() => {
     if (allSlots.length > 0) {
-      return new Date(allSlots[0].start.getFullYear(), allSlots[0].start.getMonth(), 1);
+      return getWeekStart(allSlots[0].start);
     }
-    return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    return getWeekStart(new Date());
   });
 
-  // Build calendar grid for the current month
-  const year = viewMonth.getFullYear();
-  const month = viewMonth.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const monthLabel = viewMonth.toLocaleDateString(undefined, {
-    month: 'long',
-    year: 'numeric',
+  // Build the 7 days of the current week
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + i);
+    return d;
   });
 
-  const calendarDays: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) calendarDays.push(null);
-  for (let d = 1; d <= daysInMonth; d++) calendarDays.push(d);
+  const toDateKey = (date: Date) => {
+    const y = date.getFullYear();
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const d = date.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
 
-  const toDateKey = (day: number) => {
-    const m = (month + 1).toString().padStart(2, '0');
-    const d = day.toString().padStart(2, '0');
-    return `${year}-${m}-${d}`;
+  // Auto-select the first available date in the current week
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  useEffect(() => {
+    const firstAvail = weekDays.find((d) => availableDates.has(toDateKey(d)));
+    if (firstAvail) {
+      setSelectedDate(toDateKey(firstAvail));
+    } else {
+      setSelectedDate(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weekStart.getTime()]);
+
+  const weekLabel = (() => {
+    const end = new Date(weekStart);
+    end.setDate(end.getDate() + 6);
+    const sameMonth = weekStart.getMonth() === end.getMonth();
+    if (sameMonth) {
+      return `${weekStart.toLocaleDateString(undefined, { month: 'long', day: 'numeric' })} – ${end.getDate()}, ${end.getFullYear()}`;
+    }
+    return `${weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${end.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  })();
+
+  const prevWeek = () => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() - 7);
+    setWeekStart(d);
+  };
+  const nextWeek = () => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + 7);
+    setWeekStart(d);
   };
 
   const slotsForDate = selectedDate
@@ -323,64 +357,47 @@ function CalendarPicker({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-6">
-      {/* Calendar */}
-      <div className="sm:w-72 flex-shrink-0">
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
-          Select a date
-        </h3>
+    <div className="flex flex-col gap-6">
+      {/* Week selector */}
+      <div>
         <div className="border border-gray-200 rounded-xl p-4">
-          {/* Month navigation */}
+          {/* Week navigation */}
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() => setViewMonth(new Date(year, month - 1, 1))}
+              onClick={prevWeek}
               className="p-1 hover:bg-gray-100 rounded transition-colors"
             >
               <ChevronLeft className="w-4 h-4 text-gray-600" />
             </button>
             <span className="text-sm font-semibold text-gray-800">
-              {monthLabel}
+              {weekLabel}
             </span>
             <button
-              onClick={() => setViewMonth(new Date(year, month + 1, 1))}
+              onClick={nextWeek}
               className="p-1 hover:bg-gray-100 rounded transition-colors"
             >
               <ChevronRight className="w-4 h-4 text-gray-600" />
             </button>
           </div>
 
-          {/* Day headers */}
-          <div className="grid grid-cols-7 gap-1 mb-1">
-            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
-              <div
-                key={d}
-                className="text-center text-xs font-medium text-gray-400 py-1"
-              >
-                {d}
-              </div>
-            ))}
-          </div>
-
-          {/* Days */}
+          {/* Week days */}
           <div className="grid grid-cols-7 gap-1">
-            {calendarDays.map((day, i) => {
-              if (day === null) {
-                return <div key={`empty-${i}`} />;
-              }
+            {weekDays.map((day) => {
               const dateKey = toDateKey(day);
               const hasSlots = availableDates.has(dateKey);
               const isSelected = selectedDate === dateKey;
               const today = new Date();
               const isPast =
-                new Date(year, month, day) <
+                day <
                 new Date(today.getFullYear(), today.getMonth(), today.getDate());
+              const dayLabel = day.toLocaleDateString(undefined, { weekday: 'short' });
 
               return (
                 <button
                   key={dateKey}
                   onClick={() => hasSlots && !isPast && setSelectedDate(dateKey)}
                   disabled={!hasSlots || isPast}
-                  className={`aspect-square rounded-lg flex items-center justify-center text-sm transition-all ${
+                  className={`flex flex-col items-center gap-1 py-2 rounded-lg text-sm transition-all ${
                     isSelected
                       ? 'bg-black text-white font-semibold'
                       : hasSlots && !isPast
@@ -388,7 +405,11 @@ function CalendarPicker({
                         : 'text-gray-300 cursor-default'
                   }`}
                 >
-                  {day}
+                  <span className="text-xs">{dayLabel}</span>
+                  <span>{day.getDate()}</span>
+                  {hasSlots && !isPast && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-black'}`} />
+                  )}
                 </button>
               );
             })}
@@ -397,11 +418,11 @@ function CalendarPicker({
       </div>
 
       {/* Time slots for selected date */}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0">
         {!selectedDate ? (
-          <div className="flex items-center justify-center h-full min-h-[200px]">
+          <div className="flex items-center justify-center min-h-[100px]">
             <p className="text-gray-400 text-sm">
-              Select a date to see available times
+              No available times this week. Try another week.
             </p>
           </div>
         ) : (
