@@ -16,6 +16,8 @@ class Event:
     end: datetime
     description: str = ""
     source: str = ""  # Where this commitment was found (gmail, text, slack, etc.)
+    response_status: str = ""  # User's response: accepted, tentative, needsAction, declined
+    organizer_email: str = ""  # Email of the event organizer
 
 
 def _parse_event_datetime(event_data: dict, field: str) -> datetime:
@@ -32,6 +34,18 @@ def _parse_event_datetime(event_data: dict, field: str) -> datetime:
     return datetime.fromisoformat(event_data[field]["date"]).replace(tzinfo=timezone.utc)
 
 
+def _user_response_status(event_data: dict) -> str:
+    """Extract the current user's response status from an event's attendee list.
+
+    Returns one of: 'accepted', 'tentative', 'needsAction', 'declined', or ''
+    (empty string if the user is the organizer with no attendee entry, e.g. their own event).
+    """
+    for attendee in event_data.get("attendees", []):
+        if attendee.get("self"):
+            return attendee.get("responseStatus", "")
+    return ""
+
+
 def _event_from_api(event_data: dict) -> Event:
     """Convert a Google Calendar API event dict to our Event dataclass."""
     return Event(
@@ -40,6 +54,8 @@ def _event_from_api(event_data: dict) -> Event:
         start=_parse_event_datetime(event_data, "start"),
         end=_parse_event_datetime(event_data, "end"),
         description=event_data.get("description", ""),
+        response_status=_user_response_status(event_data),
+        organizer_email=event_data.get("organizer", {}).get("email", ""),
     )
 
 

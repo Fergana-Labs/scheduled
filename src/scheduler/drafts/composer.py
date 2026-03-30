@@ -256,6 +256,8 @@ class LocalDraftBackend:
                 "end": e.end.isoformat(),
                 "description": e.description,
                 "source": e.source,
+                "response_status": e.response_status,
+                "organizer_email": e.organizer_email,
             }
             for e in events
         ]
@@ -611,7 +613,8 @@ class DraftComposer:
             "   - If a time was confirmed but no calendar invite was sent, draft a confirmation reply.\n"
             "   - If a meeting was cancelled/rescheduled but the calendar still has the old event, note this discrepancy.\n"
             "3. Inspect the user's availability using get_calendar_events over a reasonable window "
-            "(for example, the next 14 days).\n"
+            "(for example, the next 14 days). Each event includes response_status and organizer_email. "
+            "A tentative calendar hold sent by the counterparty is not a conflict.\n"
             "4. Based on the thread context, draft the appropriate response:\n"
             "   - If someone is requesting a meeting or proposing times: propose concrete meeting times "
             "that respect the user's existing commitments. "
