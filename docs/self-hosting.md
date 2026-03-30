@@ -11,7 +11,7 @@
 Open Claude Code and paste this prompt:
 
 ```
-Clone https://github.com/Fergana-Labs/scheduled (branch: self-hosted) and follow the setup-prompt.md file to deploy it to Google Cloud Run for me.
+Clone https://github.com/Fergana-Labs/scheduled and follow the setup-prompt.md file to deploy it to Google Cloud Run for me.
 ```
 
 Claude Code will walk you through the rest — creating a GCP project, deploying to Cloud Run, and connecting your Gmail.
