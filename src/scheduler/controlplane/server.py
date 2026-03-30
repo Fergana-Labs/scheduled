@@ -45,6 +45,7 @@ logger = logging.getLogger(__name__)
 _WATCH_RENEWAL_INTERVAL = 12 * 3600  # 12 hours
 _onboarding_status: dict[str, dict] = {}  # user_id -> {"status": ..., "error": ...}
 _onboarding_lock = threading.Lock()
+_last_poll_at: float | None = None  # timestamp of last completed poll cycle
 _UNKNOWN_GMAIL_WEBHOOK_TTL = 300  # 5 minutes
 _unknown_gmail_webhook_emails: dict[str, float] = {}
 
@@ -391,6 +392,9 @@ async def _gmail_poll_loop():
                     logger.info("gmail_poll: cleaned up %d old processed_messages rows", deleted)
             except Exception:
                 logger.exception("gmail_poll: cleanup failed")
+
+        global _last_poll_at
+        _last_poll_at = time.time()
 
         await asyncio.sleep(config.watcher_poll_interval)
 
@@ -949,6 +953,26 @@ def auth_google_redirect(signin: str | None = None):
     return RedirectResponse(url)
 
 
+def _get_self_hosted_status() -> dict:
+    from scheduler.db import get_all_user_ids, get_user_by_id
+
+    user_ids = get_all_user_ids()
+    user = get_user_by_id(user_ids[0]) if user_ids else None
+
+    last_poll_seconds_ago = int(time.time() - _last_poll_at) if _last_poll_at else None
+
+    return {
+        "status": "running",
+        "service": "scheduled (self-hosted)",
+        "polling_interval_seconds": config.watcher_poll_interval,
+        "last_poll_seconds_ago": last_poll_seconds_ago,
+        "user": user.email if user else None,
+        "system_enabled": user.system_enabled if user else None,
+        "has_gmail_history": user.gmail_history_id is not None if user else None,
+        "onboarding_status": user.onboarding_status if user else None,
+    }
+
+
 @app.get("/")
 def root_callback(code: str | None = None, state: str | None = None, error: str | None = None, scope: str | None = None):
     """Handle the OAuth callback at the root path (Google redirects to http://localhost:8080).
@@ -956,6 +980,8 @@ def root_callback(code: str | None = None, state: str | None = None, error: str 
     If no OAuth query params are present, returns a simple health check.
     """
     if not code and not state and not error:
+        if _is_self_hosted_mode():
+            return _get_self_hosted_status()
         return {"status": "ok", "service": "scheduler-control-plane"}
     return auth_google_callback(code=code, state=state, error=error, scope=scope)
 
