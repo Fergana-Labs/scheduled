@@ -1,5 +1,6 @@
 """Lifecycle welcome email: send a personalized Postmark email, then create an example draft reply."""
 
+import html as html_mod
 import logging
 import time
 from datetime import datetime, timedelta
@@ -25,24 +26,39 @@ POSTMARK_SEND_URL = "https://api.postmarkapp.com/email"
 WELCOME_SUBJECT = "Welcome to Scheduled!"
 
 WELCOME_TEMPLATE = """\
-Hello and welcome to Scheduled!
+<p>Hello and welcome to Scheduled!</p>
 
-We're excited you are here! Our goal is to empower you to focus on what matters by automating away the mind-numbing tasks that have become our lives. We image a world where humans don't have to spend another minute doing such mundane tasks (trust us, one of us used to be a management consultant, so we've had our fair share of sleep-less nights aligning boxes and scheduling meetings).
+<p>We're excited you are here! Our goal is to empower you to focus on what matters \
+by automating away the mind-numbing tasks that have become our lives. We image a world \
+where humans don't have to spend another minute doing such mundane tasks (trust us, one \
+of us used to be a management consultant, so we've had our fair share of sleep-less nights \
+aligning boxes and scheduling meetings).</p>
 
-Unlike other scheduling tools like Calendly, Cal.com, or Fxyer, our product philosophy is built around seamlessly fitting into your existing scheduling preferences and workflow. If you head over to https://tryscheduled.com/settings, you will find guides based on what we have learned from how you have scheduled in the past. These will be used by our agent to help you schedule future meetings.
+<p>Unlike other scheduling tools like Calendly, Cal&#46;com, or Fxyer, our product \
+philosophy is built around seamlessly fitting into your existing scheduling preferences \
+and workflow. If you head over to <a href="https://tryscheduled.com/settings">your settings</a>, \
+you will find guides based on what we have learned from how you have scheduled in the past. \
+These will be used by our agent to help you schedule future meetings.</p>
 
-Note that we take privacy very seriously and this is the only personal data of yours we store on our server, which can be verified by looking through our open source codebase.
+<p>Note that we take privacy very seriously and this is the only personal data of yours \
+we store on our server, which can be verified by looking through our open source codebase.</p>
 
-{personalized_snippet}
+<p>{personalized_snippet}</p>
 
-You are all set for now. Expect to see drafts written by our agent pop-up automatically in threads where scheduling is a concern. We handle all of the background work of checking against your calendar, preferences, and sending invites for you. Feel free to edit these drafts or just send as is.
+<p>You are all set for now. Expect to see drafts written by our agent pop-up automatically \
+in threads where scheduling is a concern. We handle all of the background work of checking \
+against your calendar, preferences, and sending invites for you. Feel free to edit these \
+drafts or just send as is.</p>
 
-If this resonates, we would love to hop on a quick 15 minute call to get you up to speed and to see how else we can build this to match your needs. Just reply to the email (there should be a draft auto-populated below) and we'll use scheduled to automatically find a time.
+<p>If this resonates, we would love to hop on a quick 15 minute call to get you up to speed \
+and to see how else we can build this to match your needs. Just reply to the email (there \
+should be a draft auto-populated below) and we'll use scheduled to automatically find a time.</p>
 
-Warmly,
+<p>Warmly,</p>
 
-Sam
-CEO and Co-Founder of Scheduled (https://tryscheduled.com) by Fergana Labs (https://ferganalabs.com)"""
+<p>Sam<br>CEO and Co-Founder of \
+<a href="https://tryscheduled.com">Scheduled</a> by \
+<a href="https://ferganalabs.com">Fergana Labs</a></p>"""
 
 
 def _get_anthropic_client() -> Anthropic:
@@ -111,7 +127,7 @@ def generate_welcome_email(
     else:
         snippet = "We'll learn your scheduling preferences over time as you use Scheduled."
 
-    body = WELCOME_TEMPLATE.format(personalized_snippet=snippet)
+    body = WELCOME_TEMPLATE.format(personalized_snippet=html_mod.escape(snippet))
     return {"subject": WELCOME_SUBJECT, "body": body}
 
 
@@ -239,7 +255,7 @@ def send_lifecycle_email(user_id: str) -> None:
                 "From": config.postmark_from_email,
                 "To": user.email,
                 "Subject": subject,
-                "TextBody": welcome_body,
+                "HtmlBody": welcome_body,
             },
             timeout=15,
         )
