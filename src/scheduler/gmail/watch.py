@@ -15,8 +15,10 @@ import logging
 from google.auth.exceptions import RefreshError
 
 from scheduler.config import config
-from scheduler.db import get_all_user_ids, get_user_by_id, update_gmail_history_id, update_onboarding_status
+from scheduler.db import get_all_user_ids, get_user_by_id, update_gmail_history_id, update_onboarding_status, increment_refresh_failures, reset_refresh_failures
 from scheduler.gmail.client import GmailClient
+
+_REFRESH_FAILURE_THRESHOLD = 3
 
 logger = logging.getLogger(__name__)
 
@@ -90,19 +92,22 @@ def renew_all_watches() -> dict:
 
         try:
             setup_gmail_watch(user_id)
+            reset_refresh_failures(str(user_id))
             renewed += 1
         except RefreshError as e:
-            # Retry once — a single RefreshError can be transient (Google rate
-            # limiting, brief outage).  Only mark the user for re-auth if the
-            # retry also fails with RefreshError.
+            # Retry once — transient RefreshErrors happen.
             logger.warning("gmail_watch: RefreshError for user=%s, retrying once: %s", user_id, e)
             try:
                 setup_gmail_watch(user_id)
+                reset_refresh_failures(str(user_id))
                 renewed += 1
-                logger.info("gmail_watch: retry succeeded for user=%s", user_id)
             except RefreshError as e2:
-                logger.warning("gmail_watch: retry also failed for user=%s, marking for re-auth: %s", user_id, e2)
-                update_onboarding_status(str(user_id), "failed")
+                count = increment_refresh_failures(str(user_id))
+                if count >= _REFRESH_FAILURE_THRESHOLD:
+                    logger.warning("gmail_watch: %d consecutive failures for user=%s, marking for re-auth", count, user_id)
+                    update_onboarding_status(str(user_id), "failed")
+                else:
+                    logger.warning("gmail_watch: RefreshError for user=%s (failure %d/%d)", user_id, count, _REFRESH_FAILURE_THRESHOLD)
                 failed.append((user_id, str(e2)))
             except Exception as e2:
                 logger.error("gmail_watch: retry failed with non-auth error for user=%s: %s", user_id, e2)

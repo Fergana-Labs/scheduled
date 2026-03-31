@@ -2394,13 +2394,27 @@ def _handle_sent_message_for_invite(user_id: str, email, gmail: GmailClient, cal
     delete_pending_invite(pending.id)
 
 
+_REFRESH_FAILURE_THRESHOLD = 3
+
+
+def _handle_refresh_error(user_id: str, email: str) -> None:
+    """Increment refresh_failures; mark user for re-auth if threshold reached."""
+    from scheduler.db import increment_refresh_failures, update_onboarding_status
+    count = increment_refresh_failures(user_id)
+    if count >= _REFRESH_FAILURE_THRESHOLD:
+        logger.warning("gmail: %d consecutive RefreshErrors for user=%s, marking for re-auth", count, email)
+        update_onboarding_status(user_id, "failed")
+    else:
+        logger.warning("gmail: RefreshError for user=%s (failure %d/%d)", email, count, _REFRESH_FAILURE_THRESHOLD)
+
+
 def _get_new_message_ids(user_id: str) -> list[str]:
     """Get new Gmail message IDs since the stored history ID and advance the baseline.
 
     Uses the history ID returned by Gmail's History API as the new baseline,
     so no messages are lost between fetching and advancing.
     """
-    from scheduler.db import get_user_by_id, update_gmail_history_id
+    from scheduler.db import get_user_by_id, update_gmail_history_id, reset_refresh_failures
 
     user = get_user_by_id(user_id)
     if not user or not user.gmail_history_id:
@@ -2412,37 +2426,33 @@ def _get_new_message_ids(user_id: str) -> list[str]:
     try:
         new_message_ids, new_history_id = gmail.get_history(user.gmail_history_id)
     except RefreshError:
-        # Retry once — transient RefreshErrors happen (Google rate limits, brief outages).
-        # Only mark user for re-auth if the retry also fails.
-        logger.warning("gmail: RefreshError for user=%s, retrying once", user.email)
+        gmail.close()
+        # Retry once with fresh credentials (handles races where another
+        # thread just refreshed the token).
         try:
             creds = load_credentials(user_id)
             gmail = GmailClient(creds)
             new_message_ids, new_history_id = gmail.get_history(user.gmail_history_id)
         except RefreshError:
-            logger.warning("gmail: retry also failed for user=%s, marking for re-auth", user.email)
-            from scheduler.db import update_onboarding_status
-            update_onboarding_status(user_id, "failed")
+            gmail.close()
+            _handle_refresh_error(user_id, user.email)
             return []
     except Exception:
         logger.warning("gmail: history expired for user=%s, resetting", user.email)
         try:
             new_history_id = gmail.get_current_history_id()
         except RefreshError:
-            logger.warning("gmail: RefreshError during reset for user=%s, retrying once", user.email)
-            try:
-                creds = load_credentials(user_id)
-                gmail = GmailClient(creds)
-                new_history_id = gmail.get_current_history_id()
-            except RefreshError:
-                logger.warning("gmail: retry also failed for user=%s, marking for re-auth", user.email)
-                from scheduler.db import update_onboarding_status
-                update_onboarding_status(user_id, "failed")
-                return []
+            gmail.close()
+            _handle_refresh_error(user_id, user.email)
+            return []
         update_gmail_history_id(user_id, new_history_id)
+        gmail.close()
         return []
 
+    # Success — reset failure counter
+    reset_refresh_failures(user_id)
     update_gmail_history_id(user_id, new_history_id)
+    gmail.close()
     return new_message_ids
 
 
@@ -2624,6 +2634,9 @@ def _process_messages(user_id: str, email_address: str, message_ids: list[str]) 
             else:
                 logger.exception("gmail: failed to process message %s for user=%s", message_id, email_address)
 
+    gmail.close()
+    calendar.close()
+
 
 @app.post("/webhooks/gmail")
 async def gmail_webhook(request: Request, background_tasks: BackgroundTasks):
@@ -2724,6 +2737,17 @@ def web_page_event(req: TrackEventRequest):
 
 
 # --- Admin API routes ---
+
+
+@app.get("/web/api/v1/admin/auth-health")
+def admin_auth_health(admin: dict = Depends(_require_admin)):
+    """Auth health for all connected users: refresh failure counts, status."""
+    from scheduler.db import get_auth_health
+    data = get_auth_health()
+    for row in data:
+        if row.get("updated_at"):
+            row["updated_at"] = row["updated_at"].isoformat()
+    return {"data": data}
 
 
 @app.get("/web/api/v1/admin/funnel")

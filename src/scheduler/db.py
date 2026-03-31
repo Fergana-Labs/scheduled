@@ -46,6 +46,7 @@ class UserRow:
     display_name: str | None = None
     draft_auto_delete_enabled: bool = True
     google_email: str | None = None
+    refresh_failures: int = 0
 
 
 _USER_ROW_FIELDS.update(f.name for f in fields(UserRow))
@@ -513,6 +514,44 @@ def update_onboarding_status(user_id: str, status: str | None) -> None:
             (status, user_id),
         )
         conn.commit()
+
+
+def increment_refresh_failures(user_id: str) -> int:
+    """Increment refresh_failures and return the new count."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET refresh_failures = refresh_failures + 1, updated_at = now() WHERE id = %s RETURNING refresh_failures",
+            (user_id,),
+        )
+        row = cur.fetchone()
+        conn.commit()
+        return row[0] if row else 0
+
+
+def reset_refresh_failures(user_id: str) -> None:
+    """Reset refresh_failures to 0 after a successful API call."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET refresh_failures = 0 WHERE id = %s AND refresh_failures > 0",
+            (user_id,),
+        )
+        conn.commit()
+
+
+def get_auth_health() -> list[dict]:
+    """Return auth health for all active users (for admin dashboard)."""
+    with _conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            SELECT email, onboarding_status, refresh_failures,
+                   google_refresh_token IS NOT NULL as has_token,
+                   gmail_history_id IS NOT NULL as has_history,
+                   system_enabled, updated_at
+            FROM users
+            WHERE google_refresh_token IS NOT NULL
+            ORDER BY refresh_failures DESC, updated_at DESC
+        """)
+        cols = [desc[0] for desc in cur.description]
+        return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
 def insert_page_event(event: str, properties: dict | None = None) -> None:

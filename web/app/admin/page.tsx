@@ -84,7 +84,7 @@ interface DraftRow {
   sent_similarity: number | null;
 }
 
-type Tab = 'funnel' | 'cohorts' | 'drafts' | 'definitions';
+type Tab = 'funnel' | 'cohorts' | 'drafts' | 'auth-health' | 'definitions';
 
 // --- Helpers ---
 
@@ -813,6 +813,120 @@ function DraftBrowser() {
   );
 }
 
+// --- Auth Health Section ---
+
+interface AuthHealthRow {
+  email: string;
+  onboarding_status: string | null;
+  refresh_failures: number;
+  has_token: boolean;
+  has_history: boolean;
+  system_enabled: boolean;
+  updated_at: string;
+}
+
+function AuthHealthSection() {
+  const [data, setData] = useState<AuthHealthRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api('/admin/auth-health').then((res) => {
+      setData(res.data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-gray-400" /></div>;
+
+  const failed = data.filter((r) => r.onboarding_status === 'failed');
+  const atRisk = data.filter((r) => r.refresh_failures > 0 && r.onboarding_status !== 'failed');
+  const healthy = data.filter((r) => r.refresh_failures === 0 && r.onboarding_status !== 'failed');
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-3 gap-4">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
+          <div className="text-2xl font-bold text-green-700">{healthy.length}</div>
+          <div className="text-sm text-green-600">Healthy</div>
+        </div>
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-center">
+          <div className="text-2xl font-bold text-yellow-700">{atRisk.length}</div>
+          <div className="text-sm text-yellow-600">At Risk (1-2 failures)</div>
+        </div>
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
+          <div className="text-2xl font-bold text-red-700">{failed.length}</div>
+          <div className="text-sm text-red-600">Needs Re-Auth</div>
+        </div>
+      </div>
+
+      {(failed.length > 0 || atRisk.length > 0) && (
+        <div className="overflow-hidden rounded-lg border border-gray-200">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Email</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Status</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Failures</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Last Updated</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[...failed, ...atRisk].map((row) => (
+                <tr key={row.email} className={row.onboarding_status === 'failed' ? 'bg-red-50' : 'bg-yellow-50'}>
+                  <td className="px-4 py-2 font-mono text-xs">{row.email}</td>
+                  <td className="px-4 py-2">
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      row.onboarding_status === 'failed'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {row.onboarding_status === 'failed' ? 'Needs Re-Auth' : 'At Risk'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 font-mono">{row.refresh_failures}/3</td>
+                  <td className="px-4 py-2 text-xs text-gray-500">
+                    {new Date(row.updated_at).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <details className="rounded-lg border border-gray-200">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-gray-600">
+          All connected users ({data.length})
+        </summary>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Email</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Status</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Failures</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">System</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Watch</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {data.map((row) => (
+                <tr key={row.email}>
+                  <td className="px-4 py-2 font-mono text-xs">{row.email}</td>
+                  <td className="px-4 py-2 text-xs">{row.onboarding_status ?? '—'}</td>
+                  <td className="px-4 py-2 font-mono text-xs">{row.refresh_failures}</td>
+                  <td className="px-4 py-2 text-xs">{row.system_enabled ? 'on' : 'off'}</td>
+                  <td className="px-4 py-2 text-xs">{row.has_history ? 'active' : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  );
+}
+
 function Definitions() {
   return (
     <div className="space-y-8 text-sm text-gray-700 leading-relaxed">
@@ -950,6 +1064,7 @@ export default function AdminDashboard() {
     { key: 'funnel', label: 'Funnel' },
     { key: 'cohorts', label: 'Cohorts' },
     { key: 'drafts', label: 'Drafts' },
+    { key: 'auth-health', label: 'Auth Health' },
     { key: 'definitions', label: 'Definitions' },
   ];
 
@@ -975,6 +1090,7 @@ export default function AdminDashboard() {
         {tab === 'funnel' && <FunnelSection />}
         {tab === 'cohorts' && <CohortSection />}
         {tab === 'drafts' && <DraftBrowser />}
+        {tab === 'auth-health' && <AuthHealthSection />}
         {tab === 'definitions' && <Definitions />}
       </div>
     </div>
