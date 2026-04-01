@@ -333,6 +333,23 @@ def _refresh_stale_drafts() -> int:
 _DRAFT_REFRESH_INTERVAL = 1800  # 30 minutes
 
 
+def _log_memory_snapshot():
+    """Log top tracemalloc allocations — temporary, for diagnosing the memory leak."""
+    if not tracemalloc.is_tracing():
+        return
+    snapshot = tracemalloc.take_snapshot()
+    snapshot = snapshot.filter_traces([
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap_external>"),
+    ])
+    current, peak = tracemalloc.get_traced_memory()
+    logger.info("MEMPROFILE current=%.1fMB peak=%.1fMB", current / 1024 / 1024, peak / 1024 / 1024)
+    for stat in snapshot.statistics("filename")[:15]:
+        logger.info("MEMPROFILE  %s: %.1fMB (%d allocs)", stat.traceback, stat.size / 1024 / 1024, stat.count)
+    for stat in snapshot.statistics("lineno")[:10]:
+        logger.info("MEMPROFILE_LINE  %s: %.1fMB (%d allocs)", stat.traceback, stat.size / 1024 / 1024, stat.count)
+
+
 async def _draft_refresh_loop():
     """Background loop: refresh stale drafts before users' mornings."""
     await asyncio.sleep(120)  # let server finish starting
@@ -344,6 +361,7 @@ async def _draft_refresh_loop():
         except Exception:
             logger.exception("draft_refresh_loop: failed")
         gc.collect()
+        _log_memory_snapshot()
         await asyncio.sleep(_DRAFT_REFRESH_INTERVAL)
 
 
