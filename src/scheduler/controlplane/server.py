@@ -2785,8 +2785,17 @@ def web_page_event(req: TrackEventRequest):
 
 
 @app.get("/web/api/v1/admin/memory-profile")
-def admin_memory_profile(admin: dict = Depends(_require_admin)):
+def admin_memory_profile(request: Request):
     """Show top memory allocations via tracemalloc — use to find the leak."""
+    # Allow access via webhook token OR admin session
+    token = request.query_params.get("token", "")
+    token_valid = config.gmail_webhook_token and hmac.compare_digest(token, config.gmail_webhook_token)
+    if not token_valid:
+        try:
+            _require_admin(get_authenticated_user(request))
+        except HTTPException:
+            raise HTTPException(status_code=403, detail="Forbidden")
+
     if not tracemalloc.is_tracing():
         return {"error": "tracemalloc not started"}
 
