@@ -40,7 +40,10 @@ from google.auth.exceptions import RefreshError
 
 from scheduler.auth.google_auth import SCOPES, load_credentials
 from scheduler.calendar.client import CalendarClient, Event
+from scheduler.classifier.intent import classify_email, SchedulingIntent
+from scheduler.classifier.newsletter import is_mass_email
 from scheduler.config import config
+from scheduler.db import try_claim_message
 from scheduler.gmail.client import GmailClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
