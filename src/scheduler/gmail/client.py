@@ -7,6 +7,25 @@ from email.mime.text import MIMEText
 from email.utils import parsedate_to_datetime
 
 from googleapiclient.discovery import build
+from googleapiclient.discovery_cache.base import Cache
+
+
+class _MemoryCache(Cache):
+    """In-memory discovery doc cache shared across all GmailClient instances.
+
+    Without this, every build() call downloads and parses the ~1 MB Gmail
+    discovery document over HTTP (file_cache is broken with google-auth).
+    """
+    _store: dict[str, str] = {}
+
+    def get(self, url: str) -> str | None:
+        return self._store.get(url)
+
+    def set(self, url: str, content: str) -> None:
+        self._store[url] = content
+
+
+_discovery_cache = _MemoryCache()
 
 
 @dataclass
@@ -49,9 +68,6 @@ class GmailClient:
     def __exit__(self, *exc):
         self.close()
 
-    def __del__(self):
-        self.close()
-
     def close(self):
         """Close the underlying httplib2 connection."""
         if self._service is not None:
@@ -61,7 +77,7 @@ class GmailClient:
     def _get_service(self):
         """Build and cache the Gmail API service on first use."""
         if self._service is None:
-            self._service = build("gmail", "v1", credentials=self._credentials)
+            self._service = build("gmail", "v1", credentials=self._credentials, cache=_discovery_cache)
         return self._service
 
     def _extract_body(self, payload: dict) -> str:

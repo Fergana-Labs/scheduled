@@ -2507,7 +2507,15 @@ def _process_messages(user_id: str, email_address: str, message_ids: list[str]) 
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=user.calendar_ids or [])
+    try:
+        _process_message_batch(gmail, calendar, user, user_id, email_address, message_ids)
+    finally:
+        gmail.close()
+        calendar.close()
 
+
+def _process_message_batch(gmail, calendar, user, user_id, email_address, message_ids):
+    """Inner loop extracted so _process_messages can use try/finally for cleanup."""
     for message_id in message_ids:
         if not try_claim_message(user_id, message_id):
             logger.info("gmail: message %s already claimed, skipping", message_id)
@@ -2667,8 +2675,6 @@ def _process_messages(user_id: str, email_address: str, message_ids: list[str]) 
             else:
                 logger.exception("gmail: failed to process message %s for user=%s", message_id, email_address)
 
-    gmail.close()
-    calendar.close()
 
 
 @app.post("/webhooks/gmail")

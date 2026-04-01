@@ -4,6 +4,25 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from googleapiclient.discovery import build
+from googleapiclient.discovery_cache.base import Cache
+
+
+class _MemoryCache(Cache):
+    """In-memory discovery doc cache shared across all CalendarClient instances.
+
+    Without this, every build() call downloads and parses the ~1 MB Calendar
+    discovery document over HTTP (file_cache is broken with google-auth).
+    """
+    _store: dict[str, str] = {}
+
+    def get(self, url: str) -> str | None:
+        return self._store.get(url)
+
+    def set(self, url: str, content: str) -> None:
+        self._store[url] = content
+
+
+_discovery_cache = _MemoryCache()
 
 
 @dataclass
@@ -78,16 +97,13 @@ class CalendarClient:
     def _get_service(self):
         """Build and cache the Calendar API service."""
         if self._service is None:
-            self._service = build("calendar", "v3", credentials=self._credentials)
+            self._service = build("calendar", "v3", credentials=self._credentials, cache=_discovery_cache)
         return self._service
 
     def __enter__(self):
         return self
 
     def __exit__(self, *exc):
-        self.close()
-
-    def __del__(self):
         self.close()
 
     def close(self):
