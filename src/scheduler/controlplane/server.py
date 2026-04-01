@@ -12,6 +12,7 @@ and passed into the sandbox as an env var.
 
 import asyncio
 import base64
+import gc
 import html
 import hashlib
 import os
@@ -22,6 +23,7 @@ import logging
 import secrets
 import threading
 import time
+import tracemalloc
 import urllib.parse
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta, timezone
@@ -38,7 +40,10 @@ from google.auth.exceptions import RefreshError
 
 from scheduler.auth.google_auth import SCOPES, BOT_MODE_SCOPES, load_credentials
 from scheduler.calendar.client import CalendarClient, Event
+from scheduler.classifier.intent import classify_email, SchedulingIntent
+from scheduler.classifier.newsletter import is_mass_email
 from scheduler.config import config
+from scheduler.db import try_claim_message
 from scheduler.gmail.client import GmailClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -328,6 +333,23 @@ def _refresh_stale_drafts() -> int:
 _DRAFT_REFRESH_INTERVAL = 1800  # 30 minutes
 
 
+def _log_memory_snapshot():
+    """Log top tracemalloc allocations — temporary, for diagnosing the memory leak."""
+    if not tracemalloc.is_tracing():
+        return
+    snapshot = tracemalloc.take_snapshot()
+    snapshot = snapshot.filter_traces([
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap_external>"),
+    ])
+    current, peak = tracemalloc.get_traced_memory()
+    logger.info("MEMPROFILE current=%.1fMB peak=%.1fMB", current / 1024 / 1024, peak / 1024 / 1024)
+    for stat in snapshot.statistics("filename")[:15]:
+        logger.info("MEMPROFILE  %s: %.1fMB (%d allocs)", stat.traceback, stat.size / 1024 / 1024, stat.count)
+    for stat in snapshot.statistics("lineno")[:10]:
+        logger.info("MEMPROFILE_LINE  %s: %.1fMB (%d allocs)", stat.traceback, stat.size / 1024 / 1024, stat.count)
+
+
 async def _draft_refresh_loop():
     """Background loop: refresh stale drafts before users' mornings."""
     await asyncio.sleep(120)  # let server finish starting
@@ -338,6 +360,8 @@ async def _draft_refresh_loop():
                 logger.info("draft_refresh_loop: refreshed %d stale drafts", refreshed)
         except Exception:
             logger.exception("draft_refresh_loop: failed")
+        gc.collect()
+        _log_memory_snapshot()
         await asyncio.sleep(_DRAFT_REFRESH_INTERVAL)
 
 
@@ -529,6 +553,9 @@ async def _bot_watch_renewal():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Start memory tracing so /admin/memory-profile can show top allocators
+    tracemalloc.start(25)  # 25 frames deep for meaningful tracebacks
+
     if _is_self_hosted_mode():
         task = asyncio.create_task(_gmail_poll_loop())
     else:
@@ -544,6 +571,7 @@ async def lifespan(app: FastAPI):
     if refresh_task:
         refresh_task.cancel()
     bot_task.cancel()
+    tracemalloc.stop()
 
 
 app = FastAPI(title="Scheduler Control Plane", lifespan=lifespan)
@@ -1608,9 +1636,6 @@ def _cleanup_expired_sessions() -> None:
         cal = session.get("calendar")
         if cal:
             cal.close()
-        gm = session.get("gmail")
-        if gm:
-            gm.close()
 
 
 def get_session(authorization: str = Header(default="")) -> dict:
@@ -2795,6 +2820,9 @@ def _process_messages(user_id: str, email_address: str, message_ids: list[str]) 
     finally:
         gmail.close()
         calendar.close()
+        # Break reference cycles from httpx/asyncio/anyio promptly instead
+        # of waiting for gen2 GC (which may not run for minutes).
+        gc.collect()
 
 
 def _process_message_batch(gmail, calendar, user, user_id, email_address, message_ids):
@@ -2957,7 +2985,6 @@ def _process_message_batch(gmail, calendar, user, user_id, email_address, messag
                 logger.warning("gmail: message %s not found (deleted?), skipping", message_id)
             else:
                 logger.exception("gmail: failed to process message %s for user=%s", message_id, email_address)
-
 
 
 @app.post("/webhooks/gmail")
@@ -3260,6 +3287,52 @@ def web_page_event(req: TrackEventRequest):
 
 
 # --- Admin API routes ---
+
+
+@app.get("/web/api/v1/admin/memory-profile")
+def admin_memory_profile(request: Request):
+    """Show top memory allocations via tracemalloc — use to find the leak."""
+    # Allow access via webhook token OR admin session
+    token = request.query_params.get("token", "")
+    token_valid = config.gmail_webhook_token and hmac.compare_digest(token, config.gmail_webhook_token)
+    if not token_valid:
+        try:
+            _require_admin(get_authenticated_user(request))
+        except HTTPException:
+            raise HTTPException(status_code=403, detail="Forbidden")
+
+    if not tracemalloc.is_tracing():
+        return {"error": "tracemalloc not started"}
+
+    snapshot = tracemalloc.take_snapshot()
+    # Filter out importlib and tracemalloc internals
+    snapshot = snapshot.filter_traces([
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap_external>"),
+        tracemalloc.Filter(False, tracemalloc.__file__),
+    ])
+
+    # Top 30 by file
+    by_file = snapshot.statistics("filename")
+    top_files = [
+        {"file": str(s.traceback), "size_mb": round(s.size / 1024 / 1024, 2), "count": s.count}
+        for s in by_file[:30]
+    ]
+
+    # Top 30 by line
+    by_line = snapshot.statistics("lineno")
+    top_lines = [
+        {"location": str(s.traceback), "size_mb": round(s.size / 1024 / 1024, 2), "count": s.count}
+        for s in by_line[:30]
+    ]
+
+    current, peak = tracemalloc.get_traced_memory()
+    return {
+        "current_mb": round(current / 1024 / 1024, 1),
+        "peak_mb": round(peak / 1024 / 1024, 1),
+        "top_by_file": top_files,
+        "top_by_line": top_lines,
+    }
 
 
 @app.get("/web/api/v1/admin/auth-health")
