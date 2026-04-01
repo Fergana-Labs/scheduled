@@ -8,8 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
 
-# Bounded thread pool instead of unbounded Thread() per event.
-# Caps stack memory and avoids spawning hundreds of threads under load.
+# Bounded pool — avoids spawning unbounded threads under load.
 _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="analytics")
 
 
