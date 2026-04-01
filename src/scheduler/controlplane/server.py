@@ -598,7 +598,7 @@ app.add_middleware(
 # Auto-restart after 50K requests to reclaim leaked per-request memory from
 # uvicorn/h11/FastAPI/starlette.  Equivalent to uvicorn --limit-max-requests
 # but works without changing the Render start command.
-_MAX_REQUESTS = 50_000
+_MAX_REQUESTS = 10_000
 _request_count = 0
 
 
