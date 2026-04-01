@@ -24,15 +24,19 @@ async def _run_onboarding_all():
     creds = get_credentials()
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.scheduled_calendar_name)
-    calendar.get_or_create_scheduled_calendar()
+    try:
+        calendar.get_or_create_scheduled_calendar()
 
-    onboarding_backend = LocalBackend(gmail, calendar)
-    guide_backend = LocalGuideBackend(gmail, calendar)
+        onboarding_backend = LocalBackend(gmail, calendar)
+        guide_backend = LocalGuideBackend(gmail, calendar)
 
-    async with anyio.create_task_group() as tg:
-        tg.start_soon(_run_backfill, onboarding_backend, config.onboarding_lookback_days)
-        tg.start_soon(run_preferences_agent, guide_backend)
-        tg.start_soon(run_style_agent, guide_backend)
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(_run_backfill, onboarding_backend, config.onboarding_lookback_days)
+            tg.start_soon(run_preferences_agent, guide_backend)
+            tg.start_soon(run_style_agent, guide_backend)
+    finally:
+        gmail.close()
+        calendar.close()
 
 
 def run_onboarding():

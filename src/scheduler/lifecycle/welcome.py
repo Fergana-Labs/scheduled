@@ -291,6 +291,7 @@ def send_lifecycle_email(user_id: str) -> None:
 
     if not thread_id:
         logger.warning("lifecycle: timed out polling for welcome email for user=%s", user_id)
+        gmail.close()
         return
 
     # (e) Fetch calendar availability
@@ -370,3 +371,6 @@ def send_lifecycle_email(user_id: str) -> None:
         logger.info("lifecycle: sent example reasoning email for user=%s", user_id)
     except Exception:
         logger.exception("lifecycle: failed to send reasoning email for user=%s", user_id)
+    finally:
+        gmail.close()
+        calendar.close()

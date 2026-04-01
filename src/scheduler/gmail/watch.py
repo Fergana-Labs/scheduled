@@ -44,21 +44,20 @@ def setup_gmail_watch(user_id: str) -> dict:
     from scheduler.auth.google_auth import load_credentials
 
     creds = load_credentials(user_id)
-    gmail = GmailClient(creds)
+    with GmailClient(creds) as gmail:
+        result = gmail.watch(config.gmail_pubsub_topic)
 
-    result = gmail.watch(config.gmail_pubsub_topic)
+        # Store the initial history ID so we have a baseline for diffs
+        update_gmail_history_id(user_id, result["historyId"])
 
-    # Store the initial history ID so we have a baseline for diffs
-    update_gmail_history_id(user_id, result["historyId"])
+        logger.info(
+            "gmail_watch: registered for user=%s, historyId=%s, expires=%s",
+            user_id,
+            result["historyId"],
+            result["expiration"],
+        )
 
-    logger.info(
-        "gmail_watch: registered for user=%s, historyId=%s, expires=%s",
-        user_id,
-        result["historyId"],
-        result["expiration"],
-    )
-
-    return result
+        return result
 
 
 def renew_all_watches() -> dict:

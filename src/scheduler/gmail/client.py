@@ -36,13 +36,18 @@ class GmailClient:
     def __init__(self, credentials):
         """Initialize with Google OAuth2 credentials.
 
-        Builds the Gmail API service once.  GmailClient instances are
-        created per-request (one per webhook / background task), so the
-        service lives on a single thread — no SSL cross-thread issues.
-        Call close() when done to release the httplib2 connection.
+        The API service is built lazily on first use, so constructing a
+        GmailClient is free.  Use as a context manager or call close()
+        when done to release the httplib2 connection.
         """
         self._credentials = credentials
-        self._service = build("gmail", "v1", credentials=self._credentials)
+        self._service = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
 
     def close(self):
         """Close the underlying httplib2 connection."""
@@ -51,7 +56,9 @@ class GmailClient:
             self._service = None
 
     def _get_service(self):
-        """Return the cached Gmail API service."""
+        """Build and cache the Gmail API service on first use."""
+        if self._service is None:
+            self._service = build("gmail", "v1", credentials=self._credentials)
         return self._service
 
     def _extract_body(self, payload: dict) -> str:

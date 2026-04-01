@@ -49,35 +49,34 @@ def process_new_message(message: str, sender: str, source: str = "email") -> boo
 
     end = start + timedelta(minutes=duration_minutes)
 
-    calendar = _get_calendar_client()
+    with _get_calendar_client() as calendar:
+        # Simple deduplication: look for an existing scheduled calendar event with a matching
+        # summary in a small window around the proposed time.
+        window_start = start - timedelta(minutes=15)
+        window_end = end + timedelta(minutes=15)
+        existing = calendar.find_event(summary=summary, time_min=window_start, time_max=window_end)
 
-    # Simple deduplication: look for an existing scheduled calendar event with a matching
-    # summary in a small window around the proposed time.
-    window_start = start - timedelta(minutes=15)
-    window_end = end + timedelta(minutes=15)
-    existing = calendar.find_event(summary=summary, time_min=window_start, time_max=window_end)
+        description_lines = [
+            f"[source: {source}]",
+            f"Detected from message by {sender}.",
+        ]
+        description = "\n".join(description_lines)
 
-    description_lines = [
-        f"[source: {source}]",
-        f"Detected from message by {sender}.",
-    ]
-    description = "\n".join(description_lines)
+        event = Event(
+            id=None,
+            summary=summary,
+            start=start,
+            end=end,
+            description=description,
+            source=source,
+        )
 
-    event = Event(
-        id=None,
-        summary=summary,
-        start=start,
-        end=end,
-        description=description,
-        source=source,
-    )
+        if existing is not None and existing.id:
+            calendar.update_event(existing.id, event)
+        else:
+            calendar.add_event(event)
 
-    if existing is not None and existing.id:
-        calendar.update_event(existing.id, event)
-    else:
-        calendar.add_event(event)
-
-    return True
+        return True
 
 
 def process_email_by_id(message_id: str) -> bool:
@@ -85,8 +84,8 @@ def process_email_by_id(message_id: str) -> bool:
     from scheduler.gmail.client import GmailClient
 
     creds = get_credentials()
-    gmail = GmailClient(creds)
-    email = gmail.get_email(message_id)
+    with GmailClient(creds) as gmail:
+        email = gmail.get_email(message_id)
 
     # Use the email body as the message text; treat the sender as the
     # calendar event counterparty.

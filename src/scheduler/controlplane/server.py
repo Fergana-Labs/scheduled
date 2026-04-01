@@ -93,25 +93,39 @@ def _is_gmail_404(exc: Exception) -> bool:
 
 def _cleanup_stale_drafts() -> int:
     """Delete Gmail drafts older than 48 hours that we created and the user never sent."""
+    from itertools import groupby
+    from operator import itemgetter
     from scheduler.auth.google_auth import load_credentials
     from scheduler.db import get_stale_unsent_drafts, mark_draft_auto_deleted
 
     stale = get_stale_unsent_drafts(hours=48)
     deleted = 0
-    for row in stale:
+
+    # Group by user so we create one GmailClient per user, not per draft
+    stale_sorted = sorted(stale, key=itemgetter("user_id"))
+    for user_id, drafts in groupby(stale_sorted, key=itemgetter("user_id")):
         try:
-            creds = load_credentials(row["user_id"])
-            gmail = GmailClient(creds)
-            gmail.delete_draft(row["draft_id"])
+            creds = load_credentials(user_id)
         except Exception:
-            logger.warning(
-                "auto_delete_draft: failed to delete draft_id=%s for user=%s",
-                row["draft_id"], row["user_id"], exc_info=True,
-            )
-        # Remove the DB row regardless — if the Gmail draft is already gone
-        # (user deleted it manually, or it was sent), we still clean up.
-        mark_draft_auto_deleted(row["id"])
-        deleted += 1
+            logger.warning("auto_delete_draft: creds failed for user=%s, skipping", user_id, exc_info=True)
+            for row in drafts:
+                mark_draft_auto_deleted(row["id"])
+                deleted += 1
+            continue
+
+        with GmailClient(creds) as gmail:
+            for row in drafts:
+                try:
+                    gmail.delete_draft(row["draft_id"])
+                except Exception:
+                    logger.warning(
+                        "auto_delete_draft: failed to delete draft_id=%s for user=%s",
+                        row["draft_id"], user_id, exc_info=True,
+                    )
+                # Remove the DB row regardless
+                mark_draft_auto_deleted(row["id"])
+                deleted += 1
+
     return deleted
 
 
@@ -172,17 +186,19 @@ def _draft_needs_refresh_today(windows: list[dict], user_tz_str: str) -> bool:
 
 def _refresh_stale_drafts() -> int:
     """Delete stale Gmail drafts and recompose them with fresh availability."""
+    from itertools import groupby
+    from operator import itemgetter
     from scheduler.classifier.intent import classify_email, SchedulingIntent
     from scheduler.db import get_drafts_eligible_for_refresh, get_user_by_id, mark_draft_auto_deleted
 
     candidates = get_drafts_eligible_for_refresh()
     refreshed = 0
 
-    for row in candidates:
-        user_id = str(row["user_id"])
-        draft_id = row["draft_id"]
-        thread_id = row["thread_id"]
-        user_email = row["user_email"]
+    # Group by user so we create one GmailClient + CalendarClient per user
+    candidates_sorted = sorted(candidates, key=itemgetter("user_id"))
+    for user_id_raw, user_drafts in groupby(candidates_sorted, key=itemgetter("user_id")):
+        user_id = str(user_id_raw)
+        user_drafts = list(user_drafts)  # consume the groupby iterator
 
         try:
             creds = load_credentials(user_id)
@@ -190,124 +206,121 @@ def _refresh_stale_drafts() -> int:
             logger.warning("draft_refresh: creds failed for user=%s, skipping", user_id, exc_info=True)
             continue
 
-        gmail = GmailClient(creds)
         user = get_user_by_id(user_id)
         extra_ids = (user.calendar_ids or []) if user else []
-        calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=extra_ids)
 
-        # Check timezone window — only refresh during user's morning
-        user_tz = calendar.get_user_timezone()
-        if not _is_morning_window(user_tz):
-            continue
+        # CalendarClient is lazy — timezone check won't trigger GmailClient build
+        with CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=extra_ids) as calendar:
+            user_tz = calendar.get_user_timezone()
+            if not _is_morning_window(user_tz):
+                continue  # not morning for this user — skip all their drafts, no Gmail build
 
-        # Check if any suggested time is today or earlier (needs refresh before user's day)
-        composed_at = row.get("composed_at")
-        windows = row.get("suggested_windows") or []
-        if isinstance(windows, str):
-            windows = json.loads(windows)
-        if windows:
-            if not _draft_needs_refresh_today(windows, user_tz):
-                continue  # all proposed times are tomorrow or later, still valid
-        else:
-            # No suggested windows (availability mode) — fall back to 24h age check
-            if composed_at and (datetime.now(timezone.utc) - composed_at.replace(tzinfo=timezone.utc)) < timedelta(hours=24):
-                continue
+            with GmailClient(creds) as gmail:
+                for row in user_drafts:
+                    draft_id = row["draft_id"]
+                    thread_id = row["thread_id"]
+                    user_email = row["user_email"]
 
-        # Check if user acted on the draft (edited or deleted)
-        try:
-            gmail_draft = gmail.get_draft(draft_id)
-        except Exception:
-            logger.warning("draft_refresh: failed to fetch draft %s, skipping", draft_id, exc_info=True)
-            continue
+                    # Check if any suggested time is today or earlier
+                    composed_at = row.get("composed_at")
+                    windows = row.get("suggested_windows") or []
+                    if isinstance(windows, str):
+                        windows = json.loads(windows)
+                    if windows:
+                        if not _draft_needs_refresh_today(windows, user_tz):
+                            continue
+                    else:
+                        if composed_at and (datetime.now(timezone.utc) - composed_at.replace(tzinfo=timezone.utc)) < timedelta(hours=24):
+                            continue
 
-        if gmail_draft is None:
-            # User deleted the draft — clean up DB row, don't recompose
-            logger.info("draft_refresh: draft %s deleted by user, cleaning up", draft_id)
-            mark_draft_auto_deleted(row["id"])
-            continue
+                    # Check if user acted on the draft (edited or deleted)
+                    try:
+                        gmail_draft = gmail.get_draft(draft_id)
+                    except Exception:
+                        logger.warning("draft_refresh: failed to fetch draft %s, skipping", draft_id, exc_info=True)
+                        continue
 
-        if not _draft_body_matches(row.get("raw_body"), gmail_draft["body"]):
-            # User edited the draft — leave their version alone
-            logger.info("draft_refresh: draft %s edited by user, skipping refresh", draft_id)
-            continue
+                    if gmail_draft is None:
+                        logger.info("draft_refresh: draft %s deleted by user, cleaning up", draft_id)
+                        mark_draft_auto_deleted(row["id"])
+                        continue
 
-        # Delete old Gmail draft
-        try:
-            gmail.delete_draft(draft_id)
-        except Exception:
-            logger.warning("draft_refresh: failed to delete old draft %s", draft_id, exc_info=True)
+                    if not _draft_body_matches(row.get("raw_body"), gmail_draft["body"]):
+                        logger.info("draft_refresh: draft %s edited by user, skipping refresh", draft_id)
+                        continue
 
-        # Re-fetch the email thread
-        try:
-            thread_emails = gmail.get_thread(thread_id)
-        except Exception:
-            logger.warning("draft_refresh: thread %s gone, cleaning up draft", thread_id, exc_info=True)
-            mark_draft_auto_deleted(row["id"])
-            continue
+                    # Delete old Gmail draft
+                    try:
+                        gmail.delete_draft(draft_id)
+                    except Exception:
+                        logger.warning("draft_refresh: failed to delete old draft %s", draft_id, exc_info=True)
 
-        if not thread_emails:
-            mark_draft_auto_deleted(row["id"])
-            continue
+                    # Re-fetch the email thread
+                    try:
+                        thread_emails = gmail.get_thread(thread_id)
+                    except Exception:
+                        logger.warning("draft_refresh: thread %s gone, cleaning up draft", thread_id, exc_info=True)
+                        mark_draft_auto_deleted(row["id"])
+                        continue
 
-        # Check if thread was resolved (user sent a reply after we composed)
-        user_replied = any(
-            t_email.sender and user_email in t_email.sender and composed_at and t_email.date > composed_at
-            for t_email in thread_emails
-        )
-        if user_replied:
-            logger.info("draft_refresh: thread %s resolved (user replied), cleaning up", thread_id)
-            mark_draft_auto_deleted(row["id"])
-            continue
+                    if not thread_emails:
+                        mark_draft_auto_deleted(row["id"])
+                        continue
 
-        # Build thread_messages context (same as webhook handler)
-        email = thread_emails[-1]  # latest message in thread
-        thread_messages = []
-        for t_email in thread_emails:
-            if "DRAFT" in t_email.label_ids:
-                continue  # skip unsent drafts
-            thread_messages.append({
-                "sender": t_email.sender,
-                "subject": t_email.subject,
-                "body": _strip_html(t_email.body) if t_email.body else "",
-                "date": t_email.date.isoformat(),
-            })
+                    user_replied = any(
+                        t_email.sender and user_email in t_email.sender and composed_at and t_email.date > composed_at
+                        for t_email in thread_emails
+                    )
+                    if user_replied:
+                        logger.info("draft_refresh: thread %s resolved (user replied), cleaning up", thread_id)
+                        mark_draft_auto_deleted(row["id"])
+                        continue
 
-        # Re-classify
-        classification = classify_email(
-            email.subject, email.body, email.sender,
-            thread_messages=thread_messages,
-            recipient=email.recipient, cc=email.cc,
-            user_email=user_email,
-        )
+                    email = thread_emails[-1]
+                    thread_messages = []
+                    for t_email in thread_emails:
+                        if "DRAFT" in t_email.label_ids:
+                            continue
+                        thread_messages.append({
+                            "sender": t_email.sender,
+                            "subject": t_email.subject,
+                            "body": _strip_html(t_email.body) if t_email.body else "",
+                            "date": t_email.date.isoformat(),
+                        })
 
-        if classification.intent == SchedulingIntent.DOESNT_NEED_DRAFT:
-            logger.info("draft_refresh: thread %s no longer needs draft, cleaning up", thread_id)
-            mark_draft_auto_deleted(row["id"])
-            continue
+                    classification = classify_email(
+                        email.subject, email.body, email.sender,
+                        thread_messages=thread_messages,
+                        recipient=email.recipient, cc=email.cc,
+                        user_email=user_email,
+                    )
 
-        # Delete old composed_drafts row
-        mark_draft_auto_deleted(row["id"])
+                    if classification.intent == SchedulingIntent.DOESNT_NEED_DRAFT:
+                        logger.info("draft_refresh: thread %s no longer needs draft, cleaning up", thread_id)
+                        mark_draft_auto_deleted(row["id"])
+                        continue
 
-        # Recompose with fresh availability
-        try:
-            compose_result = _compose_draft_for_runtime(
-                user_id=user_id,
-                email=email,
-                classification=classification,
-                gmail=gmail,
-                calendar=calendar,
-                autopilot=user.autopilot_enabled if user else False,
-                user_email=user_email,
-                thread_messages=thread_messages,
-                refresh_count=row["refresh_count"] + 1,
-            )
-            if compose_result and compose_result.get("draft_id"):
-                logger.info("draft_refresh: refreshed draft for thread %s (refresh #%d)", thread_id, row["refresh_count"] + 1)
-                refreshed += 1
-            else:
-                logger.info("draft_refresh: thread %s resolved during recomposition, no new draft", thread_id)
-        except Exception:
-            logger.exception("draft_refresh: failed to recompose draft for thread %s", thread_id)
+                    mark_draft_auto_deleted(row["id"])
+
+                    try:
+                        compose_result = _compose_draft_for_runtime(
+                            user_id=user_id,
+                            email=email,
+                            classification=classification,
+                            gmail=gmail,
+                            calendar=calendar,
+                            autopilot=user.autopilot_enabled if user else False,
+                            user_email=user_email,
+                            thread_messages=thread_messages,
+                            refresh_count=row["refresh_count"] + 1,
+                        )
+                        if compose_result and compose_result.get("draft_id"):
+                            logger.info("draft_refresh: refreshed draft for thread %s (refresh #%d)", thread_id, row["refresh_count"] + 1)
+                            refreshed += 1
+                        else:
+                            logger.info("draft_refresh: thread %s resolved during recomposition, no new draft", thread_id)
+                    except Exception:
+                        logger.exception("draft_refresh: failed to recompose draft for thread %s", thread_id)
 
     return refreshed
 
@@ -514,9 +527,12 @@ async def setup_init(body: SetupInitRequest, authorization: str = Header(default
     try:
         creds = await asyncio.to_thread(load_credentials, user.id)
         gmail = GmailClient(creds)
-        history_id = await asyncio.to_thread(gmail.get_current_history_id)
-        await asyncio.to_thread(update_gmail_history_id, user.id, history_id)
-        logger.info("setup_init: gmail history_id=%s for %s", history_id, user.email)
+        try:
+            history_id = await asyncio.to_thread(gmail.get_current_history_id)
+            await asyncio.to_thread(update_gmail_history_id, user.id, history_id)
+            logger.info("setup_init: gmail history_id=%s for %s", history_id, user.email)
+        finally:
+            gmail.close()
     except Exception:
         logger.exception("setup_init: failed to init gmail history_id")
         raise HTTPException(status_code=500, detail="Gmail initialization failed — retry setup")
@@ -1303,6 +1319,9 @@ def _cleanup_expired_sessions() -> None:
     expired = [tok for tok, s in sessions.items() if now - s["created_at"] > _SESSION_TTL]
     for tok in expired:
         session = sessions.pop(tok)
+        gmail = session.get("gmail")
+        if gmail:
+            gmail.close()
         cal = session.get("calendar")
         if cal:
             cal.close()
@@ -1719,27 +1738,30 @@ def confirm_scheduling_link_public(link_id: str, req: ConfirmTimeRequest):
     extra_ids = (user.calendar_ids or []) if user else []
     calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=extra_ids)
 
-    existing = calendar.get_all_events(selected_start, selected_end, include_primary=True)
-    if existing:
-        raise HTTPException(
-            status_code=409,
-            detail="This time slot is no longer available. Please select another time.",
-        )
-
-    # Create calendar invite
     try:
-        event_id = calendar.create_invite_event(
-            summary=link.event_summary,
-            start=selected_start,
-            end=selected_end,
-            attendee_emails=[link.attendee_email],
-            description="Scheduled via Scheduled - https://tryscheduled.com",
-            location=link.location,
-            add_google_meet=link.add_google_meet,
-        )
-    except Exception:
-        logger.exception("confirm_scheduling_link: failed to create invite for link %s", link_id)
-        raise HTTPException(status_code=500, detail="Failed to create calendar invite")
+        existing = calendar.get_all_events(selected_start, selected_end, include_primary=True)
+        if existing:
+            raise HTTPException(
+                status_code=409,
+                detail="This time slot is no longer available. Please select another time.",
+            )
+
+        # Create calendar invite
+        try:
+            event_id = calendar.create_invite_event(
+                summary=link.event_summary,
+                start=selected_start,
+                end=selected_end,
+                attendee_emails=[link.attendee_email],
+                description="Scheduled via Scheduled - https://tryscheduled.com",
+                location=link.location,
+                add_google_meet=link.add_google_meet,
+            )
+        except Exception:
+            logger.exception("confirm_scheduling_link: failed to create invite for link %s", link_id)
+            raise HTTPException(status_code=500, detail="Failed to create calendar invite")
+    finally:
+        calendar.close()
 
     confirm_scheduling_link(link_id, selected_start, selected_end, event_id)
 
@@ -1811,107 +1833,111 @@ def _process_scheduling_link_submission(user_id: str, link_id: str) -> None:
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.scheduled_calendar_name, extra_calendar_ids=user.calendar_ids or [])
 
-    # Get the original thread for context
-    thread_messages = []
-    if link.thread_id:
-        try:
-            thread_emails = gmail.get_thread(link.thread_id)
-            for t_email in thread_emails:
-                if "DRAFT" in t_email.label_ids:
-                    continue  # skip unsent drafts
-                thread_messages.append({
-                    "sender": t_email.sender,
-                    "subject": t_email.subject,
-                    "body": t_email.body,
-                    "date": t_email.date.isoformat(),
-                })
-        except Exception:
-            logger.warning("scheduling_link_submission: failed to fetch thread %s", link.thread_id)
-
-    # Format the painted availability for the agent
-    avail_lines = []
-    for slot in (link.recipient_availability or []):
-        avail_lines.append(f"  - {slot.get('date', '?')} {slot.get('start', '?')}-{slot.get('end', '?')}")
-    avail_text = "\n".join(avail_lines) if avail_lines else "  (no specific times provided)"
-
-    # Build a synthetic classification for the composer
-    from scheduler.classifier.intent import ClassificationResult, SchedulingIntent
-    classification = ClassificationResult(
-        intent=SchedulingIntent.NEEDS_DRAFT,
-        confidence=1.0,
-        summary=(
-            f"{link.attendee_name or link.attendee_email} used your Scheduled link to share their "
-            f"availability for '{link.event_summary}'. Their available times:\n{avail_text}\n"
-            f"Find the best overlapping time with the user's calendar and draft a confirmation email."
-        ),
-        proposed_times=[f"{s.get('date', '')} {s.get('start', '')}-{s.get('end', '')}" for s in (link.recipient_availability or [])],
-        participants=[link.attendee_email],
-        duration_minutes=link.duration_minutes,
-    )
-
-    # Get the latest email in the thread to use as the trigger
-    email_payload = None
-    if link.thread_id:
-        try:
-            thread_emails = gmail.get_thread(link.thread_id)
-            if thread_emails:
-                email_payload = thread_emails[-1]
-        except Exception:
-            pass
-
-    if not email_payload:
-        logger.warning("scheduling_link_submission: no email found for thread %s, skipping", link.thread_id)
-        return
-
-    compose_result = _compose_draft_for_runtime(
-        user_id=user_id,
-        email=email_payload,
-        classification=classification,
-        gmail=gmail,
-        calendar=calendar,
-        autopilot=user.autopilot_enabled,
-        user_email=user.email,
-        thread_messages=thread_messages,
-    )
-
-    compose_result = compose_result or {}
-    draft_id = compose_result.get("draft_id")
-    invite_proposal = compose_result.get("invite_proposal")
-
-    if draft_id:
-        logger.info("scheduling_link_submission: created draft %s for link %s", draft_id, link_id)
-
-        if invite_proposal:
-            from scheduler.db import create_pending_invite
+    try:
+        # Get the original thread for context
+        thread_messages = []
+        if link.thread_id:
             try:
-                create_pending_invite(
-                    user_id=user_id,
-                    thread_id=link.thread_id or "",
-                    attendee_emails=invite_proposal["attendee_emails"],
-                    event_summary=invite_proposal["event_summary"],
-                    event_start=datetime.fromisoformat(invite_proposal["event_start"]),
-                    event_end=datetime.fromisoformat(invite_proposal["event_end"]),
-                    add_google_meet=invite_proposal.get("add_google_meet", False),
-                    location=invite_proposal.get("location", ""),
-                )
+                thread_emails = gmail.get_thread(link.thread_id)
+                for t_email in thread_emails:
+                    if "DRAFT" in t_email.label_ids:
+                        continue  # skip unsent drafts
+                    thread_messages.append({
+                        "sender": t_email.sender,
+                        "subject": t_email.subject,
+                        "body": t_email.body,
+                        "date": t_email.date.isoformat(),
+                    })
             except Exception:
-                logger.exception("scheduling_link_submission: failed to create pending invite")
+                logger.warning("scheduling_link_submission: failed to fetch thread %s", link.thread_id)
 
-        # Send reasoning email mentioning the scheduling link
-        if user.reasoning_emails_enabled and link.thread_id:
+        # Format the painted availability for the agent
+        avail_lines = []
+        for slot in (link.recipient_availability or []):
+            avail_lines.append(f"  - {slot.get('date', '?')} {slot.get('start', '?')}-{slot.get('end', '?')}")
+        avail_text = "\n".join(avail_lines) if avail_lines else "  (no specific times provided)"
+
+        # Build a synthetic classification for the composer
+        from scheduler.classifier.intent import ClassificationResult, SchedulingIntent
+        classification = ClassificationResult(
+            intent=SchedulingIntent.NEEDS_DRAFT,
+            confidence=1.0,
+            summary=(
+                f"{link.attendee_name or link.attendee_email} used your Scheduled link to share their "
+                f"availability for '{link.event_summary}'. Their available times:\n{avail_text}\n"
+                f"Find the best overlapping time with the user's calendar and draft a confirmation email."
+            ),
+            proposed_times=[f"{s.get('date', '')} {s.get('start', '')}-{s.get('end', '')}" for s in (link.recipient_availability or [])],
+            participants=[link.attendee_email],
+            duration_minutes=link.duration_minutes,
+        )
+
+        # Get the latest email in the thread to use as the trigger
+        email_payload = None
+        if link.thread_id:
             try:
-                from scheduler.lifecycle.reasoning import send_reasoning_email
-                send_reasoning_email(
-                    user_email=user.email,
-                    thread_id=link.thread_id,
-                    subject=email_payload.subject if hasattr(email_payload, "subject") else link.event_summary,
-                    classification=classification,
-                    calendar=calendar,
-                    gmail=gmail,
-                    invite_proposal=invite_proposal,
-                )
+                thread_emails = gmail.get_thread(link.thread_id)
+                if thread_emails:
+                    email_payload = thread_emails[-1]
             except Exception:
-                logger.exception("scheduling_link_submission: failed to send reasoning email")
+                pass
+
+        if not email_payload:
+            logger.warning("scheduling_link_submission: no email found for thread %s, skipping", link.thread_id)
+            return
+
+        compose_result = _compose_draft_for_runtime(
+            user_id=user_id,
+            email=email_payload,
+            classification=classification,
+            gmail=gmail,
+            calendar=calendar,
+            autopilot=user.autopilot_enabled,
+            user_email=user.email,
+            thread_messages=thread_messages,
+        )
+
+        compose_result = compose_result or {}
+        draft_id = compose_result.get("draft_id")
+        invite_proposal = compose_result.get("invite_proposal")
+
+        if draft_id:
+            logger.info("scheduling_link_submission: created draft %s for link %s", draft_id, link_id)
+
+            if invite_proposal:
+                from scheduler.db import create_pending_invite
+                try:
+                    create_pending_invite(
+                        user_id=user_id,
+                        thread_id=link.thread_id or "",
+                        attendee_emails=invite_proposal["attendee_emails"],
+                        event_summary=invite_proposal["event_summary"],
+                        event_start=datetime.fromisoformat(invite_proposal["event_start"]),
+                        event_end=datetime.fromisoformat(invite_proposal["event_end"]),
+                        add_google_meet=invite_proposal.get("add_google_meet", False),
+                        location=invite_proposal.get("location", ""),
+                    )
+                except Exception:
+                    logger.exception("scheduling_link_submission: failed to create pending invite")
+
+            # Send reasoning email mentioning the scheduling link
+            if user.reasoning_emails_enabled and link.thread_id:
+                try:
+                    from scheduler.lifecycle.reasoning import send_reasoning_email
+                    send_reasoning_email(
+                        user_email=user.email,
+                        thread_id=link.thread_id,
+                        subject=email_payload.subject if hasattr(email_payload, "subject") else link.event_summary,
+                        classification=classification,
+                        calendar=calendar,
+                        gmail=gmail,
+                        invite_proposal=invite_proposal,
+                    )
+                except Exception:
+                    logger.exception("scheduling_link_submission: failed to send reasoning email")
+    finally:
+        gmail.close()
+        calendar.close()
 
 
 # --- Settings routes ---
@@ -2059,21 +2085,25 @@ def _run_onboarding_all(user_id: str) -> None:
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.scheduled_calendar_name)
-    cal_id = calendar.get_or_create_scheduled_calendar()
-    if cal_id:
-        from scheduler.db import update_scheduled_calendar_id
-        update_scheduled_calendar_id(user_id, cal_id)
+    try:
+        cal_id = calendar.get_or_create_scheduled_calendar()
+        if cal_id:
+            from scheduler.db import update_scheduled_calendar_id
+            update_scheduled_calendar_id(user_id, cal_id)
 
-    guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
-    onboarding_backend = LocalBackend(gmail, calendar)
+        guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
+        onboarding_backend = LocalBackend(gmail, calendar)
 
-    async def _run():
-        async with anyio.create_task_group() as tg:
-            tg.start_soon(_run_backfill, onboarding_backend, config.onboarding_lookback_days)
-            tg.start_soon(run_preferences_agent, guide_backend)
-            tg.start_soon(run_style_agent, guide_backend)
+        async def _run():
+            async with anyio.create_task_group() as tg:
+                tg.start_soon(_run_backfill, onboarding_backend, config.onboarding_lookback_days)
+                tg.start_soon(run_preferences_agent, guide_backend)
+                tg.start_soon(run_style_agent, guide_backend)
 
-    anyio.run(_run)
+        anyio.run(_run)
+    finally:
+        gmail.close()
+        calendar.close()
 
     # Send lifecycle welcome email (non-blocking — failure never stops onboarding)
     try:
@@ -2136,8 +2166,8 @@ def _run_onboarding_for_runtime(user_id: str) -> None:
 
             # Ensure Scheduled calendar exists before sandbox launch (agents need it)
             creds = load_credentials(user_id)
-            calendar = CalendarClient(creds, config.scheduled_calendar_name)
-            cal_id = calendar.get_or_create_scheduled_calendar()
+            with CalendarClient(creds, config.scheduled_calendar_name) as calendar:
+                cal_id = calendar.get_or_create_scheduled_calendar()
             if cal_id:
                 from scheduler.db import update_scheduled_calendar_id
                 update_scheduled_calendar_id(user_id, cal_id)
@@ -3068,18 +3098,18 @@ def web_list_calendars(user: dict = Depends(get_authenticated_user)):
         raise HTTPException(status_code=404, detail="User not found")
 
     creds = load_credentials(user["user_id"])
-    calendar = CalendarClient(creds, config.scheduled_calendar_name)
-    selected_ids = set(db_user.calendar_ids or [])
+    with CalendarClient(creds, config.scheduled_calendar_name) as calendar:
+        selected_ids = set(db_user.calendar_ids or [])
 
-    all_cals = calendar.list_calendars()
-    scheduled_id = calendar.get_or_create_scheduled_calendar()
+        all_cals = calendar.list_calendars()
+        scheduled_id = calendar.get_or_create_scheduled_calendar()
 
-    # Filter out the scheduled calendar — users shouldn't toggle it
-    return [
-        {**cal, "selected": cal["id"] in selected_ids}
-        for cal in all_cals
-        if cal["id"] != scheduled_id
-    ]
+        # Filter out the scheduled calendar — users shouldn't toggle it
+        return [
+            {**cal, "selected": cal["id"] in selected_ids}
+            for cal in all_cals
+            if cal["id"] != scheduled_id
+        ]
 
 
 class WebUpdateCalendarsRequest(BaseModel):
@@ -3124,18 +3154,22 @@ def _run_guide_regeneration(user_id: str, guide_name: str) -> None:
     creds = load_credentials(user_id)
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.scheduled_calendar_name)
-    calendar.get_or_create_scheduled_calendar()
+    try:
+        calendar.get_or_create_scheduled_calendar()
 
-    guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
+        guide_backend = LocalGuideBackend(gmail, calendar, user_id=user_id)
 
-    if guide_name == "scheduling_preferences":
-        from scheduler.guides.preferences import run_preferences_agent
+        if guide_name == "scheduling_preferences":
+            from scheduler.guides.preferences import run_preferences_agent
 
-        anyio.run(run_preferences_agent, guide_backend)
-    elif guide_name == "email_style":
-        from scheduler.guides.style import run_style_agent
+            anyio.run(run_preferences_agent, guide_backend)
+        elif guide_name == "email_style":
+            from scheduler.guides.style import run_style_agent
 
-        anyio.run(run_style_agent, guide_backend)
+            anyio.run(run_style_agent, guide_backend)
+    finally:
+        gmail.close()
+        calendar.close()
 
     logger.info("guide_regeneration: completed %s for user=%s", guide_name, user_id)
 
@@ -3217,190 +3251,193 @@ def demo_chat(req: DemoChatRequest, request: Request):
         extra_calendar_ids=db_user.calendar_ids or [],
     )
 
-    # 2. Fetch events for the next 7 days
-    user_tz = calendar.get_user_timezone()
-    now = datetime.now(timezone.utc)
-    events = calendar.get_all_events(
-        time_min=now,
-        time_max=now + timedelta(days=7),
-        include_primary=True,
-    )
-
-    # Build availability string for the LLM (real data — LLM needs it to
-    # find free slots), but we never send summaries to the frontend.
-    events_for_llm = "\n".join(
-        f"- {e.start.strftime('%A %B %-d, %-I:%M %p')} – {e.end.strftime('%-I:%M %p')}: busy"
-        for e in sorted(events, key=lambda ev: ev.start)
-    )
-
-    # 3. Single Claude API call
-    client = Anthropic(api_key=config.anthropic_api_key)
-
-    system_prompt = (
-        "You are powering a live demo of Scheduled, an AI scheduling assistant. "
-        "In this demo, a visitor is messaging Sam to set up a virtual meeting. "
-        "You reply AS Sam — in first person, warm and professional.\n\n"
-        "CONTEXT: The visitor is on tryscheduled.com/demo and wants to schedule "
-        "a video call with Sam to learn about Scheduled. You don't need any more "
-        "context — just help them find a time. Every message from the visitor is "
-        "a direct scheduling request. Never ask for clarification or more context.\n\n"
-        f"Sam's timezone: {user_tz}\n"
-        f"Current time: {now.strftime('%A %B %-d, %Y %-I:%M %p')} UTC\n\n"
-        f"Sam's calendar (next 7 days — busy slots):\n{events_for_llm}\n\n"
-        "## Sam's scheduling preferences\n"
-        "- Prefers 30-minute virtual meetings (Google Meet).\n"
-        "- Likes to group meetings together when possible to keep "
-        "blocks of deep work time intact.\n"
-        "- Prefers afternoon slots for external calls.\n"
-        "- Offers 2-3 specific time slots across different days.\n\n"
-        "## Sam's email style\n"
-        "- Warm, concise, friendly. Signs off casually.\n"
-        "- Uses line breaks between paragraphs.\n"
-        "- Uses bullet points (with - not *) for listing times.\n"
-        "- NEVER use emojis or em dashes in replies.\n"
-        "- Keep formatting clean — this should read like a normal email.\n\n"
-        "## Rules\n"
-        "- Suggest times that DON'T conflict with busy slots above.\n"
-        "- Offer 2-3 time slots across different days when first proposing.\n"
-        "- Format the reply like a real email: use line breaks (\\n) between "
-        "paragraphs, use bullet points (- ) for listing time options.\n"
-        "- Keep replies concise but well-formatted.\n"
-        "- When a time is agreed, confirm it and say you'll send a calendar invite.\n"
-        "- NEVER ask 'should I send an invite?' — just say you will.\n"
-        "- NEVER ask for more context or clarification.\n\n"
-        "## reasoning_summary\n"
-        "This field should explain your scheduling logic. Include:\n"
-        "1. Which conflicts you avoided and why.\n"
-        "2. How you applied Sam's preferences (grouping meetings, afternoon preference).\n"
-        "3. Why the proposed slots were chosen.\n"
-        "Example: 'Monday morning is packed with back-to-back meetings, so I suggested "
-        "the afternoon slot to keep Sam's morning focus block. Tuesday's 2 PM works well "
-        "since there's already a meeting at 1 PM, keeping calls grouped together.'\n"
-        "2-3 sentences.\n\n"
-        "CRITICAL: Your ENTIRE response must be a single raw JSON object. "
-        "No explanation, no commentary, no markdown fences. Just JSON.\n\n"
-        '{"reply": "your email text", "is_complete": false, '
-        '"proposed_dates": ["YYYY-MM-DD", ...], '
-        '"proposed_slots": [{"start": "ISO8601", "end": "ISO8601"}, ...], '
-        '"reasoning_summary": "2-3 sentences explaining your calendar analysis"}\n\n'
-        "proposed_dates: ALL dates mentioned in the reply.\n"
-        "proposed_slots: the exact time windows you suggest (ISO8601 with timezone).\n"
-        "Set is_complete to true when a specific time is confirmed.\n"
-        "When is_complete is true, also include:\n"
-        '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
-        '"event_summary": "short title"'
-    )
-
-    llm_messages = [{"role": m["role"], "content": m["content"]} for m in req.messages]
-
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=512,
-        system=system_prompt,
-        messages=llm_messages,
-    )
-
-    text = response.content[0].text.strip()
-
-    # Robust JSON extraction: strip fences, find JSON object in surrounding text
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
-
-    result = None
     try:
-        result = json.loads(text)
-    except json.JSONDecodeError:
-        # Try to find a JSON object embedded in the text
-        brace_start = text.find("{")
-        brace_end = text.rfind("}")
-        if brace_start != -1 and brace_end > brace_start:
-            try:
-                result = json.loads(text[brace_start : brace_end + 1])
-            except json.JSONDecodeError:
-                pass
-    if result is None:
-        result = {"reply": text, "is_complete": False}
+        # 2. Fetch events for the next 7 days
+        user_tz = calendar.get_user_timezone()
+        now = datetime.now(timezone.utc)
+        events = calendar.get_all_events(
+            time_min=now,
+            time_max=now + timedelta(days=7),
+            include_primary=True,
+        )
 
-    reply = result.get("reply", "")
-    is_complete = result.get("is_complete", False)
+        # Build availability string for the LLM (real data — LLM needs it to
+        # find free slots), but we never send summaries to the frontend.
+        events_for_llm = "\n".join(
+            f"- {e.start.strftime('%A %B %-d, %-I:%M %p')} – {e.end.strftime('%-I:%M %p')}: busy"
+            for e in sorted(events, key=lambda ev: ev.start)
+        )
 
-    resp: dict = {"reply": reply, "is_complete": is_complete}
+        # 3. Single Claude API call
+        client = Anthropic(api_key=config.anthropic_api_key)
 
-    # Always build masked events + reasoning (not just on is_complete)
-    from dateutil import parser as dateutil_parser
+        system_prompt = (
+            "You are powering a live demo of Scheduled, an AI scheduling assistant. "
+            "In this demo, a visitor is messaging Sam to set up a virtual meeting. "
+            "You reply AS Sam — in first person, warm and professional.\n\n"
+            "CONTEXT: The visitor is on tryscheduled.com/demo and wants to schedule "
+            "a video call with Sam to learn about Scheduled. You don't need any more "
+            "context — just help them find a time. Every message from the visitor is "
+            "a direct scheduling request. Never ask for clarification or more context.\n\n"
+            f"Sam's timezone: {user_tz}\n"
+            f"Current time: {now.strftime('%A %B %-d, %Y %-I:%M %p')} UTC\n\n"
+            f"Sam's calendar (next 7 days — busy slots):\n{events_for_llm}\n\n"
+            "## Sam's scheduling preferences\n"
+            "- Prefers 30-minute virtual meetings (Google Meet).\n"
+            "- Likes to group meetings together when possible to keep "
+            "blocks of deep work time intact.\n"
+            "- Prefers afternoon slots for external calls.\n"
+            "- Offers 2-3 specific time slots across different days.\n\n"
+            "## Sam's email style\n"
+            "- Warm, concise, friendly. Signs off casually.\n"
+            "- Uses line breaks between paragraphs.\n"
+            "- Uses bullet points (with - not *) for listing times.\n"
+            "- NEVER use emojis or em dashes in replies.\n"
+            "- Keep formatting clean — this should read like a normal email.\n\n"
+            "## Rules\n"
+            "- Suggest times that DON'T conflict with busy slots above.\n"
+            "- Offer 2-3 time slots across different days when first proposing.\n"
+            "- Format the reply like a real email: use line breaks (\\n) between "
+            "paragraphs, use bullet points (- ) for listing time options.\n"
+            "- Keep replies concise but well-formatted.\n"
+            "- When a time is agreed, confirm it and say you'll send a calendar invite.\n"
+            "- NEVER ask 'should I send an invite?' — just say you will.\n"
+            "- NEVER ask for more context or clarification.\n\n"
+            "## reasoning_summary\n"
+            "This field should explain your scheduling logic. Include:\n"
+            "1. Which conflicts you avoided and why.\n"
+            "2. How you applied Sam's preferences (grouping meetings, afternoon preference).\n"
+            "3. Why the proposed slots were chosen.\n"
+            "Example: 'Monday morning is packed with back-to-back meetings, so I suggested "
+            "the afternoon slot to keep Sam's morning focus block. Tuesday's 2 PM works well "
+            "since there's already a meeting at 1 PM, keeping calls grouped together.'\n"
+            "2-3 sentences.\n\n"
+            "CRITICAL: Your ENTIRE response must be a single raw JSON object. "
+            "No explanation, no commentary, no markdown fences. Just JSON.\n\n"
+            '{"reply": "your email text", "is_complete": false, '
+            '"proposed_dates": ["YYYY-MM-DD", ...], '
+            '"proposed_slots": [{"start": "ISO8601", "end": "ISO8601"}, ...], '
+            '"reasoning_summary": "2-3 sentences explaining your calendar analysis"}\n\n'
+            "proposed_dates: ALL dates mentioned in the reply.\n"
+            "proposed_slots: the exact time windows you suggest (ISO8601 with timezone).\n"
+            "Set is_complete to true when a specific time is confirmed.\n"
+            "When is_complete is true, also include:\n"
+            '"agreed_time_start": "ISO8601", "agreed_time_end": "ISO8601", '
+            '"event_summary": "short title"'
+        )
 
-    agreed_start = result.get("agreed_time_start", "")
-    agreed_end = result.get("agreed_time_end", "")
+        llm_messages = [{"role": m["role"], "content": m["content"]} for m in req.messages]
 
-    # Collect all proposed dates (plural) to fetch events for each
-    proposed_dates_raw = result.get("proposed_dates", [])
-    if isinstance(proposed_dates_raw, str):
-        proposed_dates_raw = [proposed_dates_raw]
-    # Fallback to old single field
-    if not proposed_dates_raw:
-        old = result.get("proposed_date", "")
-        if old:
-            proposed_dates_raw = [old]
-    if is_complete and agreed_start:
-        proposed_dates_raw = [agreed_start]
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=512,
+            system=system_prompt,
+            messages=llm_messages,
+        )
 
-    # Parse dates and fetch events for the full range, using user's timezone
-    import zoneinfo
+        text = response.content[0].text.strip()
 
-    try:
-        user_tzinfo = zoneinfo.ZoneInfo(user_tz)
-    except (KeyError, Exception):
-        user_tzinfo = timezone.utc
+        # Robust JSON extraction: strip fences, find JSON object in surrounding text
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 
-    parsed_dates = []
-    for d in proposed_dates_raw:
+        result = None
         try:
-            dt = dateutil_parser.parse(d)
-            # If naive, localize to user's timezone
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=user_tzinfo)
-            parsed_dates.append(dt)
-        except (ValueError, OverflowError):
-            continue
+            result = json.loads(text)
+        except json.JSONDecodeError:
+            # Try to find a JSON object embedded in the text
+            brace_start = text.find("{")
+            brace_end = text.rfind("}")
+            if brace_start != -1 and brace_end > brace_start:
+                try:
+                    result = json.loads(text[brace_start : brace_end + 1])
+                except json.JSONDecodeError:
+                    pass
+        if result is None:
+            result = {"reply": text, "is_complete": False}
 
-    if not parsed_dates:
-        parsed_dates = [now.astimezone(user_tzinfo) + timedelta(days=1)]
+        reply = result.get("reply", "")
+        is_complete = result.get("is_complete", False)
 
-    range_start = min(parsed_dates).replace(hour=0, minute=0, second=0, microsecond=0)
-    range_end = max(parsed_dates).replace(hour=23, minute=59, second=59, microsecond=0) + timedelta(seconds=1)
+        resp: dict = {"reply": reply, "is_complete": is_complete}
 
-    all_events = calendar.get_all_events(
-        time_min=range_start, time_max=range_end, include_primary=True
-    )
+        # Always build masked events + reasoning (not just on is_complete)
+        from dateutil import parser as dateutil_parser
 
-    masked_events = [
-        {
-            "start": e.start.isoformat(),
-            "end": e.end.isoformat(),
-            "summary": "Blocked",
+        agreed_start = result.get("agreed_time_start", "")
+        agreed_end = result.get("agreed_time_end", "")
+
+        # Collect all proposed dates (plural) to fetch events for each
+        proposed_dates_raw = result.get("proposed_dates", [])
+        if isinstance(proposed_dates_raw, str):
+            proposed_dates_raw = [proposed_dates_raw]
+        # Fallback to old single field
+        if not proposed_dates_raw:
+            old = result.get("proposed_date", "")
+            if old:
+                proposed_dates_raw = [old]
+        if is_complete and agreed_start:
+            proposed_dates_raw = [agreed_start]
+
+        # Parse dates and fetch events for the full range, using user's timezone
+        import zoneinfo
+
+        try:
+            user_tzinfo = zoneinfo.ZoneInfo(user_tz)
+        except (KeyError, Exception):
+            user_tzinfo = timezone.utc
+
+        parsed_dates = []
+        for d in proposed_dates_raw:
+            try:
+                dt = dateutil_parser.parse(d)
+                # If naive, localize to user's timezone
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=user_tzinfo)
+                parsed_dates.append(dt)
+            except (ValueError, OverflowError):
+                continue
+
+        if not parsed_dates:
+            parsed_dates = [now.astimezone(user_tzinfo) + timedelta(days=1)]
+
+        range_start = min(parsed_dates).replace(hour=0, minute=0, second=0, microsecond=0)
+        range_end = max(parsed_dates).replace(hour=23, minute=59, second=59, microsecond=0) + timedelta(seconds=1)
+
+        all_events = calendar.get_all_events(
+            time_min=range_start, time_max=range_end, include_primary=True
+        )
+
+        masked_events = [
+            {
+                "start": e.start.isoformat(),
+                "end": e.end.isoformat(),
+                "summary": "Blocked",
+            }
+            for e in sorted(all_events, key=lambda ev: ev.start)
+        ]
+
+        date_labels = [d.strftime("%B %-d") for d in sorted(set(d.date() for d in parsed_dates))]
+        date_label = " & ".join(date_labels) + f", {parsed_dates[0].year}"
+
+        # Pass through proposed_slots for calendar highlighting
+        proposed_slots = result.get("proposed_slots", [])
+
+        resp["events"] = masked_events
+        resp["proposed_slots"] = proposed_slots
+        resp["reasoning"] = {
+            "summary": result.get("reasoning_summary", "Scheduling request"),
+            "date_label": date_label,
         }
-        for e in sorted(all_events, key=lambda ev: ev.start)
-    ]
 
-    date_labels = [d.strftime("%B %-d") for d in sorted(set(d.date() for d in parsed_dates))]
-    date_label = " & ".join(date_labels) + f", {parsed_dates[0].year}"
+        if is_complete:
+            resp["event_summary"] = result.get("event_summary", "Meeting")
+            resp["agreed_time_start"] = agreed_start
+            resp["agreed_time_end"] = agreed_end
 
-    # Pass through proposed_slots for calendar highlighting
-    proposed_slots = result.get("proposed_slots", [])
-
-    resp["events"] = masked_events
-    resp["proposed_slots"] = proposed_slots
-    resp["reasoning"] = {
-        "summary": result.get("reasoning_summary", "Scheduling request"),
-        "date_label": date_label,
-    }
-
-    if is_complete:
-        resp["event_summary"] = result.get("event_summary", "Meeting")
-        resp["agreed_time_start"] = agreed_start
-        resp["agreed_time_end"] = agreed_end
-
-    return resp
+        return resp
+    finally:
+        calendar.close()
 
 
 class DemoBookRequest(BaseModel):
@@ -3432,21 +3469,24 @@ def demo_book(req: DemoBookRequest, request: Request):
     )
 
     try:
-        start = dateutil_parser.parse(req.agreed_time_start)
-        end = dateutil_parser.parse(req.agreed_time_end)
-    except (ValueError, OverflowError) as exc:
-        raise HTTPException(status_code=400, detail=f"Invalid time: {exc}")
+        try:
+            start = dateutil_parser.parse(req.agreed_time_start)
+            end = dateutil_parser.parse(req.agreed_time_end)
+        except (ValueError, OverflowError) as exc:
+            raise HTTPException(status_code=400, detail=f"Invalid time: {exc}")
 
-    event_id = calendar.create_invite_event(
-        summary=req.event_summary,
-        start=start,
-        end=end,
-        attendee_emails=[req.attendee_email],
-        description="Booked via Scheduled demo — tryscheduled.com/demo",
-        add_google_meet=True,
-    )
+        event_id = calendar.create_invite_event(
+            summary=req.event_summary,
+            start=start,
+            end=end,
+            attendee_emails=[req.attendee_email],
+            description="Booked via Scheduled demo — tryscheduled.com/demo",
+            add_google_meet=True,
+        )
 
-    return {"status": "booked", "event_id": event_id}
+        return {"status": "booked", "event_id": event_id}
+    finally:
+        calendar.close()
 
 
 @app.post("/api/v1/gmail/watch/renew")
