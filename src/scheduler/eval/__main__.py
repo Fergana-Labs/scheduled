@@ -546,13 +546,20 @@ def cmd_record(args):
     """Dump the last 1000 emails + calendar + guides to a fixture. No LLM calls."""
     from datetime import timedelta
 
-    from scheduler.auth.google_auth import get_credentials
     from scheduler.calendar.client import CalendarClient
     from scheduler.config import config
     from scheduler.eval.backends import _serialize_email, _serialize_event, save_fixture
     from scheduler.gmail.client import GmailClient
 
-    creds = get_credentials()
+    if args.user_id:
+        # Preferred path when DATABASE_URL is set: load tokens from DB
+        from scheduler.auth.google_auth import load_credentials
+        creds = load_credentials(args.user_id)
+    else:
+        # Fallback: browser OAuth flow (requires port 8080 free and correct redirect URI)
+        from scheduler.auth.google_auth import get_credentials
+        creds = get_credentials()
+
     gmail = GmailClient(creds)
     calendar = CalendarClient(creds, config.scheduled_calendar_name)
 
@@ -607,10 +614,11 @@ def cmd_record(args):
     from scheduler.guides import load_guide
     guides = {}
     for name in ["scheduling_preferences", "email_style"]:
-        guides[name] = load_guide(name)
+        guides[name] = load_guide(name, user_id=args.user_id)
 
     metadata = {
         "thread_ids": [c.thread_id for c in EVAL_CASES] + (args.thread_ids or []),
+        "user_id": args.user_id,
         "lookback_days": lookback_days,
         "n_messages": len(messages),
         "n_events": len(events),
@@ -985,6 +993,10 @@ def main():
     rec = sub.add_parser("record", help="Dump inbox + calendar to a fixture (run once)")
     rec.add_argument("--out", required=True, help="Output fixture file path")
     rec.add_argument("--thread-ids", nargs="*", help="Extra thread IDs to include for draft eval")
+    rec.add_argument(
+        "--user-id",
+        help="User UUID from the DB (use when DATABASE_URL is set — avoids browser OAuth flow)",
+    )
     rec.set_defaults(func=cmd_record)
 
     # list
