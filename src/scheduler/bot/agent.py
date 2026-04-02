@@ -122,10 +122,10 @@ def _build_tools(
     @tool(
         "read_thread",
         "Read the full email thread from the bot's inbox to understand the context.",
-        {"thread_id": str},
+        {},
     )
     async def read_thread(args):
-        thread = bot_gmail.get_thread(args["thread_id"])
+        thread = bot_gmail.get_thread(thread_id)
         messages = [
             {
                 "sender": m.sender,
