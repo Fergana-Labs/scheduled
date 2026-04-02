@@ -35,6 +35,7 @@ export default function PendingState({ agents }: PendingStateProps) {
         {agents && (
           <div className="mt-5 space-y-3">
             {Object.entries(AGENT_LABELS).map(([key, label]) => {
+              if (!(key in agents)) return null;
               const status = agents[key];
               return (
                 <div key={key} className="flex items-center gap-3">

@@ -825,11 +825,21 @@ def auth0_login(signup: str | None = None):
     return RedirectResponse(url)
 
 
-def _is_onboarded(user_id: str, *, scheduled_calendar_id: str | None = None) -> bool:
+def _is_onboarded(
+    user_id: str,
+    *,
+    scheduled_calendar_id: str | None = None,
+    scheduling_mode: str = "draft",
+) -> bool:
     from scheduler.db import get_guides_for_user
     guides = get_guides_for_user(user_id)
     guide_names = {g.name for g in guides}
-    has_guides = "scheduling_preferences" in guide_names and "email_style" in guide_names
+
+    if scheduling_mode == "bot":
+        has_guides = "scheduling_preferences" in guide_names
+    else:
+        has_guides = "scheduling_preferences" in guide_names and "email_style" in guide_names
+
     return has_guides and scheduled_calendar_id is not None
 
 
@@ -913,7 +923,11 @@ def auth0_callback(code: str | None = None, error: str | None = None):
 
     # Check if user has Google tokens and onboarding status
     has_google = user.google_refresh_token is not None
-    is_onboarded = has_google and _is_onboarded(str(user.id), scheduled_calendar_id=user.scheduled_calendar_id)
+    is_onboarded = has_google and _is_onboarded(
+        str(user.id),
+        scheduled_calendar_id=user.scheduled_calendar_id,
+        scheduling_mode=user.scheduling_mode,
+    )
 
     if has_google and is_onboarded:
         logger.info("auth0_callback: returning user=%s, renewing gmail watch", user.id)
@@ -1119,7 +1133,11 @@ def auth_google_connect_callback(
     # Check onboarding status
     from scheduler.db import get_user_by_id as _get_user
     db_user = _get_user(user_id)
-    is_onboarded = _is_onboarded(user_id, scheduled_calendar_id=db_user.scheduled_calendar_id if db_user else None)
+    is_onboarded = _is_onboarded(
+        user_id,
+        scheduled_calendar_id=db_user.scheduled_calendar_id if db_user else None,
+        scheduling_mode=db_user.scheduling_mode if db_user else "draft",
+    )
 
     from starlette.background import BackgroundTask
 
@@ -1564,7 +1582,11 @@ def auth_google_callback(
             logger.debug("Failed to update display_name for user=%s", user.id)
 
     # Determine if user is already onboarded
-    is_onboarded = _is_onboarded(str(user.id), scheduled_calendar_id=user.scheduled_calendar_id)
+    is_onboarded = _is_onboarded(
+        str(user.id),
+        scheduled_calendar_id=user.scheduled_calendar_id,
+        scheduling_mode=user.scheduling_mode,
+    )
 
     from starlette.background import BackgroundTask
 
@@ -3504,8 +3526,14 @@ def web_onboarding_status(
     db_user = get_user_by_id(user["user_id"])
     connected = db_user is not None and db_user.google_refresh_token is not None
 
+    scheduling_mode = db_user.scheduling_mode if db_user else "draft"
+
     if connected:
-        ready = _is_onboarded(user["user_id"], scheduled_calendar_id=db_user.scheduled_calendar_id)
+        ready = _is_onboarded(
+            user["user_id"],
+            scheduled_calendar_id=db_user.scheduled_calendar_id,
+            scheduling_mode=scheduling_mode,
+        )
     else:
         ready = False
 
@@ -3529,7 +3557,10 @@ def web_onboarding_status(
                 "onboarding: detected stuck onboarding (status=%s) for user=%s, auto-retrying",
                 db_user.onboarding_status, user_id,
             )
-            background_tasks.add_task(_run_onboarding_for_runtime, user_id)
+            if scheduling_mode == "bot":
+                background_tasks.add_task(_run_bot_mode_onboarding, user_id)
+            else:
+                background_tasks.add_task(_run_onboarding_for_runtime, user_id)
         elif db_user.onboarding_status == "failed":
             result["failed"] = True
             result["error"] = "Onboarding failed. Please try again."

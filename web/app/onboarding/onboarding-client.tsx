@@ -3,11 +3,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2, Mail, Bot } from 'lucide-react';
 import { api, captureSessionFromURL, getSession } from '@/lib/api';
 import { track, setGAUserId } from '@/lib/analytics';
 import PendingState from '@/components/onboarding/PendingState';
 import FailedState from '@/components/onboarding/FailedState';
+
+type SchedulingMode = 'draft' | 'bot' | null;
 
 interface UserInfo {
   user_id: string;
@@ -17,11 +19,12 @@ interface UserInfo {
 
 interface OnboardingClientProps {
   needsGoogle: boolean;
+  initialMode: SchedulingMode;
 }
 
 type AgentStatus = Record<string, string>;
 
-export default function OnboardingClient({ needsGoogle }: OnboardingClientProps) {
+export default function OnboardingClient({ needsGoogle, initialMode }: OnboardingClientProps) {
   const router = useRouter();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +32,7 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
   const [failed, setFailed] = useState(false);
   const [failedError, setFailedError] = useState<string | null>(null);
   const [agents, setAgents] = useState<AgentStatus | null>(null);
+  const [selectedMode, setSelectedMode] = useState<SchedulingMode>(initialMode);
 
   useEffect(() => {
     captureSessionFromURL();
@@ -119,6 +123,28 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
   }
 
   if (needsGoogle) {
+    const connectUrl = selectedMode === 'bot'
+      ? `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google/connect-calendar?token=${getSession() || ''}`
+      : `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google/connect?token=${getSession() || ''}`;
+
+    type ModeOption = { mode: 'draft' | 'bot'; icon: React.ReactNode; title: string; description: React.ReactNode; footnote: string };
+    const modeOptions: ModeOption[] = [
+      {
+        mode: 'draft',
+        icon: <Mail className={`mt-0.5 h-5 w-5 flex-shrink-0 ${selectedMode === 'draft' ? 'text-[#43614a]' : 'text-gray-400'}`} />,
+        title: 'Draft mode',
+        description: 'Scheduled drafts replies in your Gmail. You review and send them yourself.',
+        footnote: 'Requires Gmail + Calendar access',
+      },
+      {
+        mode: 'bot',
+        icon: <Bot className={`mt-0.5 h-5 w-5 flex-shrink-0 ${selectedMode === 'bot' ? 'text-[#43614a]' : 'text-gray-400'}`} />,
+        title: 'Bot mode',
+        description: <>CC <span className="font-medium">scheduling@tryscheduled.com</span> on any thread and the bot replies directly.</>,
+        footnote: 'Only needs Calendar access',
+      },
+    ];
+
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA]">
         <div className="mx-auto max-w-lg px-4">
@@ -136,9 +162,9 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
               </span>
             </div>
 
-            <div className="mb-8">
+            <div className="mb-6">
               <h1 className="text-xl font-semibold text-gray-900">
-                Connect your Google account
+                How would you like to schedule?
               </h1>
               <p className="mt-2 text-sm text-gray-500">
                 Signed in as{' '}
@@ -146,14 +172,38 @@ export default function OnboardingClient({ needsGoogle }: OnboardingClientProps)
                   {user?.email}
                 </span>
               </p>
-              <p className="mt-4 text-sm text-gray-500">
-                Scheduled needs access to your Gmail and Calendar to draft scheduling replies.
-              </p>
+            </div>
+
+            <div className="mb-6 space-y-3">
+              {modeOptions.map(({ mode, icon, title, description, footnote }) => (
+                <button
+                  key={mode}
+                  onClick={() => setSelectedMode(mode)}
+                  className={`w-full rounded-xl border-2 p-4 text-left transition-colors ${
+                    selectedMode === mode
+                      ? 'border-[#43614a] bg-[#43614a]/5'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    {icon}
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{title}</p>
+                      <p className="mt-1 text-xs text-gray-500">{description}</p>
+                      <p className="mt-1 text-xs text-gray-400">{footnote}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
 
             <a
-              href={`${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/google/connect?token=${getSession() || ''}`}
-              className="inline-flex w-full items-center justify-center rounded-xl bg-[#43614a] px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-[#527559]"
+              href={selectedMode ? connectUrl : undefined}
+              className={`inline-flex w-full items-center justify-center rounded-xl px-6 py-4 text-base font-semibold text-white transition-colors ${
+                selectedMode
+                  ? 'bg-[#43614a] hover:bg-[#527559]'
+                  : 'cursor-not-allowed bg-gray-300'
+              }`}
             >
               Connect Google Account
             </a>

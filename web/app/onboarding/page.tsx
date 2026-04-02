@@ -1,16 +1,13 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import OnboardingClient from './onboarding-client';
 
-interface OnboardingPageProps {
-  searchParams?: {
-    needs_google?: string | string[];
-  };
-}
+export default function OnboardingPage() {
+  const searchParams = useSearchParams();
+  const needsGoogle = searchParams.get('needs_google') === '1';
+  const modeParam = searchParams.get('mode');
+  const initialMode = modeParam === 'bot' ? 'bot' : modeParam === 'draft' ? 'draft' : null;
 
-export default function OnboardingPage({ searchParams }: OnboardingPageProps) {
-  const rawNeedsGoogle = searchParams?.needs_google;
-  const needsGoogle = Array.isArray(rawNeedsGoogle)
-    ? rawNeedsGoogle.includes('1')
-    : rawNeedsGoogle === '1';
-
-  return <OnboardingClient needsGoogle={needsGoogle} />;
+  return <OnboardingClient needsGoogle={needsGoogle} initialMode={initialMode} />;
 }
