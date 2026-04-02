@@ -25,6 +25,7 @@ interface Settings {
   draft_auto_delete_enabled: boolean;
   scheduled_calendar_id: string | null;
   guides: { name: string; content: string; updated_at: string }[];
+  scheduling_mode: string;
 }
 
 export default function SettingsPage() {
@@ -63,8 +64,13 @@ export default function SettingsPage() {
 
         const s = await api<Settings>('/web/api/v1/settings');
         setSettings(s);
-      } catch {
-        // No valid session — clear stale token and redirect to sign-in
+      } catch (err) {
+        if (err instanceof Error && err.message === 'subscription_required') {
+          // Subscription lapsed — show paywall (session is still valid in localStorage)
+          router.replace('/onboarding');
+          return;
+        }
+        // Auth failed — only clear session if /auth/me itself failed (not a downstream call)
         clearSession();
         window.location.href = `${process.env.NEXT_PUBLIC_CONTROL_PLANE_URL}/auth/login`;
         return;
@@ -87,8 +93,6 @@ export default function SettingsPage() {
       </div>
     );
   }
-
-  const readySettings = settings;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#FAFAFA]">
@@ -150,16 +154,17 @@ export default function SettingsPage() {
               </h1>
               <DisconnectedState />
             </>
-          ) : readySettings ? (
+          ) : settings ? (
             <ReadyState
-              systemEnabled={readySettings.system_enabled}
-              autopilotEnabled={readySettings.autopilot_enabled}
-              processSalesEmails={readySettings.process_sales_emails}
-              brandingEnabled={readySettings.scheduled_branding_enabled}
-              reasoningEmailsEnabled={readySettings.reasoning_emails_enabled}
-              draftAutoDeleteEnabled={readySettings.draft_auto_delete_enabled}
-              calendarId={readySettings.scheduled_calendar_id}
-              guides={readySettings.guides}
+              systemEnabled={settings.system_enabled}
+              autopilotEnabled={settings.autopilot_enabled}
+              processSalesEmails={settings.process_sales_emails}
+              brandingEnabled={settings.scheduled_branding_enabled}
+              reasoningEmailsEnabled={settings.reasoning_emails_enabled}
+              draftAutoDeleteEnabled={settings.draft_auto_delete_enabled}
+              calendarId={settings.scheduled_calendar_id}
+              guides={settings.guides}
+              schedulingMode={settings.scheduling_mode}
               onDisconnected={handleDisconnected}
             />
           ) : null}

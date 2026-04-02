@@ -79,6 +79,14 @@ class UserRow:
     google_email: str | None = None
     refresh_failures: int = 0
     scheduling_mode: str = "draft"
+    job_title: str | None = None
+    scheduling_context: str | None = None
+    onboarding_completed_at: datetime | None = None
+    stripe_customer_id: str | None = None
+    stripe_subscription_id: str | None = None
+    subscription_status: str = "none"
+    trial_ends_at: datetime | None = None
+    subscription_current_period_end: datetime | None = None
 
 
 _USER_ROW_FIELDS.update(f.name for f in fields(UserRow))
@@ -1683,6 +1691,65 @@ def update_scheduling_mode(user_id: str, mode: str) -> None:
             (mode, user_id),
         )
         conn.commit()
+
+
+def update_user_profile(
+    user_id: str,
+    job_title: str | None = None,
+    scheduling_context: str | None = None,
+) -> None:
+    with _pooled_conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """UPDATE users
+               SET job_title = %s,
+                   scheduling_context = %s,
+                   onboarding_completed_at = now(),
+                   updated_at = now()
+             WHERE id = %s""",
+            (job_title, scheduling_context, user_id),
+        )
+        conn.commit()
+
+
+def update_stripe_customer(user_id: str, stripe_customer_id: str) -> None:
+    with _pooled_conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE users SET stripe_customer_id = %s, updated_at = now() WHERE id = %s",
+            (stripe_customer_id, user_id),
+        )
+        conn.commit()
+
+
+def update_subscription_status(
+    stripe_customer_id: str,
+    *,
+    subscription_id: str | None = None,
+    status: str | None = None,
+    trial_ends_at: datetime | None = None,
+    current_period_end: datetime | None = None,
+) -> None:
+    with _pooled_conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """UPDATE users SET
+                stripe_subscription_id = COALESCE(%s, stripe_subscription_id),
+                subscription_status = COALESCE(%s, subscription_status),
+                trial_ends_at = COALESCE(%s, trial_ends_at),
+                subscription_current_period_end = COALESCE(%s, subscription_current_period_end),
+                updated_at = now()
+               WHERE stripe_customer_id = %s""",
+            (subscription_id, status, trial_ends_at, current_period_end, stripe_customer_id),
+        )
+        conn.commit()
+
+
+def get_user_by_stripe_customer(stripe_customer_id: str) -> UserRow | None:
+    with _pooled_conn() as conn, conn.cursor() as cur:
+        cur.execute("SELECT * FROM users WHERE stripe_customer_id = %s", (stripe_customer_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        cols = [d[0] for d in cur.description]
+        return _row_to_user(cols, row)
 
 
 # ---------------------------------------------------------------------------

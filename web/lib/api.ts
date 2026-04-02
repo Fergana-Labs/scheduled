@@ -9,9 +9,10 @@ export function captureSessionFromURL() {
   const token = params.get('token') || params.get('session');
   if (token) {
     localStorage.setItem(SESSION_KEY, token);
-    // Remove token from URL without reload
+    // Remove token and transient params from URL without reload
     params.delete('token');
     params.delete('session');
+    params.delete('checkout');
     const clean = params.toString();
     const newUrl = window.location.pathname + (clean ? `?${clean}` : '');
     window.history.replaceState({}, '', newUrl);
@@ -41,13 +42,21 @@ export async function api<T = unknown>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const { headers: _dropHeaders, ...restOptions } = options;
   const res = await fetch(`${BASE_URL}${path}`, {
     credentials: 'include',
+    ...restOptions,
     headers,
-    ...options,
   });
 
   if (!res.ok) {
+    // Parse 403 subscription_required so callers can handle it
+    if (res.status === 403) {
+      const body = await res.json().catch(() => ({}));
+      if (body.detail === 'subscription_required') {
+        throw new Error('subscription_required');
+      }
+    }
     throw new Error(`API error: ${res.status}`);
   }
 
