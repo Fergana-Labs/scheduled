@@ -3550,15 +3550,20 @@ def web_onboarding_status(
         elif db_user.onboarding_status in ("running", "pending", None):
             # DB says running/pending/null but no in-memory status — the background task
             # was lost (server restarted, deploy killed it, or it never started).
-            # Auto-retry by kicking off onboarding again.
-            logger.info(
-                "onboarding: detected stuck onboarding (status=%s) for user=%s, auto-retrying",
-                db_user.onboarding_status, user_id,
-            )
-            if scheduling_mode == "bot":
-                background_tasks.add_task(_run_bot_mode_onboarding, user_id)
-            else:
-                background_tasks.add_task(_run_onboarding_for_runtime, user_id)
+            # Set in-memory status first to prevent duplicate retries from subsequent polls.
+            with _onboarding_lock:
+                if _onboarding_status.get(user_id, {}).get("status") in ("running", "retrying"):
+                    pass  # Another poll already triggered the retry
+                else:
+                    _onboarding_status[user_id] = {"status": "retrying"}
+                    logger.info(
+                        "onboarding: detected stuck onboarding (status=%s) for user=%s, auto-retrying",
+                        db_user.onboarding_status, user_id,
+                    )
+                    if scheduling_mode == "bot":
+                        background_tasks.add_task(_run_bot_mode_onboarding, user_id)
+                    else:
+                        background_tasks.add_task(_run_onboarding_for_runtime, user_id)
         elif db_user.onboarding_status == "failed":
             result["failed"] = True
             result["error"] = "Onboarding failed. Please try again."
@@ -3719,8 +3724,10 @@ def web_billing_status(user: dict = Depends(get_authenticated_user)):
             subs = stripe_mod.Subscription.list(customer=db_user.stripe_customer_id, limit=1)
             if subs.data:
                 sub = subs.data[0]
-                trial_end = datetime.fromtimestamp(sub.trial_end, tz=timezone.utc) if sub.trial_end else None
-                period_end = datetime.fromtimestamp(sub.current_period_end, tz=timezone.utc) if sub.current_period_end else None
+                raw_trial_end = getattr(sub, "trial_end", None)
+                raw_period_end = getattr(sub, "current_period_end", None)
+                trial_end = datetime.fromtimestamp(raw_trial_end, tz=timezone.utc) if raw_trial_end else None
+                period_end = datetime.fromtimestamp(raw_period_end, tz=timezone.utc) if raw_period_end else None
                 update_subscription_status(
                     db_user.stripe_customer_id,
                     subscription_id=sub.id,
@@ -3785,8 +3792,10 @@ async def stripe_webhook(request: Request):
             try:
                 _ensure_stripe()
                 sub = stripe_mod.Subscription.retrieve(subscription_id)
-                trial_end = datetime.fromtimestamp(sub.trial_end, tz=timezone.utc) if sub.trial_end else None
-                period_end = datetime.fromtimestamp(sub.current_period_end, tz=timezone.utc) if sub.current_period_end else None
+                raw_trial_end = getattr(sub, "trial_end", None)
+                raw_period_end = getattr(sub, "current_period_end", None)
+                trial_end = datetime.fromtimestamp(raw_trial_end, tz=timezone.utc) if raw_trial_end else None
+                period_end = datetime.fromtimestamp(raw_period_end, tz=timezone.utc) if raw_period_end else None
                 update_subscription_status(
                     customer_id,
                     subscription_id=subscription_id,
