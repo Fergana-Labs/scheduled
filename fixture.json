@@ -1,0 +1,837 @@
+{
+  "metadata": {
+    "recorded_at": "2026-04-02T15:09:48.797869",
+    "thread_ids": [],
+    "user_id": "c98b2b2e-0aca-4fbb-abef-2b08748b9454",
+    "lookback_days": 60,
+    "n_messages": 40,
+    "n_events": 39,
+    "calendar_window": {
+      "start": "2026-02-01T15:09:41.810096",
+      "end": "2026-05-02T15:09:41.810096"
+    }
+  },
+  "messages": [
+    {
+      "id": "19d49ba26739b294",
+      "thread_id": "19d49ba26739b294",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Apr 1, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on April 1, 2026, 4:45 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nArchitectural proposal for continuous improvement of email and scheduling  \r\nstyle guides was presented with discussion regarding atomic changes and  \r\napproval for implementation.\r\n\r\n\r\nContinuous Improvement Architecture Review\r\nThe proposed architecture for continuous improvement involves a weekly  \r\ncrunch job aggregating user data to update email and scheduling style  \r\nguides based on persistent user edits. The 5-step process uses cosine  \r\nsimilarity to classify changes as persistent, defined as being seen more  \r\nthan 3 times, before passing them to an update agent.\r\n\r\nClarifying Atomic Changes Logic\r\nAtomic changes are defined as small adjustments to a user's learned  \r\npreferences, addressing new persistent patterns with minor updates, rather  \r\nthan template rewrites. The update agent uses an LLM call to reason over  \r\nthe input and desired changes, with a human-in-the-loop step for reviewing  \r\nand queuing proposed updates.\r\n\r\nArchitectural Approval and Simplification\r\nClarification was provided that the reject changes tool means no updates  \r\nwill be made to the current user configuration, leading to an agreement to  \r\nsimplify the interface by combining redundant tool calls. The architecture  \r\nwas generally approved, with the decision made to move forward with  \r\nimplementation.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\n[Triumphant Babalola] Simplify Interface: Remove the redundant no changes  \r\nneeded action from the interface plan.\r\n\r\n[Triumphant Babalola] Implement Architecture: Implement the continuous  \r\nimprovement architecture plan. Notify Henry Dowling when the Pull Request  \r\nis ready for merging.\r\n\r\n[Triumphant Babalola] Request Assistance: Notify Henry Dowling if  \r\nimplementation efforts are blocked or require support.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-04-01T15:47:09+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on April 1, 2026, 4:45 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d44f0974558ea5",
+      "thread_id": "19d44f0974558ea5",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 31, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 31, 2026, 6:27 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nAuthentication error fixes facilitated the system's ability to pull draft  \r\ndata, with a deep dive into continuous learning methodologies.\r\n\r\n\r\nAuthentication Error Fixes\r\nAn authentication error involving the Google ID was fixed, enabling the  \r\nscheduling feature to work via email. A system preference for scheduling  \r\nand email style is being built, but insufficient data is currently  \r\navailable.\r\n\r\nResearching Continual Learning Approach\r\nDiscussion centered on the complex challenge of distinguishing between  \r\ninstance-specific feedback and persistent user preferences in memory  \r\nsystems. The decision was made to prioritize continuous learning by  \r\nupdating the per-user email and scheduling preference guides.\r\n\r\nTechnical Implementation Strategy\r\nThe agreed-upon technical strategy involves using weighted classifiers on  \r\ndiffs to track consistent changes over 30 days and update the user style  \r\nguides. The system must address the memory leak causing the production  \r\nservice to crash every 15 minutes.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\n[Triumphant Babalola] Test Scheduling: Send a scheduling-related email to  \r\nverify draft appearance in the inbox after the call.\r\n\r\n[Triumphant Babalola] Build Continuous: Build the RL layer, including  \r\nweighted measures and classifiers, to extract insights from email  \r\ndifferences.\r\n\r\n[Triumphant Babalola] Prepare Comparison: Put the output of the continuous  \r\nlearning experiment into an Excel sheet to compare reasons for required  \r\nchanges.\r\n\r\n[Triumphant Babalola] Request Production: Reach out for access to the  \r\nproduction database for collected draft and sent email data once initial  \r\nplumbing is complete.\r\n\r\n[Triumphant Babalola] Create Test: Use AI to mock up synthetic user data  \r\nand exchanges for initial testing of the continuous learning system.\r\n\r\n[Samuel Liu] Fix Server: Investigate and fix the server memory leak causing  \r\nfrequent crashes.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-31T17:28:30+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 31, 2026, 6:27 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d44ea2c1c4b7ed",
+      "thread_id": "19d44ea059ae6eb0",
+      "sender": "Scheduled <internal@tryscheduled.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Re: Welcome to Scheduled!",
+      "body": "Scheduled drafted a reply in this thread.\r\n\r\nWhy: Schedule a welcome call with Sam from Scheduled\r\n\r\nYour meetings on April 1, 2026:\r\n  - 5:30 PM \u2013 5:45 PM: Daily checkin\r\n\r\n\u2014 Scheduled\r\n",
+      "date": "2026-03-31T17:21:30+00:00",
+      "snippet": "Scheduled drafted a reply in this thread. Why: Schedule a welcome call with Sam from Scheduled Your meetings on April 1, 2026: - 5:30 PM \u2013 5:45 PM: Daily checkin \u2014 Scheduled"
+    },
+    {
+      "id": "19d44ea27583dda3",
+      "thread_id": "19d44ea059ae6eb0",
+      "sender": "triumphant@ferganalabs.com",
+      "recipient": "sam@tryscheduled.com",
+      "cc": "",
+      "subject": "Re: Welcome to Scheduled!",
+      "body": "[This is an example draft created by Scheduled to show how it works \u2014 feel free to edit or delete it]<br><br>Hey Sam<br><br>thanks for the welcome<br><br>a 15 min call sounds good<br><br>does Thursday Apr 3 at 10 AM WAT work for you ?<br><br>Triumphant<br><br>Use <a href=\"https://tryscheduled.com/schedule/03d75510-779a-4204-8cb1-8d3cad8291bf\">Scheduled</a> to find a time automatically with Triumphant Babalola",
+      "date": "2026-03-31T10:21:29-07:00",
+      "snippet": "[This is an example draft created by Scheduled to show how it works \u2014 feel free to edit or delete it] Hey Sam thanks for the welcome a 15 min call sounds good does Thursday Apr 3 at 10 AM WAT work for"
+    },
+    {
+      "id": "19d44ea059ae6eb0",
+      "thread_id": "19d44ea059ae6eb0",
+      "sender": "Sam Liu <sam@tryscheduled.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Welcome to Scheduled!",
+      "body": "<p>Hello and welcome to Scheduled!</p>\r\n\r\n<p>We're excited you are here! Our goal is to empower you to focus on what matters by automating away the mind-numbing tasks that have become our lives. We image a world where humans don't have to spend another minute doing such mundane tasks (trust us, one of us used to be a management consultant, so we've had our fair share of sleep-less nights aligning boxes and scheduling meetings).</p>\r\n\r\n<p>Unlike other scheduling tools like Calendly, Cal&#46;com, or Fxyer, our product philosophy is built around seamlessly fitting into your existing scheduling preferences and workflow. If you head over to <a href=\"https://track.pstmrk.it/3s/tryscheduled.com%2Fsettings/x3cbAQ/kmPEAQ/AQ/902a2685-e8a5-41e4-ae0e-c21005e8e281/1/wu2M9CiFGo\">your settings</a>, you will find guides based on what we have learned from how you have scheduled in the past. These will be used by our agent to help you schedule future meetings.</p>\r\n\r\n<p>Note that we take privacy very seriously and this is the only personal data of yours we store on our server, which can be verified by looking through our open source codebase.</p>\r\n\r\n<p>We noticed you tend to keep your schedule lean and purposeful \u2014 short daily syncs paired with longer focused sessions when deeper work is needed. We&#x27;ve set things up to match that rhythm so your most important recurring commitments stay protected automatically.</p>\r\n\r\n<p>You are all set for now. Expect to see drafts written by our agent pop-up automatically in threads where scheduling is a concern. We handle all of the background work of checking against your calendar, preferences, and sending invites for you. Feel free to edit these drafts or just send as is.</p>\r\n\r\n<p>If this resonates, we would love to hop on a quick 15 minute call to get you up to speed and to see how else we can build this to match your needs. Just reply to the email (there should be a draft auto-populated below) and we'll use scheduled to automatically find a time.</p>\r\n\r\n<p>Warmly,</p>\r\n\r\n<p>Sam<br>CEO and Co-Founder of <a href=\"https://track.pstmrk.it/3s/tryscheduled.com/x3cbAQ/kmPEAQ/AQ/902a2685-e8a5-41e4-ae0e-c21005e8e281/2/JJ0eLRbZD1\">Scheduled</a> by <a href=\"https://track.pstmrk.it/3s/ferganalabs.com/x3cbAQ/kmPEAQ/AQ/902a2685-e8a5-41e4-ae0e-c21005e8e281/3/HXAYAbdHCk\">Fergana Labs</a></p><img src=\"https://ea.pstmrk.it/open?m=v3_1.qTZf9aiFBCyyfIoRF7wz4A.1GGKuqCXmqZch0_D8Hl8w0oBruESzaAprTAm39PMEslnHaUkICHdxJJzuUuyUG4xOOkfX00k55TTcdsb0AKI5X2EkNmSsBcL3_h56jMs_1riSXzcTPYEVsFOueoDekEN7XvI8I35lrP0GV-CqO3qSuoxntDO8HJ89pPRvlzwxHLaNQ-4P3kyJMPCb0KcZzgfhP17dhvdgYRcZl3eLQZ0bB3hGBvtyzA54lyMNiqwL9kTaHNN_8SiaPuMdvYc_mJGEzbP88L1kER0bCHsCgpWhHigXdQBkEHXowkjUyCy9Y9MQFU-CiK4OPrRSeovlFR_fohgg4q3KYc9JZnowU5p7ujkiVbUb1YutaW2G1ZbRaoP7tgXpV7ZUE1TOVZEJjI4mcUuTnFuu7DkkEr6m7oxoZRDd3UR1M0hSW7rc6PMO5DPAGF2S3OR8vQ4PjxFcnCJdqk3m0nzi_PY0e5co3aE_DntvYGcsUKA-4k11HZyBnUFqcy4ZWJWcjoidQpIfwG8\" width=\"1\" height=\"1\" border=\"0\" alt=\"\" />\r\n",
+      "date": "2026-03-31T17:21:19+00:00",
+      "snippet": "Hello and welcome to Scheduled! We&#39;re excited you are here! Our goal is to empower you to focus on what matters by automating away the mind-numbing tasks that have become our lives. We image a"
+    },
+    {
+      "id": "19d44a3df1737326",
+      "thread_id": "19d44969362fc78a",
+      "sender": "Triumphant Babalola <triumphant@ferganalabs.com>",
+      "recipient": "Triumphant Babalola <triumphant.b1@turing.com>",
+      "cc": "",
+      "subject": "Re: Testing Scheduled",
+      "body": "Hey man\r\n\r\nDoing well thanks\r\n\r\nWhat testing are you running\r\n\r\nOn Tue, Mar 31, 2026 at 4:50\u202fPM Triumphant Babalola <\r\ntriumphant.b1@turing.com> wrote:\r\n\r\n> Hey man\r\n>\r\n> how are you ?\r\n>\r\n> I hope all is well\r\n>\r\n> testing 12\r\n>\r\n> Triumphant\r\n>\r\n",
+      "date": "2026-03-31T17:04:42+01:00",
+      "snippet": "Hey man Doing well thanks What testing are you running On Tue, Mar 31, 2026 at 4:50 PM Triumphant Babalola &lt;triumphant.b1@turing.com&gt; wrote: Hey man how are you ? I hope all is well testing 12"
+    },
+    {
+      "id": "19d44969362fc78a",
+      "thread_id": "19d44969362fc78a",
+      "sender": "Triumphant Babalola <triumphant.b1@turing.com>",
+      "recipient": "\"triumphant@ferganalabs.com\" <triumphant@ferganalabs.com>",
+      "cc": "",
+      "subject": "Testing Scheduled",
+      "body": "Hey man\r\n\r\nhow are you ?\r\n\r\nI hope all is well\r\n\r\ntesting 12\r\n\r\nTriumphant\r\n",
+      "date": "2026-03-31T16:49:59+01:00",
+      "snippet": "Hey man how are you ? I hope all is well testing 12 Triumphant"
+    },
+    {
+      "id": "19d3fd4404ec20aa",
+      "thread_id": "19d3fd4404ec20aa",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 30, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 30, 2026, 6:38 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nWorking relationship reset for increased engineering velocity, with a new  \r\ncontinual learning project for the emailer and discussion of the AI agent  \r\nupdate strategy.\r\n\r\n\r\nVelocity and Relationship Reset\r\nHenry Dowling apologized for reduced bandwidth and proposed a working  \r\nrelationship reset, requesting higher engineering velocity from Triumphant  \r\nBabalola. Henry Dowling committed to providing more detailed feedback and  \r\nspecs to improve efficiency and work on the new project.\r\n\r\nContinual Learning Emailer Project\r\nA new project was introduced to build continual learning for the emailer  \r\nscheduling product to update the user's style guide and scheduling  \r\npreferences over time. The system will continually read sent and received  \r\nemails, attempting to update the guides at least once per 24 hours.\r\n\r\nUpdate Strategy and Plumbing\r\nThe key metric for determining guide updates is the diff between the  \r\nagent-generated draft and the final email sent by the user, noting  \r\nperformance concerns for agents with too much style content. The first  \r\nengineering step is to ensure the system can grab sent emails and match  \r\nthem to drafts, which should be done using the thread ID.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nTriumphant Babalola will set up a cron job to run the style guide updater  \r\nagent in the back end, initially once every 24 hours for all users.\r\n\r\nTriumphant Babalola will build a system to continually read the user's sent  \r\nand received emails to update the style guide and scheduling preferences  \r\nguides.\r\n\r\nTriumphant Babalola will familiarize with the plumbing to read user inboxes  \r\nand sent emails, and match the diffs between the drafts created and the  \r\nsent emails.\r\n\r\nHenry Dowling will share the Google doc about the project with Triumphant  \r\nBabalola.\r\n\r\nTriumphant Babalola will try to sign up for scheduled again tomorrow and  \r\nsee if the authentication error persists, then hop on a call with Henry  \r\nDowling to debug if necessary.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-30T17:39:27+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 30, 2026, 6:38 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d3fd260001d3b8",
+      "thread_id": "19d3fd260001d3b8",
+      "sender": "\"Henry Dowling (via Google Docs)\" <drive-shares-dm-noreply@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "sam@ferganalabs.com",
+      "subject": "Document shared with you: \"Continually learning from draft/email diffs\"",
+      "body": "I've shared an item with you:\r\n\r\nContinually learning from draft/email diffs\r\nhttps://docs.google.com/document/d/1IsZf3PoqaGcef4hlGNNWxwU-5WuAwt4lJ_oi_C1qcw8/edit?usp=sharing&ts=69cab4d4\r\n\r\nIt's not an attachment -- it's stored online. To open this item, just click  \r\nthe link above.\r\n",
+      "date": "2026-03-30T17:37:24+00:00",
+      "snippet": "Henry Dowling shared a document Henry Dowling (henry@ferganalabs.com) has invited you to edit the following document: Continually learning from draft/email diffs Open Google LLC, 1600 Amphitheatre"
+    },
+    {
+      "id": "19d2f07ec46ebfc2",
+      "thread_id": "19d2f07ec46ebfc2",
+      "sender": "\"Fergana Labs (via Slack)\" <notification@slack.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "You've got 3 unread messages",
+      "body": "Fergana Labs\r\n\r\n4 members\r\n\r\n\ud83d\udd25Your team has sent 23 messages recently\r\n\r\nView all unread messages [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/team]\r\n\r\nNew messages in #engineering\r\n\r\nHenryMarch 26th at 1:24 PM\r\nHere is what dimitri saw when trying to sign up\r\n\r\n\rHttpError 403 when requesting [\rhttps://www.googleapis.com/calendar/v3/users/me/calendarList?alt=json](https://www.googleapis.com/calendar/v3/users/me/calendarList?alt=json)\rreturned \"Request had insufficient authentication scopes.\". Details: \"[{'message': 'Insufficient Permission', 'domain': 'global', 'reason': 'insufficientPermissions'}]\"\r\n\r\nSamMarch 26th at 8:52 PM\r\n\u2022 Overall, I'm relatively sure that the mentos VC admin controls caused the 403 problem earlier today. I fixed a small bug we had where if someone took 1 hour to move from auth0 to oauth, the token would time out.\r\n\u2022 We should have the sent drafts processing fixed - essentially we would flag drafts as \"sent\" instead of as just drafts because we were look at teh wrong fields in the pub/sub\r\n\u2022 We can now see full message thread in the dashboard as well\r\n\u2022 Added the auto-delete drafts when it's stale\r\n\u2022 Updated our SEO so hopefully we can get ranking on the scheduled keyword (which seems pretty easy since we're competing with the diciontary lol)\r\n\r\nOpen in Slack [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/archives/C09AMKTMZGU/p1774583528408129?c=4&o=1&d=1]\r\n\r\nNew message in #user-feedback\r\n\r\nHenryMarch 26th at 4:30 PM\r\nsome skill issues\r\nCleanShot 2026-03-26 at 16.30.14@2x...\r\n\r\nPreview available in Slack\r\nShow preview [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/archives/C098TKKPZU4/p1774567832085189]\r\n\r\nOpen in Slack [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/archives/C098TKKPZU4/p1774567832085189?c=4&o=2&d=1]\r\n\r\nManage email settings\r\n\r\nYou can snooze notifications this week [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/unsub/U0AL00X7C2J-8e07d750a8363dda9b43816a3c5ebc6dd426d7476091e2f3665417906bb3d3bf-notify-mute-7d] or unsubscribe [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/unsub/U0AL00X7C2J-fc77d87b1e7935544814bfce9a209d305bb36f74fd892a7333090e87d92501ff-digest].\r\n\r\nSee notifications instantly\r\n\r\nThe Slack app is the best way to manage your notifications and stay up to date.\r\n\r\nGet [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/downloads?t=download_app]\r\n\r\nGet [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10791821447634/downloads?t=download_app]",
+      "date": "2026-03-27T11:22:21+00:00",
+      "snippet": "Fergana Labs 4 members \ud83d\udd25Your team has sent 23 messages recently View all unread messages New messages in #engineering HenryMarch 26th at 1:24 PM Here is what dimitri saw when trying to sign up &lt;"
+    },
+    {
+      "id": "19d2b1261b0363a9",
+      "thread_id": "19d2b1261b0363a9",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 26, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 26, 2026, 5:53 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nPPTX to HTML conversion scope was narrowed with a decision to pursue  \r\npixel-perfect 1:1 copies and a scheduled email agent product was  \r\ndemonstrated.\r\n\r\n\r\nAgent Research and HTML PR\r\nThe team committed to reviewing the HTML stream pull request within 12  \r\nhours. Research is progressing on the agent to ensure smooth GPT to HTML  \r\nconversion following initial UI resolution.\r\n\r\nPPTX to HTML Conversion Scope\r\nThe scope for slide deck conversion was narrowed to focus solely on PPTX to  \r\nHTML, with the objective of achieving a pixel-perfect 1:1 copy. The team  \r\nmust explore the existing implementation using Aspose for insights into the  \r\nconversion process.\r\n\r\nScheduled Email Agent Demo\r\nA demonstration of the scheduled email agent product was conducted, and the  \r\nuser was onboarded to the system. The agent uses a multi-agent architecture  \r\nwith a classifier and composer to automatically generate scheduling  \r\nresponses based on user calendar preferences.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nHenry Dowling will send Triumphant Babalola an email in about half an hour  \r\nso Triumphant Babalola can see if a draft shows up in the inbox.\r\n\r\nHenry Dowling will put up a review for the PR Triumphant Babalola raised  \r\nfor the HTML stream today.\r\n\r\nTriumphant Babalola will get started on benchmarking the agent's ability to  \r\ngenerate HTML files from imported PPTX files.\r\n\r\nTriumphant Babalola will do a deep dive into the scheduled email agent code  \r\nbase.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-26T16:55:17+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 26, 2026, 5:53 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d2afe86cef629d",
+      "thread_id": "19d2afe86cef629d",
+      "sender": "Fyxer Notetaker <notetaker-updates@fyxer.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Henry shared: Daily checkin with you",
+      "body": "<html lang=\"en\"><head><meta charSet=\"utf-8\"/><title></title><style>\r\n          * {\r\n            margin: 0;\r\n            padding: 0;\r\n            border: 0;\r\n          }\r\n          p {\r\n            margin-bottom: 16px;\r\n          }\r\n          a {\r\n            text-decoration: underline;\r\n            font-weight: 600;\r\n          }\r\n        </style></head><body><div style=\"display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0\" data-skip-in-text=\"true\">Meeting notes and key decisions ready for your review.<div>\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff</div></div><p style=\"margin:0 0 16px 0\">Hi <!-- -->there<!-- -->,</p><p style=\"margin:0 0 16px 0\">Henry<!-- --> recorded <strong>Daily checkin</strong>.<!-- --> The key decisions and action items have been distilled into a summary and tasks for your review.</p><p style=\"margin:0 0 24px 0\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260326T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTI2VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"background-color:#FF5A39;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:600;font-size:16px\">Review Next Steps</a></p><p style=\"margin:0 0 8px 0;font-size:14px;color:#666666\">To view the entire meeting summary and recording:</p><p style=\"margin:0 0 24px 0;font-size:14px\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260326T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTI2VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"color:#FF5A39\">Click here to get access</a></p><p style=\"margin:0 0 32px 0;font-size:14px;color:#333333\">Best,<br/>Henry</p><hr style=\"border:none;border-top:1px solid #e5e5e5;margin:24px 0\"/><p style=\"margin:0;font-size:13px;color:#888888\">Powered by Fyxer \u00b7<!-- --> <a href=\"https://fyxer.ai?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT\" style=\"color:#888888\">Try free for <!-- -->7<!-- --> days</a></p><p style=\"font-size:11px;color:#bbbbbb\">Click<!-- --> <a style=\"color:#bbbbbb;text-decoration:none;font-weight:600\" href=\"https://app.fyxer.com/email-unsubscribe?email=triumphant%40ferganalabs.com&amp;template=call-recording-notification\">here</a> <!-- -->to unsubscribe.</p></body></html>\r\n",
+      "date": "2026-03-26T16:33:34+00:00",
+      "snippet": "Meeting notes and key decisions ready for your review. \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff"
+    },
+    {
+      "id": "19d25e33921df877",
+      "thread_id": "19d25e33921df877",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 25, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 25, 2026, 5:44 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nHTML streaming issues for presentation files discussed, with resolution  \r\nfocusing on disabling the redundant file preview mechanism and a new  \r\ninternal project introduced.\r\n\r\n\r\nHTML Streaming Glitch Identified\r\nHTML streaming for presentation files successfully allows slide-by-slide  \r\nviewing in the preview tab, but a glitch occurs due to an overlap between  \r\nthe new streaming flow and the existing file saving mechanism. Streaming  \r\ncapabilities for follow-up edits were added, though consistency issues with  \r\npersistence remain a current focus for remediation.\r\n\r\nResolve Overlapping Preview\r\nDiscussions centered on the conflict between immediate file preview and new  \r\nHTML streaming, resulting in the decision to keep the chat UI preview  \r\nmechanism. The path forward is to instruct the agent to recognize the  \r\nactive HTML stream and avoid triggering the file preview again, only  \r\nkeeping the file displayed in the chat UI.\r\n\r\nInternal Project Introduction\r\nThe screen blanking bug will be fixed before submitting a Pull Request to  \r\navoid broken code, with the proposed fix focusing on preventing redundant  \r\npreview triggering. A new internal project involving an email assistant,  \r\nwhich originated as a recruiting tool, was introduced as a potential  \r\ncomplement to the existing PowerPoint product.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nHenry Dowling will give Triumphant Babalola a tour of the email product  \r\ntomorrow.\r\n\r\nTriumphant Babalola will fix the overlapping glitch between the file  \r\nshowing on the UI itself and the streaming preview being persistent before  \r\nputting up a PR.\r\n\r\nHenry Dowling will review the PR once Triumphant Babalola is done with the  \r\ncurrent fix.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-25T16:45:40+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 25, 2026, 5:44 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d25d7920afc2ca",
+      "thread_id": "19d25d7920afc2ca",
+      "sender": "Fyxer Notetaker <notetaker-updates@fyxer.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Henry shared: Daily checkin with you",
+      "body": "<html lang=\"en\"><head><meta charSet=\"utf-8\"/><title></title><style>\r\n          * {\r\n            margin: 0;\r\n            padding: 0;\r\n            border: 0;\r\n          }\r\n          p {\r\n            margin-bottom: 16px;\r\n          }\r\n          a {\r\n            text-decoration: underline;\r\n            font-weight: 600;\r\n          }\r\n        </style></head><body><div style=\"display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0\" data-skip-in-text=\"true\">Meeting notes and key decisions ready for your review.<div>\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff</div></div><p style=\"margin:0 0 16px 0\">Hi <!-- -->there<!-- -->,</p><p style=\"margin:0 0 16px 0\">Henry<!-- --> recorded <strong>Daily checkin</strong>.<!-- --> The key decisions and action items have been distilled into a summary and tasks for your review.</p><p style=\"margin:0 0 24px 0\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260325T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTI1VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"background-color:#FF5A39;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:600;font-size:16px\">Review Next Steps</a></p><p style=\"margin:0 0 8px 0;font-size:14px;color:#666666\">To view the entire meeting summary and recording:</p><p style=\"margin:0 0 24px 0;font-size:14px\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260325T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTI1VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"color:#FF5A39\">Click here to get access</a></p><p style=\"margin:0 0 32px 0;font-size:14px;color:#333333\">Best,<br/>Henry</p><hr style=\"border:none;border-top:1px solid #e5e5e5;margin:24px 0\"/><p style=\"margin:0;font-size:13px;color:#888888\">Powered by Fyxer \u00b7<!-- --> <a href=\"https://fyxer.ai?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT\" style=\"color:#888888\">Try free for <!-- -->7<!-- --> days</a></p><p style=\"font-size:11px;color:#bbbbbb\">Click<!-- --> <a style=\"color:#bbbbbb;text-decoration:none;font-weight:600\" href=\"https://app.fyxer.com/email-unsubscribe?email=triumphant%40ferganalabs.com&amp;template=call-recording-notification\">here</a> <!-- -->to unsubscribe.</p></body></html>\r\n",
+      "date": "2026-03-25T16:32:56+00:00",
+      "snippet": "Meeting notes and key decisions ready for your review. \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff"
+    },
+    {
+      "id": "19d20c0e13899140",
+      "thread_id": "19d20c0e13899140",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 24, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 24, 2026, 5:48 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nResolved PR 5 changes, with the team focused on addressing real-time  \r\nstreaming instability and proposing a collaborative pairing session for  \r\nproblem resolution.\r\n\r\n\r\nPR Changes Visible Now\r\nPR 5 changes were successfully moved to the main branch after an accidental  \r\nrevert was corrected. The feature for real-time streaming, however, remains  \r\nunstable and is currently \"a lot shaky.\"\r\n\r\nStreaming Instability Diagnosis\r\nThe core instability issue is that the HTML needed for live edits to appear  \r\nin the preview panel is not rendering. The team is exploring Claude's  \r\ndocumentation for insights on achieving effective real-time document  \r\nmanipulation, similar to Claude's 'artifacts feature.'\r\n\r\nInternal Project Update Given\r\nHenry Dowling provided an update on an internal exploratory project focused  \r\non developing an email assistant for knowledge work. The team supports this  \r\nproduct, believing it presents interesting research challenges, especially  \r\nin generating effective responses.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nHenry Dowling will show the email assistant product to Triumphant Babalola  \r\nsometime.\r\n\r\nTriumphant Babalola will look at other Claude documentation to figure out  \r\nhow to get the real-time slide generation/editing preview to work.\r\n\r\nHenry Dowling and Triumphant Babalola will pair together on a call to  \r\nfigure out how to get the streaming to work if Triumphant Babalola has not  \r\nfigured it out by the time they meet tomorrow.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-24T16:50:04+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 24, 2026, 5:48 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d20c08b5128c17",
+      "thread_id": "19d20c08b5128c17",
+      "sender": "Fyxer Notetaker <notetaker-updates@fyxer.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Henry shared: Daily checkin with you",
+      "body": "<html lang=\"en\"><head><meta charSet=\"utf-8\"/><title></title><style>\r\n          * {\r\n            margin: 0;\r\n            padding: 0;\r\n            border: 0;\r\n          }\r\n          p {\r\n            margin-bottom: 16px;\r\n          }\r\n          a {\r\n            text-decoration: underline;\r\n            font-weight: 600;\r\n          }\r\n        </style></head><body><div style=\"display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0\" data-skip-in-text=\"true\">1 action item assigned to you. Review before your next steps.<div>\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff</div></div><p style=\"margin:0 0 16px 0\">Hi <!-- -->there<!-- -->,</p><p style=\"margin:0 0 16px 0\">Henry<!-- --> recorded <strong>Daily checkin</strong>.<!-- --> <!-- -->During the call, <!-- -->1<!-- --> action item<!-- --> was<!-- --> raised<!-- --> that was assigned to you<!-- -->:</p><p style=\"margin:0 0 24px 0\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260324T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTI0VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"background-color:#FF5A39;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:600;font-size:16px\">Review 1 Action Item</a></p><p style=\"margin:0 0 8px 0;font-size:14px;color:#666666\">To view the entire meeting summary and recording:</p><p style=\"margin:0 0 24px 0;font-size:14px\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260324T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTI0VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"color:#FF5A39\">Click here to get access</a></p><p style=\"margin:0 0 32px 0;font-size:14px;color:#333333\">Best,<br/>Henry</p><hr style=\"border:none;border-top:1px solid #e5e5e5;margin:24px 0\"/><p style=\"margin:0;font-size:13px;color:#888888\">Powered by Fyxer \u00b7<!-- --> <a href=\"https://fyxer.ai?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT\" style=\"color:#888888\">Try free for <!-- -->7<!-- --> days</a></p><p style=\"font-size:11px;color:#bbbbbb\">Click<!-- --> <a style=\"color:#bbbbbb;text-decoration:none;font-weight:600\" href=\"https://app.fyxer.com/email-unsubscribe?email=triumphant%40ferganalabs.com&amp;template=call-recording-notification\">here</a> <!-- -->to unsubscribe.</p></body></html>\r\n",
+      "date": "2026-03-24T16:49:40+00:00",
+      "snippet": "1 action item assigned to you. Review before your next steps. \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff"
+    },
+    {
+      "id": "19d1b90bf798c761",
+      "thread_id": "19d1b90bf798c761",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 23, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 23, 2026, 5:38 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nCodebase confusion with PR 5 and PR 6, with development focus shifted to  \r\nHTML streaming implementation and a new personal assistant exploration.\r\n\r\n\r\nBug resolution and merge updates\r\nAll bug issues were resolved, and reviewed pull requests from Friday were  \r\nmerged. Planning for HTML stream implementation has begun, aiming for a  \r\ndemo by Wednesday.\r\n\r\nCodebase merge strategy defined\r\nIt was decided that merging PRs without a full review is acceptable to  \r\nunblock development work. Henry Dowling requested that PR5 be merged back  \r\ninto the codebase, confirming it was valuable.\r\n\r\nHTML streaming and project focus\r\nTriumphant Babalola will focus on HTML streaming implementation, while  \r\nHenry Dowling and Sam are exploring a different approach involving a  \r\npersonal assistant utilizing completed research. Versell deployment issues  \r\nare confirmed as a low priority and will be handled by Henry Dowling and  \r\nSam.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nTriumphant Babalola will check the current state of PR five by asking the  \r\ncoding agent if the changes are in the codebase, and merge it back in if  \r\nnecessary.\r\n\r\nTriumphant Babalola will inform Henry Dowling on the progress of HTML  \r\nstreaming.\r\n\r\nHenry Dowling will take a look at PR six even though it was already merged.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-23T16:39:23+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 23, 2026, 5:38 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d0c38dd55b0843",
+      "thread_id": "19d0c38dd55b0843",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 20, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 20, 2026, 6:07 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nPull Requests were merged to unblock team research, followed by extensive  \r\ndebugging of persistent Versel deployment issues, which culminated in a  \r\nsuccessful resolution.\r\n\r\n\r\nPull Requests Merged\r\nTwo outstanding Pull Requests were reviewed and deemed good to merge, which  \r\nwas completed to unblock the team and allow research activities to resume.\r\n\r\nResolve Versel Deployment Blocker\r\nVersel deployment access failed due to a conflict between the GitHub setup  \r\non the personal account and the team account. Debugging revealed that  \r\nGitHub's 'keep my email address private' setting was blocking deployment  \r\nvia a non-deployable no-reply email.\r\n\r\nDeployment Issues Resolved\r\nConnecting the GitHub account directly to Versel's login connections  \r\nresolved the persistent deployment issue. The team confirmed that the  \r\ndeployment was unblocked, and focus shifted to planning for HTML streaming  \r\nresearch.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nTriumphant Babalola will work on planning the streams for HTML streaming  \r\nand get back to the agent performance research once that is complete.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-20T17:09:05+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 20, 2026, 6:07 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d06fa1d30f7703",
+      "thread_id": "19d06fa1d30f7703",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 19, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 19, 2026, 5:41 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nPR review and bug fix for Bulk Two demonstrated functionality, confirming  \r\nautomatic presentation display is now working and ready for PR, with an  \r\nagreement to use the existing SSE stream to handle Bug Three's streaming  \r\nHTML updates.\r\n\r\n\r\nBulk Two Bug Fix Demonstrated\r\nThe fix for the \"bulk two\" bug was demonstrated, confirming users can now  \r\nsee the file being saved within the UI and can click to preview the file. A  \r\nsmoother experience was also confirmed when navigating between updated  \r\nfiles and returning to previous ones.\r\n\r\nAutomatic Presentation Display Confirmed\r\nThe original intended behavior of presentations showing up automatically  \r\nwithout a button press is now functional. This automatic display fix  \r\nresolves the bug, and the solution is ready for a Pull Request.\r\n\r\nStrategy for Streaming HTML Updates\r\nFor Bug Three involving streaming HTML updates, the team agreed to use the  \r\nexisting Server-Sent Events (SSE) stream. The plan is to attach new HTML to  \r\nthe existing SSE event whenever a \"write tool\" signals an edit to the HTML.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nHenry Dowling will review the PR for the bug fix, change the PR slightly to  \r\nmatch the buttons better to the design system, and send review comments  \r\nover later today.\r\n\r\nTriumphant Babalola will raise the PR for the recently discussed fix and  \r\nthen get started on implementing SSE for streaming HTML updates.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-19T16:42:27+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 19, 2026, 5:41 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d02ae5248e6832",
+      "thread_id": "19d01d05774b0b4d",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 18, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 18, 2026, 9:40 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nMeeting began with traffic concerns, followed by discussion on pull request  \r\nreview for a bug fix, and ended with clarification and implementation  \r\ndetails for a new feature.\r\n\r\n\r\nPR Review for Bug Fix\r\nA Pull Request was raised addressing Bug 1, which involved the UI snapping  \r\nback to the old tab after switching, along with other related fixes. The PR  \r\nreview for Bug 1 is scheduled for completion later today.\r\n\r\nBug 2 Clarification and Implementation\r\nBug 2 was reclassified as a feature allowing a preview object in the box  \r\nfor viewing the document being created in the front-end UI. An  \r\nimplementation approach for this feature has already been completed,  \r\nincluding a feature that allows users to preview different versions of the  \r\ncreated slide deck.\r\n\r\nTesting and Persistence Issues\r\nExtensive testing is currently being performed to ensure the UI behavior  \r\nremains persistent across both the Bug 1 fixes and the newly implemented  \r\npreview feature. Interactions between the front-end managed state were  \r\nacknowledged as potentially complex.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nTriumphant Babalola will put up the next PR for bug two.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-18T20:41:11+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 18, 2026, 9:40 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d026c560cac919",
+      "thread_id": "19d026c560cac919",
+      "sender": "The Google Workspace Team <workspace-noreply@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Generate business-ready visuals in minutes",
+      "body": "Google  \r\nWorkspace<https://c.gle/AEJ26qtkxPGEjewNclpChlxqT8pvZfcIRoZFkatfL47OkIM7Y-fDPmwQx1mb_LDxprtnbDQFKXdj7DnOSrX9EbFvFxVpV_QnW8hW1yNATDl8HAkQam3n0vwL9VqrgrEBx887-miJOxhmeYWH4A>\r\n\r\nYour creative studio, built right into Workspace\r\n\r\nWe\u2019ve integrated our most advanced AI models directly into Google Workspace  \r\nand the Gemini app to help you generate work-ready, high-quality images and  \r\nvideos.\r\n\r\nLearn  \r\nmore<https://c.gle/AEJ26quCFeCDfRgxSXrTjLsugVlWqTSi9IYhXJAjpsbi5HSUCcWz_ElGRAVIcxO-aKCJVc2yfnUZC2uemLp4D1wNjjJ2EdXKzqyWA6PArFvLokPnycgUXNI8yM-gyPg4GF_-eLXS_aVw1KzKkUKffNTifuGifVGl2VoUncfIt5Hz3K6upqmmNTJJbXza7EGspKiWvLuFnbQy2fCVKGkXa_S5mbREVeTEN3Y-UPFXyCwcBLHQaR5ryU9J9QFGSKVYWamYcBw>\r\n\r\nA collage of UI elements demonstrating AI content generation, featuring a  \r\npensive person, text prompts for infographics and image mockups, and  \r\nexamples of generated  \r\nimages.<https://c.gle/AEJ26qtvDdjoXlApEDrTfGTPE0PtSN64tZHAwr0Ch7ruN8CmWJtc3I-AK1lH-CkIWOE3YbGGOE7nBNSJAnkt8e9QHmVDalhofaKP4woLb-UcJwzJRu1LS6_xRz8765G47kJS0cZbODoq5kwK5iS1uQ6eRHIgTHAiICbiBt4cR_V0uzfzO0_5PTCJSPXNKLIHz-IBEl7TqhlsK5lWXhSo4cxJb1pUObCSY1DVfohXa1f0f3MAPntIjDUtfB5PqToZzCEkYPM>\r\n\r\n4 practical use cases to drive real business results:\r\n\r\nGoogle Slides interface showing a presentation about the \"Niloma Chair,\"  \r\nwith an AI \"Beautify this slide\" prompt and a preview of a redesigned slide  \r\nfor the \"Svelton  \r\nChair.\"<https://c.gle/AEJ26quE2wMLkh1UajHy68ratVrQG6km8Fi0kweisfBRiGmTPdCLP-jODlOa96MUL894RWRdt6Kz16vTYLlAaDQo-d6PNCQYM7ltTzQQNNOjR4Y-pUh9Z7_C29rO3C3X3e2upvk>\r\n\r\nTransform presentations with instant visuals\r\n\r\nUse the \"Beautify this slide\" feature in Slides to instantly enhance flat  \r\ndesigns. Or generate professional infographics from your data with a simple  \r\nprompt to make complex information easy to digest.\r\n\r\nTry it in  \r\nSlides<https://c.gle/AEJ26qs2Rw-KYitoglr9Dz-D91AKepxJ6nAwqNk2tfzfbmqBU8dDu-GrH6WiE55E_Fb5gNSUTKD1TeBCjdF5KIKoY6juSJ_KTpzpplTEeoRMFl4zYE54DWDfjT0>\r\n\r\nScreenshot of a video creation tool's interface, showing a prompt to  \r\ngenerate a lifestyle video from images of a green sofa, a living room, and  \r\na person, with a video preview of a person walking into the modern living  \r\nroom.<https://c.gle/AEJ26qtC8U-naqkjEA4n39CXN6r4FcHOB5dIDftMLyMWdpRUXpL2C9WPFQSD599trmodFhE7wSr7DHSPtEgZmow206Rz7JiBzpqukSudQdGUR3FocE2vITgeKzu03WDS5J0_us9F4FnnvA>\r\n\r\nTurn static images into engaging videos\r\n\r\nAmp up visual storytelling by animating your favorite images. Just select  \r\nup to three photos and use Veo in Google  \r\nVids<https://c.gle/AEJ26qvNMsDMS_1InN-cqujniqAyGCxj2IlTHf901qYpOXC3oUrrNUK0WXQpjnOxZYWXJb61VybY4gDDOOYw5bW170Bx5dAFa7tu18MEtXHy-XL1aWRFB-kJCnk>  \r\nor the Gemini  \r\napp<https://c.gle/AEJ26qtSQ9tDnNx3J1rR203bgGbCS1M0qt-bushm_9DAImyZoS4jCa3_N2coUMUAD08JZsc06PO7vVPTAQHmZqpisndpDl0wh8bT4PvhRnSqKgSa24wZv9SqAqGHnj6q93bkYAhdkw>  \r\nto blend them into a high-quality video perfect for social media or  \r\nwebsites.\r\n\r\nTry it in the Gemini  \r\napp<https://c.gle/AEJ26qvXA4UL7Kz6LQsIwJnOleSVDpI5X2mcLvQK3BmYBn2CCy6N9unodUm97EUI4dZOEyXs8thErkr_teb5FJcka6F8GHDyiGMwllXj2vA929nCHT8FRqp2At3UnlOF35tSRfijtY_miRE7owCKwdKI>\r\n\r\nA modern living room with a green curved sofa, a wooden coffee table, a  \r\nlarge fiddle leaf fig plant, and a slatted wooden accent wall with sun  \r\nshadows.<https://c.gle/AEJ26qv5m3b8u4-3DbtyGCOWKzs68yojbTS3UYhDQTyN0egUGQmXlwzhKsqgzlmHlSL_Bb09wbnA_OJ01Vv3lKemAZU9R0Lp2rqrT_SzrUL9Q1s4WuwUYgC10uc5lzROb734jVP-a8Pj7A>\r\n\r\nGenerate professional product shots instantly\r\n\r\nCreate high-quality product images without a physical photoshoot. Just  \r\nupload a photo and describe the scene to place your product in the perfect  \r\ncontext for web pages, ads, or catalogs.\r\n\r\nTry it in the Gemini  \r\napp<https://c.gle/AEJ26quy2BYjFMkIUx7HhEXCi3qPFJHJDv3UcrwusObfIUAX27A9efnrohs1fuiuffvS5LIflUuaUZ1LAmWS7w2hWD2bvwkMXOwOpIMGahC44WAJMrf3RfYZzZj_SB7msqkg55xIJaYoH7ADI711M13F>\r\n\r\nA grey 'Svelton Chair' in a modern office setting, with text 'Available  \r\nnow'.<https://c.gle/AEJ26qs8wdzd7sLs7vXe29eEI9TsJYXppnlRCg2Y4aEm-JdqNBrgB0asyTvv8i5svl4j3aBQJMl0_lmDUFaviNbz84l39ODMFQbkJkJltToC1O-pGjg7HU3z_jmQWUmZy9wUbj1j38n6ZQ>\r\n\r\nScale your campaigns across every channel\r\n\r\nAdapt creative assets quickly for any platform. Easily resize images,  \r\ntranslate text, and generate high-quality variations to A/B test your  \r\nmessage and reach global audiences effortlessly.\r\n\r\nTry it in the Gemini  \r\napp<https://c.gle/AEJ26qtO3TsTd3pL7tf-4ZhOx2miodWQTCVnJCSg7TspP0YxFxBcpS5-c-5cYsds4RCwrXMpiN6FQa8yRJF1OXx_RdmvQ8qVNTe3dUB1iyO7x9Im3q5MnmYL-sGG03E1I6qXoEbcPxqWO0a7eIMQURex>\r\n\r\nLearn practical AI skills with AI Boost Bites\r\n\r\nOur new video lessons show you how Google's experts use AI tools like  \r\nGemini and NotebookLM for real-world tasks. Each 10-minute session includes  \r\nhands-on challenges to instantly apply what you learn.\r\n\r\nStart your learning  \r\npath<https://c.gle/AEJ26quQEyVz-PTK8GQhF5cWLXcxc7wV8lOFX-ErJan05dSfoqiA16B03nj7sDgG7JBpAetT4tgag8sAwF3PatKYks6VP5RIs01pTCSiCXf5nbUngTFmk8am3Yz-Ug648qA5xaDPmtJ7-x6xvoxKPTX5LfPM1EQO-909e3DPCLVzU9N8UzR0VpTX>\r\n\r\nGoogle Workspace icon  \r\ncluster<https://c.gle/AEJ26qtSPDvYJNxKpROpdPp6BVUX7MzRggRVYwonmmUP2DJK3A0imZDsszTbK_ibHdf2JhnymsGLZ9nAXKgLLK2sWUDpWxd6gYqIeewQSmtaNDSZHGPc4qSQtkeWzaw5dMPeRNckEFow8XXU8TmKLQ>\r\n\r\nGoogle brand logo in a dark grey  \r\ncolor.<https://c.gle/AEJ26qv_ejJYpxHGqp_71ujYsU6ln00rc4QpV3JHEpds7lB6Pk7Ugwe2YS1Ab2HoQ4HuYvW8i61oxXQVD6J5Y99U37uLpzgYpJ5tVuFdivF9X9HDRSVPPg4L-z7Vjy0VirxI460quzs>\r\n\r\n\u00a9 2026 Google LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043\r\n\r\nPlease note that some Gemini features may not be available in all languages  \r\nat this time. Full language availability details can be found  \r\nhere<https://c.gle/AEJ26qtKIO17SwvRqYE1rfGZ6PzKNP60ALyBvZrHURmLivfCP_nz9fqKPABzZYgnOFTPa_6rsM7hbmPW3aVdFoFR0qAvHasXmW3r_5xNLHO89O77M-QdZ7hk9QNwVZpdtA87TSN4kHesRxQRXZvWEHEdMvns1YCcP5vPSCfOSyIOO9VFBHSbP-g2wP8nVKlY3_oPdLyjS6fUJ1U7_w>.\r\n\r\nThis email was sent to triumphant@ferganalabs.com because you or your  \r\nadministrator signed you up to receive news, product updates, and tips  \r\nabout Google Workspace. Please note that some features highlighted in these  \r\nemails might not be deployed by your organization. If you don\u2019t want to  \r\nreceive such emails in the future, please unsubscribe  \r\nhere<https://myaccount.google.com/communication-preferences/unsubscribe/gt/AEJ26qsFE-x3RcicijBnZXwhbXLFSFLGgl_R7CxxOQWC6wLs9dPW16BRarWid0fdtKqI9Fx_R3WdpuYszrePr9pt7X8Mdqnz-SE5pGkhNnP3yfA5gJffC220tXQEr3r5ElTzqsVvjftUYGwOk9XzOLvjeTswsKhJ7kBfTMpO5IHc6ZKJbwwcicpznIyVwBzEGYkJlVaTgwauPNasc91lk3q7DBqQ_SXDup-gIP8XufHvsoA0J666UbBTRRa2pjGYCi8bk4Yf3HipHNqtBTyTQ_jYBJf8WszKFoGobiWzOmq8VRhZ?utm_source=gm&utm_medium=email&auto=true>.\r\n",
+      "date": "2026-03-18T12:29:07-07:00",
+      "snippet": "Try the latest AI tools. \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f \u200d\u034f \u034f"
+    },
+    {
+      "id": "19d01d05774b0b4d",
+      "thread_id": "19d01d05774b0b4d",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 18, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 18, 2026, 5:37 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nTechnical difficulties and a personal health update necessitated a  \r\nrescheduling of the planned discussion.\r\n\r\n\r\nInitial Audio Troubleshooting\r\nInitial technical difficulties concerning audio transmission were noted,  \r\nleading to an attempted solution by switching devices and rejoining the  \r\ncall to improve clarity.\r\n\r\nConnection and Health Update\r\nImproved audio was confirmed following adjustments, and a brief personal  \r\nupdate included a quick stop at a clinic for previous week's results.\r\n\r\nMeeting Rescheduled for Later\r\nThe discussion was postponed because the participant was stuck in traffic  \r\nwhile driving home, preventing a productive meeting at the current time.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nTriumphant Babalola will send Henry Dowling a message when ready to chat.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-18T16:38:43+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 18, 2026, 5:37 PM WAT and may contain errors."
+    },
+    {
+      "id": "19d01cd27d6516cc",
+      "thread_id": "19d01cd27d6516cc",
+      "sender": "Fyxer Notetaker <notetaker-updates@fyxer.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Henry shared: Daily checkin with you",
+      "body": "<html lang=\"en\"><head><meta charSet=\"utf-8\"/><title></title><style>\r\n          * {\r\n            margin: 0;\r\n            padding: 0;\r\n            border: 0;\r\n          }\r\n          p {\r\n            margin-bottom: 16px;\r\n          }\r\n          a {\r\n            text-decoration: underline;\r\n            font-weight: 600;\r\n          }\r\n        </style></head><body><div style=\"display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0\" data-skip-in-text=\"true\">Meeting notes and key decisions ready for your review.<div>\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff\u00a0\u200c\u200b\u200d\u200e\u200f\ufeff</div></div><p style=\"margin:0 0 16px 0\">Hi <!-- -->there<!-- -->,</p><p style=\"margin:0 0 16px 0\">Henry<!-- --> recorded <strong>Daily checkin</strong>.<!-- --> The key decisions and action items have been distilled into a summary and tasks for your review.</p><p style=\"margin:0 0 24px 0\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260318T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTE4VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"background-color:#FF5A39;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:600;font-size:16px\">Review Next Steps</a></p><p style=\"margin:0 0 8px 0;font-size:14px;color:#666666\">To view the entire meeting summary and recording:</p><p style=\"margin:0 0 24px 0;font-size:14px\"><a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260318T163000Z?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT&amp;templateId=call-recording-notification&amp;recordingUserId=YNWQJZedGNTLj8Od1D0yxbb1Df42&amp;ctx=eyJ0IjoiRGFpbHkgY2hlY2tpbiIsImgiOiJIZW5yeSBEb3dsaW5nIiwiciI6IiIsImQiOiIyMDI2LTAzLTE4VDE2OjMwOjAwLjAwMFoiLCJwIjozLCJpIjoiSGVucnkgRG93bGluZyJ9\" style=\"color:#FF5A39\">Click here to get access</a></p><p style=\"margin:0 0 32px 0;font-size:14px;color:#333333\">Best,<br/>Henry</p><hr style=\"border:none;border-top:1px solid #e5e5e5;margin:24px 0\"/><p style=\"margin:0;font-size:13px;color:#888888\">Powered by Fyxer \u00b7<!-- --> <a href=\"https://fyxer.ai?src=MEETING_ASSISTANT&amp;recordingSource=MEETING_ASSISTANT\" style=\"color:#888888\">Try free for <!-- -->7<!-- --> days</a></p><p style=\"font-size:11px;color:#bbbbbb\">Click<!-- --> <a style=\"color:#bbbbbb;text-decoration:none;font-weight:600\" href=\"https://app.fyxer.com/email-unsubscribe?email=triumphant%40ferganalabs.com&amp;template=call-recording-notification\">here</a> <!-- -->to unsubscribe.</p></body></html>\r\n",
+      "date": "2026-03-18T16:35:12+00:00",
+      "snippet": "Meeting notes and key decisions ready for your review. \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff \u200c\u200b\u200d\u200e\u200f\ufeff"
+    },
+    {
+      "id": "19d00b14ce56ffb7",
+      "thread_id": "19d00b14ce56ffb7",
+      "sender": "\"Fergana Labs (via Slack)\" <notification@slack.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "You've got 6 unread messages",
+      "body": "Fergana Labs\r\n\r\n4 members\r\n\r\n\ud83d\udd25Your team has sent 40 messages recently\r\n\r\nView all unread messages [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/team]\r\n\r\nNew message in #engineering\r\n\r\nHenryMarch 17th at 12:41 PM\r\nWe're seeing some false positives in the scheduling intent classifier step\r\nCleanShot 2026-03-17 at 12.40.43@2x...\r\n\r\nPreview available in Slack\r\nShow preview [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/archives/C09AMKTMZGU/p1773776480408489]\r\n\r\nOpen in Slack [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/archives/C09AMKTMZGU/p1773776480408489?c=4&o=1&d=1]\r\n\r\nNew messages in #marketing\r\n\r\nSamMarch 17th at 2:57 PM\r\nyeah\r\n\r\nSamMarch 17th at 2:57 PM\r\nalthough it did fuck up and didn't feel personal\r\n\r\nHenryMarch 17th at 3:54 PM\r\njoining lightfield automatically creates a shared slack channel for sharing feedback. I love this\r\n\r\n2 replies [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/archives/C099593DV1S/p1773788079784959]\r\nCleanShot 2026-03-17 at 15.54.10@2x...\r\n\r\nPreview available in Slack\r\nShow preview [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/archives/C099593DV1S/p1773788079784959]\r\n\r\nOpen in Slack [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/archives/C099593DV1S/p1773788079784959?thread_ts=1773788079.784959&c=4&o=2&d=1]\r\n\r\nManage email settings\r\n\r\nYou can snooze notifications this week [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/unsub/U0AL00X7C2J-8e07d750a8363dda9b43816a3c5ebc6dd426d7476091e2f3665417906bb3d3bf-notify-mute-7d] or unsubscribe [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/unsub/U0AL00X7C2J-fc77d87b1e7935544814bfce9a209d305bb36f74fd892a7333090e87d92501ff-digest].\r\n\r\nSee notifications instantly\r\n\r\nThe Slack app is the best way to manage your notifications and stay up to date.\r\n\r\nGet [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/downloads?t=download_app]\r\n\r\nGet [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10723830368998/downloads?t=download_app]",
+      "date": "2026-03-18T11:25:12+00:00",
+      "snippet": "Fergana Labs 4 members \ud83d\udd25Your team has sent 40 messages recently View all unread messages New message in #engineering HenryMarch 17th at 12:41 PM We&#39;re seeing some false positives in the scheduling"
+    },
+    {
+      "id": "19cfcd01823eb5c0",
+      "thread_id": "19cfcd01823eb5c0",
+      "sender": "Cursor Team <team@mail.cursor.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Tools Across the Development Lifecycle",
+      "body": "Use Cursor to plan, design, build, and review. \u00a0\r\n\r\nHi there,\r\n\r\nWriting code is just one part of building great software. Cursor has tools for every stage of the software development lifecycle.\r\n\r\nPlan\r\n\r\nPlan mode ( https://cursor.com/docs/agent/modes#plan ) lets Cursor research your codebase, ask clarifying questions, and generate a plan you can review and refine before building.\r\n\r\nPlan mode in Cursor\r\n\r\nDesign\r\n\r\nThe Browser tool ( https://cursor.com/docs/agent/browser ) gives Cursor control over a web browser. Get real-time visual feedback as you modify your site\u2019s layout and style.\r\n\r\nBrowser tool in Cursor\r\n\r\nDevelop\r\n\r\nMCP ( https://cursor.com/docs/context/mcp ) enables Cursor to connect to external tools and data sources. Create PRs with GitHub MCP or get data insights with Databricks MCP.\r\n\r\nLinear MCP in Cursor\r\n\r\nBrowse MCP directory ( https://cursor.com/docs/context/mcp#servers )\r\n\r\nReview\r\n\r\nWhen your PR is ready, use Bugbot ( https://cursor.com/docs/bugbot ) for AI code review that can detect even the hardest logic bugs with a low false-positive rate.\r\n\r\nBugbot for AI code review\r\n\r\nTry Bugbot ( https://cursor.com/dashboard?tab=bugbot )\r\n\r\nWe\u2019re excited to see what you build next! Tag us on X ( https://x.com/cursor_ai ) to share what you\u2019re creating.\r\n\r\nBest,\r\nCursor Team\r\n\r\nThe best way to code with AI.\r\n\r\nTo opt out of future emails, click unsubscribe ( https://track.customer.io/unsubscribe/dgT_pwsBAOD1hyDf9YcgAZz80BGLiVOFXenC3fgArQ== ).\r\n\r\nDownload Cursor ( https://cursor.com/download ) \u00a0 \u00a0Use Cursor in browser ( https://cursor.com/agents ) \u00a0 \u00a0Read the docs ( https://cursor.com/docs ) \u00a0 \u00a0Join a workshop ( https://cursor.com/workshops )\r\n",
+      "date": "2026-03-17T17:20:21+00:00",
+      "snippet": "Use Cursor to plan, design, build, and review. \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f"
+    },
+    {
+      "id": "19cfc91fd78874c5",
+      "thread_id": "19cfc91fd78874c5",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 17, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 17, 2026, 5:11 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nBug fixing review confirmed resolved UI issues with tab switching and  \r\npresentation display, via focus on database query and React Query cache  \r\noptimization.\r\n\r\n\r\nBug Fixes and Progress\r\nBug fixing is advancing well, including resolution of the UI mapping back  \r\nto an old tab and presentations not showing up in the chat UI. Triumphant  \r\nBabalola confirmed the tab snapping issue is fixed and was requested to  \r\ncreate a Pull Request immediately.\r\n\r\nOptimization Challenge Diagnosis\r\nThe current challenge involves slow presentation display due to reading  \r\ndirectly from the database, which led to a broken code reversion during  \r\noptimization attempts. The delay, initially suspected as a database query  \r\nissue, was diagnosed as a combination of generation latency and a possible  \r\nReact Query cache invalidation problem.\r\n\r\nCritical Bug Resolution Priority\r\nIt was decided that fixing the 3 critical bugs (tab snapping, presentation  \r\nvisibility, and slow display) must be completed before returning to  \r\nresearch work, as these issues are currently blocking development. Henry  \r\nDowling offered to pair program on the React Query issue and will review  \r\nall subsequent fix submissions.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nTriumphant Babalola will put up a PR for the tab fix to get it into  \r\nproduction and put up PRs for the other two fixes once they are completed.\r\n\r\nHenry Dowling will leave a review for Triumphant Babalola's PRs before they  \r\nare merged.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-17T16:12:31+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 17, 2026, 5:11 PM WAT and may contain errors."
+    },
+    {
+      "id": "19cf84c05736445e",
+      "thread_id": "19cf84c05736445e",
+      "sender": "Henry Dowling <henry@ferganalabs.com>",
+      "recipient": "Triumphant Babalola <triumphant@ferganalabs.com>",
+      "cc": "Samuel Liu <sam@ferganalabs.com>",
+      "subject": "Updated invitation: Daily checkin @ Tue Mar 17, 2026 5pm - 5:15pm (WAT) (Triumphant Babalola)",
+      "body": "This event has been updated\r\nChanged: time\r\n\r\n\r\nDaily checkin\r\nTuesday Mar 17, 2026 \u22c5 5pm \u2013 5:15pm\r\nWest Africa Time - Lagos\r\n\r\nJoin with Google Meet\r\nhttps://meet.google.com/ahm-oqpu-vdy?hs=224\r\n\r\n\r\n\t\r\nJoin by phone\r\n(US) +1 240-774-0073\r\nPIN: 671038671\r\n\r\nMore phone numbers\r\nhttps://tel.meet/ahm-oqpu-vdy?pin=5965101659701&hs=0\r\n\r\n\r\nOrganizer\r\nHenry Dowling\r\nhenry@ferganalabs.com\r\n\r\nGuests\r\nHenry Dowling - organizer\r\nTriumphant Babalola\r\nSamuel Liu - optional\r\nView all guest info  \r\nhttps://calendar.google.com/calendar/event?action=VIEW&eid=NTIxNWFtMGtta2dvbmRzOTM0Y2Zic2gzM2lfMjAyNjAzMTdUMTYzMDAwWiB0cml1bXBoYW50QGZlcmdhbmFsYWJzLmNvbQ&tok=MjEjaGVucnlAZmVyZ2FuYWxhYnMuY29tOGE3NWQwMjRiMGZmYjVkMTBkMTAyYjEyNGI2OThlMmIwMjhkMjNlNw&ctz=Africa%2FLagos&hl=en&es=1\r\n\r\nReply for triumphant@ferganalabs.com and view more details  \r\nhttps://calendar.google.com/calendar/event?action=VIEW&eid=NTIxNWFtMGtta2dvbmRzOTM0Y2Zic2gzM2lfMjAyNjAzMTdUMTYzMDAwWiB0cml1bXBoYW50QGZlcmdhbmFsYWJzLmNvbQ&tok=MjEjaGVucnlAZmVyZ2FuYWxhYnMuY29tOGE3NWQwMjRiMGZmYjVkMTBkMTAyYjEyNGI2OThlMmIwMjhkMjNlNw&ctz=Africa%2FLagos&hl=en&es=1\r\nYour attendance is optional.\r\n\r\n~~//~~\r\nInvitation from Google Calendar: https://calendar.google.com/calendar/\r\n\r\nYou are receiving this email because you are subscribed to calendar  \r\nnotifications. To stop receiving these emails, go to  \r\nhttps://calendar.google.com/calendar/r/settings, select this calendar, and  \r\nchange \"Other notifications\".\r\n\r\nForwarding this invitation could allow any recipient to send a response to  \r\nthe organizer, be added to the guest list, invite others regardless of  \r\ntheir own invitation status, or modify your RSVP.\r\n\r\nLearn more https://support.google.com/calendar/answer/37135#forwarding\r\n",
+      "date": "2026-03-16T20:17:36+00:00",
+      "snippet": "Daily checkin Join with Google Meet \u2013 You have been invited by Henry Dowling to attend an event named Daily checkin on Tuesday Mar 17, 2026 \u22c5 5pm \u2013 5:15pm (West Africa Time - Lagos). This event has"
+    },
+    {
+      "id": "19cf7b8decd57811",
+      "thread_id": "19cf7b8decd57811",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 16, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 16, 2026, 6:12 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nMeeting focused on critical UI and streaming issues following the product's  \r\nport to a web app with agreement on blocking bugs and a new HTML streaming  \r\nstrategy.\r\n\r\n\r\nStreaming and UI Bugs\r\nTesting revealed significant front-end issues, including slow application  \r\nresponses, twitching, and output disappearance, indicating poor streaming  \r\nexperience. A critical bug caused tabs to switch automatically, which was  \r\nacknowledged as a major UI flaw.\r\n\r\nPresentation Saving Bug Identified\r\nThe inability to see image additions and presentation changes in the  \r\npreview was confirmed as the primary blocking bug, due to files saving  \r\nlocally in the cloud sandbox and not syncing correctly to the user  \r\ninterface. The team decided to halt the HTML import project to prioritize  \r\nfixing these critical saving and display errors.\r\n\r\nStreaming HTML Edits Proposed\r\nThe current file saving infrastructure, which creates a new presentation  \r\nfile on every chat turn, was deemed inefficient. The team proposed moving  \r\nto an infrastructure that streams HTML edits to resolve UI issues and  \r\nprovide a real-time display of changes.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nTriumphant Babalola will work on fixing the tab switching issue in the UI,  \r\nconsidering getting rid of the tab state machine as a possible solution.\r\n\r\nTriumphant Babalola will work on enabling the created HTML presentation  \r\nslide to be previewed directly on the UI without changing the current flow,  \r\nlikely by fixing a React Query cache issue.\r\n\r\nTriumphant Babalola will explore how to stream the HTML from the write tool  \r\nto update the document preview during mid-turn edits.\r\n\r\nHenry Dowling will send a Slack message summarizing the technical  \r\napproaches for fixing the identified UI issues.\r\n\r\n\r\nMeeting records Document Notes by Gemini Video Recording\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-16T17:36:53+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 16, 2026, 6:12 PM WAT and may contain errors."
+    },
+    {
+      "id": "19cf283525f062aa",
+      "thread_id": "19cf283525f062aa",
+      "sender": "Cursor Team <team@mail.cursor.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Customizing Agents",
+      "body": "Use rules, skills, and hooks to modify and extend Cursor. \u00a0\r\n\r\nHi there,\r\n\r\nCoding agents can learn how you like to write software, your preferred tools, and the context of your business.\r\n\r\nUse these three features to modify and extend agent behavior:\r\n\r\nRules\r\n\r\nDefine rules ( https://cursor.com/docs/context/rules ) to teach Cursor your best practices, from team conventions to specific architectural decisions.\r\n\r\nDefine rules in Cursor\r\n\r\nTry creating a rule ( https://cursor.com/link/rule?name=example-rule&text=Prefer%20clear%2C%20self-documenting%20code.%20Add%20comments%20only%20for%20non-obvious%20%22why%22%20decisions.%20Use%20meaningful%20names%20for%20variables%20and%20functions.%20Keep%20functions%20small%20and%20focused. )\r\n\r\nSkills\r\n\r\nCreate skills ( https://cursor.com/docs/context/skills ) to let Cursor discover and run specialized prompts and code with domain-specific knowledge.\r\n\r\nCreate skills in Cursor\r\n\r\nHooks\r\n\r\nSet up hooks ( https://cursor.com/docs/agent/hooks ) for deterministic scripts that observe and control agent behavior at defined stages of the loop.\r\n\r\nSet up hooks in Cursor\r\n\r\nYou can discover and install prebuilt plugins containing rules, skills, hooks, MCP, and more on the Cursor Marketplace ( https://cursor.com/marketplace ).\r\n\r\nExplore plugins ( https://cursor.com/marketplace )\r\n\r\nBest,\r\nCursor Team\r\n\r\nThe best way to code with AI.\r\n\r\nTo opt out of future emails, click unsubscribe ( https://track.customer.io/unsubscribe/dgT_pwsBAOD1hyDf9YcgAZzyg0xaqgCwqT9nbuRS1w== ).\r\n\r\nDownload Cursor ( https://cursor.com/download ) \u00a0 \u00a0Use Cursor in browser ( https://cursor.com/agents ) \u00a0 \u00a0Read the docs ( https://cursor.com/docs ) \u00a0 \u00a0Join a workshop ( https://cursor.com/workshops )\r\n",
+      "date": "2026-03-15T17:20:17+00:00",
+      "snippet": "Use rules, skills, and hooks to modify and extend Cursor. \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f"
+    },
+    {
+      "id": "19ce61fcb6aabc4c",
+      "thread_id": "19ce61fcb6aabc4c",
+      "sender": "Slack <no-reply-4k1AratM99KMAvsCiMaFl4xA@slack.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Your Slack onboarding tasks are waiting",
+      "body": "Set up your Slack\r\n\r\nCheck off a few simple tasks so you can start working seamlessly with your team.\r\n\r\nComplete setup [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10691126159206/messages/C096RPS7ZS7]\r\n\r\nHeads up: In order to see the task list, you'll need to open this link on your desktop.\r\n\r\nMake the most of Slack.\r\nHere's a reminder of your tasks:\r\n\r\nPut a face to your name\r\n\r\nAdd a profile picture and edit your name\r\n\r\nFind someone you know\r\n\r\nSay hi and make someone's day a little brighter\r\n\r\nUse Slack on the go\r\n\r\nDownload the mobile app\r\n\r\nBrowse channels\r\n\r\nJoin conversations that matter to you",
+      "date": "2026-03-13T07:36:08+00:00",
+      "snippet": "Get set up and ready to collaborate with your team \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
+    },
+    {
+      "id": "19ce33f6be2ec762",
+      "thread_id": "19ce33f6be2ec762",
+      "sender": "Gemini <gemini-notes@google.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Notes: \u201cDaily checkin\u201d Mar 12, 2026",
+      "body": "Notes from \u201cDaily checkin\u201d\r\n\r\nThese notes have been sent to invited guests in your organization.\r\n\r\nOpen meeting notes\r\n\r\nThe content was auto-generated on March 12, 2026, 7:10 PM WAT and may  \r\ncontain errors.\r\n\r\n\r\nSummary\r\nInitial setup and authentication errors were debugged via environment  \r\nvariable investigation and resolved by disabling the redundant AuthZero  \r\nconsent screen.\r\n\r\n\r\nInitial Environment Setup and Errors\r\nDebugging resolved initial setup issues, including safely deleting the  \r\ncloud presentation agent installation instruction and investigating an  \r\nauthentication error that showed \"A is not fully configured\" despite key  \r\nvariables being present. The primary problem stemmed from multiple  \r\nenvironment variable checks in get ozero client, leading to the  \r\nidentification of two missing variables.\r\n\r\nAuthentication Environment and Log Fixes\r\nThe team resolved environment file issues by adding the missing Issuer Base  \r\nURL and restarting the Next environment, which made debug logs appear and  \r\nresolved the initial variable configuration failure. After successful login  \r\nattempts, a new error emerged involving a workspace creation failure  \r\nindicating \"user not found in database for Ozero user ID\".\r\n\r\nAuthZero Loop and Business Model\r\nA persistent authorization loop occurred after accepting the AuthZero  \r\nconsent screen, which was successfully reproduced, confirming it was a  \r\ngeneral bug, and the major decision made was to disable the redundant  \r\nconsent screen entirely. The business model was confirmed as a consumer  \r\nSaaS model priced at $20 monthly after a 7-day free trial, following a  \r\nProduct-Led Growth strategy.\r\n\r\n\r\nSuggested next steps\r\n\r\n\r\n\r\nHenry Dowling will get back to Triumphant Babalola after the meeting on the  \r\nbest way to pay for Cursor and cloud access since Triumphant Babalola is a  \r\ncontractor through Turing.\r\n\r\nTriumphant Babalola will try to install the necessary package or setting on  \r\nVS Code/Cursor to enable clicking on function definitions.\r\n\r\nTriumphant Babalola will ask Cursor why the database is out of sync and  \r\ncausing the error.\r\n\r\nHenry Dowling will fix the bug with the application logic for signing up  \r\nand send Triumphant Babalola a video showing how to log in once the OATH  \r\nissue is fixed.\r\n\r\nTriumphant Babalola will commit the edit made on the requirements for the  \r\ncloud presentation agent to the repository.\r\n\r\nTriumphant Babalola will continue research on using a VLM as an agent  \r\nevaluator for the presentation project.\r\n\r\nTriumphant Babalola will check the codebase to see if Henry Dowling has  \r\npushed changes and then try running the application locally again to  \r\nproceed with the project.\r\n\r\n\r\nMeeting records Document Notes by Gemini\r\n\r\n\r\nIs the Next Steps section in this email helpful?\r\nNot Useful Email Useful Email\r\n\r\n\r\nGoogle LLC, 1600 Ampitheatre Parkway, Mountain View, CA 94043, USA\r\n\r\nYou have received this email because meeting artifacts were initiated in  \r\nGoogle Meet.\r\n\r\n\r\n",
+      "date": "2026-03-12T18:11:49+00:00",
+      "snippet": "Notes from \u201cDaily checkin\u201d These notes have been sent to invited guests in your organization. Open meeting notes The content was auto-generated on March 12, 2026, 7:10 PM WAT and may contain errors."
+    },
+    {
+      "id": "19ce314b53186084",
+      "thread_id": "19ce314b53186084",
+      "sender": "Stash Web <no-reply@auth0user.net>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Verify your email",
+      "body": "Welcome to Stash Web!\r\n\r\nThank you for signing up. Please verify your email address by opening the following link:\r\n\r\nhttps://u37752131.ct.sendgrid.net/ls/click?upn=u001.nyPRXOOvRnQDsVRijUZi-2BRXcViYUuTj8nA3HhwAnla-2FZ2GRTzePhfqRLX7PPuYYI75uZZbsGt29Gq5j20-2FO1htD8DZVpmY2Yx-2BSyMQ2PDLa5OFQz8vzzd6wgBIBbzaIoD8jmY-2FV-2Fmx14D-2BwBCUvvROnz8ysMauYp42H2fzgGM1A-3DHcOX_5-2FNSnig5fsMUZxI9txRGaMbIvOa-2BX5aD6kDiP-2F3bKaVRmrozt9KXRnTlVfNQDenm1FEdLbYKqvvTGxwLXdWFhYw95SoA5r9LqZ6VYHRDMTy2pPcFnn9gcMt4tWSVBkLQ8XoV89PO2P9sKm-2F4QItBNdysa-2Bb-2BHtFx3tv8zRM09oP0BB14mwthgLy2xnBPaTMIgWBSfEhcNoUMIzaaCzuHHQ-3D-3D\r\n\r\nIf you are having any issues with your account, please don't hesitate to contact us by replying to this mail.\r\n\r\nThanks!\r\nStash Web\r\n",
+      "date": "2026-03-12T17:25:10+00:00",
+      "snippet": "Verify your account Auth0 Logo Verify Your Account Your account information Account: triumphant@ferganalabs.com Verify Link: https://dev-wbpkvtzafohkc6t5.us.auth0.com/u/email-verification?ticket="
+    },
+    {
+      "id": "19ce310287deedcd",
+      "thread_id": "19ce310287deedcd",
+      "sender": "Cursor Team <team@mail.cursor.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Your first coding agent request in 2 minutes",
+      "body": "Try this quick experiment to see what Cursor can do \u00a0\r\n\r\nHi there,\r\n\r\nThanks for using Cursor! You can work with coding agents to ship your next feature.\r\n\r\nDownload the desktop app ( https://cursor.com/download ) and try this 2-minute experiment:\r\n\r\n*\r\nHit Ctrl/Cmd+I to begin an agent conversation.\r\n* Ask it to \u201cVisualize this codebase in a diagram.\u201d ( https://cursor.com/link/prompt?text=visualize%20this%20codebase%20in%20a%20diagram )\r\n\r\nVisualize this codebase in a diagram\r\n\r\nNow that you've confirmed Cursor understands your codebase, you can switch to Plan Mode with Shift+Tab and describe your next feature.\r\n\r\nTry agents in Cursor ( https://cursor.com/link/prompt?text=visualize%20this%20codebase%20in%20a%20diagram )\r\n\r\nCheck out our quickstart guide ( https://cursor.com/docs/get-started/quickstart ) and Learn course ( https://cursor.com/learn ) for tips on how to plan effectively, manage context, and iterate on code with AI.\r\n\r\nBest,\r\nCursor Team\r\n\r\nThe best way to code with AI.\r\n\r\nTo opt out of future emails, click unsubscribe ( https://track.customer.io/unsubscribe/dgT_pwsBAOD1hyDf9YcgAZzjECIpBcG8doENkVCoIA== ).\r\n\r\nDownload Cursor ( https://cursor.com/download ) \u00a0 \u00a0Use Cursor in browser ( https://cursor.com/agents ) \u00a0 \u00a0Read the docs ( https://cursor.com/docs ) \u00a0 \u00a0Join a workshop ( https://cursor.com/workshops )\r\n",
+      "date": "2026-03-12T17:20:12+00:00",
+      "snippet": "Try this quick experiment to see what Cursor can do \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f \u034f"
+    },
+    {
+      "id": "19ce2f8bff105de9",
+      "thread_id": "19ce2f8bff105de9",
+      "sender": "Cursor <hi@cursor.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "You've been invited to a Cursor team!",
+      "body": "<div dir=\"ltr\"><div><b>Henry Dowling</b> has invited you to join their team on Cursor.</div><div><br /></div><div>As a team member, you'll have access to unlimited <a href=\"https://track.pstmrk.it/3s/cursor.com%2Fdocs%2Ftab%2Foverview/I76j/l-jDAQ/AQ/f8a1e9f5-ea80-4c60-9959-87eccd5041db/1/9RRlL-DZFm\">Tab</a>, more <a href=\"https://track.pstmrk.it/3s/cursor.com%2Fdocs%2Fagent%2Foverview/I76j/l-jDAQ/AQ/f8a1e9f5-ea80-4c60-9959-87eccd5041db/2/0jwM9EdKBD\">Agent</a> usage, and all <a href=\"https://track.pstmrk.it/3s/cursor.com%2Fdocs%2Fget-started%2Fconcepts/I76j/l-jDAQ/AQ/f8a1e9f5-ea80-4c60-9959-87eccd5041db/3/xKxulC8uu7\">core Cursor features</a>.</div><div><br /></div><div><a href=\"https://track.pstmrk.it/3s/cursor.com%2Fteam%2Faccept-invite%3Fcode%3D683346886ce0fb3c90f95ff26774773a264422dd1599edf7/I76j/l-jDAQ/AQ/f8a1e9f5-ea80-4c60-9959-87eccd5041db/4/1BC9JSWvbq\" style=\"display: inline-block;padding: 0.5rem 1rem;background: black;color: white;text-decoration: none;/* font-family: sans-serif; */\">Join Team</a></div><div><br /></div><div>You can also copy this link into your browser: <a href=\"https://track.pstmrk.it/3s/cursor.com%2Fteam%2Faccept-invite%3Fcode%3D683346886ce0fb3c90f95ff26774773a264422dd1599edf7/I76j/l-jDAQ/AQ/f8a1e9f5-ea80-4c60-9959-87eccd5041db/4/1BC9JSWvbq\">https://cursor.com/team/accept-invite?code=683346886ce0fb3c90f95ff26774773a264422dd1599edf7</a></div><div><br /></div><div>For any questions or feedback, reply to this email or contact us at <a href=\"mailto:hi@cursor.com\">hi@cursor.com</a></div><div><br /></div><div>Best,</div><div>Cursor Team</div></div><img src=\"https://ea.pstmrk.it/open?m=v3_1.fLqyqn8TjdDa0F6s92o5qA.YEDpNtnlgqAyQd9Kki3137mMi_QHI1Z1yq0516lzYUHyoN61q_OanDGlKdP03ee3-hUR7bYOE4miBierScSAYqv0dGOtCBs93xjSVZbSMstUP04qkRhtc0XzBPbleBHEQ4Vcpn9Z_8AbKrrlD_5IEV3lVwBLmsmO0qIRvyNWWmbXNW06gQ5oDo14-Q4vN1SU9bppSxJVOz8i_YGZNHXDqcAeDVXwlVa09ialWnTWmdXeztGh-KqPceOPlGPPdohZQlHxs4cjIoJ-DP-ASWUwgN4FLarY9wTDhyYRRShoXUiRTqAFZ0jITkVRSCq509aCa8mmsFNFFf1QQ_QXe5QS2p87heegpQ77yNDE9jQYihIUTOTHUGp3tzG1QHCTlHtuDhemJk_SiUN9xHxe0fgVCndBsdNKAI4pBHnuwZoDU7syF6DAKK-tpeJj66uxF3dsq8Gwo-coB4WIroGQsAA72Zpn73Bp3KXbGtjRL5NWJBeHsfOmXxpdisgXiocoBSMVFWBdSLLpIyno0qe_3Y3NmA\" width=\"1\" height=\"1\" border=\"0\" alt=\"\" />\r\n",
+      "date": "2026-03-12T16:54:37+00:00",
+      "snippet": "Henry Dowling has invited you to join their team on Cursor. As a team member, you&#39;ll have access to unlimited Tab, more Agent usage, and all core Cursor features. Join Team You can also copy this"
+    },
+    {
+      "id": "19cdfb49888de009",
+      "thread_id": "19cdfb49888de009",
+      "sender": "Henry Dowling <henry@ferganalabs.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Invitation: Daily checkin @ Weekly from 9:30am to 9:45am on weekdays (PDT) (triumphant@ferganalabs.com)",
+      "body": "Daily checkin\r\nWeekly from 9:30am to 9:45am on weekdays\r\nPacific Time - Los Angeles\r\n\r\nJoin with Google Meet\r\nhttps://meet.google.com/ahm-oqpu-vdy?hs=224\r\n\r\n\r\n\t\r\nJoin by phone\r\n(US) +1 240-774-0073\r\nPIN: 671038671\r\n\r\nMore phone numbers\r\nhttps://tel.meet/ahm-oqpu-vdy?pin=5965101659701&hs=0\r\n\r\n\r\nOrganizer\r\nHenry Dowling\r\nhenry@ferganalabs.com\r\n\r\nGuests\r\nHenry Dowling - organizer\r\ntriumphant@ferganalabs.com\r\nView all guest info  \r\nhttps://calendar.google.com/calendar/event?action=VIEW&eid=NTIxNWFtMGtta2dvbmRzOTM0Y2Zic2gzM2kgdHJpdW1waGFudEBmZXJnYW5hbGFicy5jb20&tok=MjEjaGVucnlAZmVyZ2FuYWxhYnMuY29tYzE4NWQ1ZTllNWQwMGQ0NTdkYzUxMWVjOWY3YjNhYWQyNGIwNTFmMQ&ctz=America%2FLos_Angeles&hl=en&es=1\r\n\r\nReply for triumphant@ferganalabs.com and view more details  \r\nhttps://calendar.google.com/calendar/event?action=VIEW&eid=NTIxNWFtMGtta2dvbmRzOTM0Y2Zic2gzM2kgdHJpdW1waGFudEBmZXJnYW5hbGFicy5jb20&tok=MjEjaGVucnlAZmVyZ2FuYWxhYnMuY29tYzE4NWQ1ZTllNWQwMGQ0NTdkYzUxMWVjOWY3YjNhYWQyNGIwNTFmMQ&ctz=America%2FLos_Angeles&hl=en&es=1\r\nYour attendance is optional.\r\n\r\n~~//~~\r\nInvitation from Google Calendar: https://calendar.google.com/calendar/\r\n\r\nYou are receiving this email because you are subscribed to calendar  \r\nnotifications. To stop receiving these emails, go to  \r\nhttps://calendar.google.com/calendar/r/settings, select this calendar, and  \r\nchange \"Other notifications\".\r\n\r\nForwarding this invitation could allow any recipient to send a response to  \r\nthe organizer, be added to the guest list, invite others regardless of  \r\ntheir own invitation status, or modify your RSVP.\r\n\r\nLearn more https://support.google.com/calendar/answer/37135#forwarding\r\n",
+      "date": "2026-03-12T01:41:20+00:00",
+      "snippet": "Daily checkin Join with Google Meet \u2013 You have been invited by Henry Dowling to attend an event named Daily checkin on Weekly from 9:30am to 9:45am on weekdays (Pacific Time - Los Angeles). Join with"
+    },
+    {
+      "id": "19cdf2cf6b3e2b4d",
+      "thread_id": "19cdf2cf6b3e2b4d",
+      "sender": "Slack <no-reply-0PqEo9uSMfMizo45wawgKZez@slack.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Fergana Labs on Slack: New Account Details",
+      "body": "Welcome to Slack\r\n\r\nTa-da! You\u2019ve joined your first Slack workspace and we couldn\u2019t be more delighted. Here are your account details, along with some tips to help you get started.\r\n\r\nWorkspace name: Fergana Labs\r\n\r\nfergana-labs.slack.com []\r\n\r\nOpen Slack [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10680127592406/messages/C096RPS7ZS7]\r\nTips for getting started\r\n\r\nTake a quick tour\r\n\r\nGet familiar with the basics of Slack [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10680127592406/resources/using-slack/your-quick-start-guide-to-slack?utm_medium=email&utm_source=confirmation-new-join] so you\u2019re ready to get to work in no time.\r\n\r\nStart working in channels\r\n\r\nKeep conversations organized in channels [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10680127592406/features/channels?utm_medium=email&utm_source=confirmation-new-join] \u2014 organized spaces for everything related to a project, topic, or team.\r\n\r\nDownload Slack\r\n\r\nFor the best experience with Slack, download our apps [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10680127592406/downloads?utm_medium=email&utm_source=confirmation-new-join&t=T096RPRNDJP] for desktop and mobile.\r\n\r\nSee more tips [https://fergana-labs.slack.com/x-p9229807761635-10680031250086-10680127592406/resources/using-slack/top-5-tips-for-getting-started-in-slack?utm_medium=email&utm_source=confirmation-new-join]\r\n\r\nIf you have any questions as you\u2019re getting started, drop us a note at help@slack.com. We\u2019re glad you\u2019re here!",
+      "date": "2026-03-11T23:13:11+00:00",
+      "snippet": "Here are your account details, along with some tips to help you get started. \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
+    },
+    {
+      "id": "19cdf2ca8a865141",
+      "thread_id": "19cdf2ca8a865141",
+      "sender": "Slack <no-reply-SyioSKe27ctoqOLhlqodNQX5@slack.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Slack confirmation code: 7IN-9UW",
+      "body": "Confirm your email address\r\n\r\nYour confirmation code is below \u2014 enter it in the browser window where you\u2019ve started signing up for Slack.\r\n\r\n7IN-9UW\r\n\r\nIf you didn\u2019t request this email, there\u2019s nothing to worry about \u2014 you can safely ignore it.",
+      "date": "2026-03-11T23:12:51+00:00",
+      "snippet": "Confirm your email address. Your confirmation code is below \u2014 enter it in the browser window where you&#39;ve started signing up for Slack. \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
+    },
+    {
+      "id": "19cdf19d8e6085c7",
+      "thread_id": "19cdf19d8e6085c7",
+      "sender": "Slack <no-reply-pMOsdjdX3Bj3FPYEs6fXwi3R@slack.com>",
+      "recipient": "triumphant@ferganalabs.com",
+      "cc": "",
+      "subject": "Henry has invited you to work with them in Slack",
+      "body": "Henry has invited you to join Slack\r\n\r\n[Profile picture of Stash Tester Mac Mini.][Profile picture of Sam.][Profile picture of triumphant.]\r\n\r\nJoin the conversation with Henry and Stash Tester Mac Mini in a workspace called Fergana Labs.\r\n\r\nFrom Henry: welcome!\r\n\r\nJoin Slack [https://join.slack.com/t/fergana-labs/invite/enQtMTA2ODIwODU0NjQ2OTAtOWJlMTgzYjE3ZTMzMDc2MGFlODc0ODYyOGFiY2JjOGEzOGQ5ZTQzZDA4MjMxZmJhZDhiZDQ2OGQyMDE2MjIyZg?x=x-p9229807761635-9229807779155-10678661196117]\r\n\r\nThis invitation expires in 30 days. Once you join, you can always access your team's workspace, Fergana Labs, at https://fergana-labs.slack.com/\r\n\r\nWhat is Slack?\r\n\r\nSlack is a messaging app for teams, a place you can collaborate on projects and organize conversations \u2014 so you can work together, no matter where you are.\r\n\r\nLearn more [https://slack.com/help/articles/115004071768-What-is-Slack-]",
+      "date": "2026-03-11T22:52:14+00:00",
+      "snippet": "Join your team on Slack. Join the conversation with Henry and Stash Tester Mac Mini in a workspace called Fergana Labs. \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c \u200c"
+    },
+    {
+      "id": "19cdeea049bf4d2a",
+      "thread_id": "19cdeea049bf4d2a",
+      "sender": "Gmail Team <mail-noreply@google.com>",
+      "recipient": "Triumphant Babalola <triumphant@ferganalabs.com>",
+      "cc": "",
+      "subject": "Tips for using your new inbox",
+      "body": "Tips for using your new inbox\r\n[image: Gmail]\r\n\r\nWelcome to your inbox\r\n[image: Search]\r\nFind emails fast\r\nWith the power of Google Search in your inbox, you can archive\r\n<https://support.google.com/mail/answer/6576?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>\r\nall your email and find it\r\n<https://support.google.com/mail/answer/6593?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>\r\nlater in a flash. Your inbox stays tidy, and you never need to worry about\r\nwhat to keep.\r\n[image: Personalize]\r\nPersonalize Fergana Labs Inc. Mail\r\nCustomize inbox backgrounds, email signatures, and other options in Fergana\r\nLabs Inc. Mail settings\r\n<https://support.google.com/mail/answer/6562?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>.\r\nReview and adjust your privacy and security settings at My Account\r\n<https://myaccount.google.com/>.\r\n[image: Organize]\r\nOrganize your email\r\nYou can organize email with labels\r\n<https://support.google.com/mail/answer/118708?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>,\r\nwhich are like folders, but you can add more than one label to a message.\r\nYou can also use filters\r\n<https://support.google.com/mail/answer/6579?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>\r\nto automatically sort and categorize messages as they come in.\r\n[image: Social]\r\nChat and meet directly from your inbox\r\nMessage with contacts in Google Chat\r\n<https://support.google.com/chat/answer/9341104?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>\r\nand start video meetings with up to 100 people in Google Meet\r\n<https://support.google.com/mail/answer/9822902?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>\r\nall without leaving Gmail.\r\n\r\nGet training and tips\r\nFind Gmail guides, tips, cheat sheets, help switching from Microsoft\u00ae\r\nOutlook\u00ae, and more at the Google Workspace Learning Center\r\n<https://support.google.com/a/users/answer/9259748?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>\r\n.\r\nVisit the Learning Center\r\n<https://support.google.com/a/users/answer/9259748?hl=en&utm_source=gmailwelcomeemail&utm_medium=email&utm_campaign=gmailwelcome>\r\n\r\nHappy emailing,\r\nThe Gmail Team\r\n[image: Google Cloud]\r\n\r\n\u00a9 2026 Google LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043\r\n\r\n*You\u2019re receiving this mandatory email service announcement to update you\r\nabout important changes to your Google Cloud product or account.*\r\n",
+      "date": "2026-03-11T15:00:04-07:00",
+      "snippet": "Welcome to your inbox Find emails fast With the power of Google Search in your inbox, you can archive all your email and find it later in a flash. Your inbox stays tidy, and you never need to worry"
+    },
+    {
+      "id": "19cdeea024b98d2a",
+      "thread_id": "19cdeea024b98d2a",
+      "sender": "Gmail Team <mail-noreply@google.com>",
+      "recipient": "Triumphant Babalola <triumphant@ferganalabs.com>",
+      "cc": "",
+      "subject": "Get the official Gmail app",
+      "body": "Get the official Gmail app\r\n[image: Gmail]\r\n\r\nGet the official Gmail app\r\nThe best features of Fergana Labs Inc. Mail are only available on your\r\nphone and tablet with the official Gmail app. Download the app or go to\r\ngmail.com on your computer or mobile device to get started.\r\n\r\n[image: Get it on Google Play]\r\n<https://play.google.com/store/apps/details?id=com.google.android.gm&hl=en>\r\n[image:\r\nApple App Store]\r\n<https://apps.apple.com/app/gmail-email-by-google/id422689480?l=en>\r\n\r\nHappy emailing,\r\nThe Gmail Team\r\n[image: Google Cloud]\r\n\r\n\u00a9 2026 Google LLC 1600 Amphitheatre Parkway, Mountain View, CA 94043\r\n\r\n*You\u2019re receiving this mandatory email service announcement to update you\r\nabout important changes to your Google Cloud product or account.*\r\n",
+      "date": "2026-03-11T15:00:04-07:00",
+      "snippet": "Get the official Gmail app The best features of Fergana Labs Inc. Mail are only available on your phone and tablet with the official Gmail app. Download the app or go to gmail.com on your computer or"
+    }
+  ],
+  "events": [
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260312T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-12T17:30:00+01:00",
+      "end": "2026-03-12T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260313T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-13T17:30:00+01:00",
+      "end": "2026-03-13T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260316T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-16T17:30:00+01:00",
+      "end": "2026-03-16T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260317T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-17T17:00:00+01:00",
+      "end": "2026-03-17T17:15:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260318T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-18T17:30:00+01:00",
+      "end": "2026-03-18T17:45:00+01:00",
+      "description": "\ud83d\udcf9 <a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260318T163000Z\">View Fyxer Call Recording</a><br/><br/>",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260319T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-19T17:30:00+01:00",
+      "end": "2026-03-19T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260320T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-20T17:30:00+01:00",
+      "end": "2026-03-20T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260323T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-23T17:30:00+01:00",
+      "end": "2026-03-23T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260324T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-24T17:30:00+01:00",
+      "end": "2026-03-24T17:45:00+01:00",
+      "description": "\ud83d\udcf9 <a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260324T163000Z\">View Fyxer Call Recording</a><br/><br/>",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260325T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-25T17:30:00+01:00",
+      "end": "2026-03-25T17:45:00+01:00",
+      "description": "\ud83d\udcf9 <a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260325T163000Z\">View Fyxer Call Recording</a><br/><br/>",
+      "source": ""
+    },
+    {
+      "id": "i4v4pfmjj1oc5m4l9g1g46v358",
+      "summary": "Email Product Tour with Henry",
+      "start": "2026-03-26T09:00:00+00:00",
+      "end": "2026-03-26T10:00:00+00:00",
+      "description": "[source: gmail]\nHenry Dowling committed during the Mar 25 Daily Checkin to give Triumphant Babalola a tour of the internal email assistant product (an email assistant originally built as a recruiting tool, explored as a complement to the PowerPoint product). Exact time was not specified \u2014 scheduled here as a morning placeholder. Source: \"Notes: Daily checkin Mar 25, 2026\" (Gemini meeting notes). Google Meet for regular calls: https://meet.google.com/ahm-oqpu-vdy",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260326T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-26T17:30:00+01:00",
+      "end": "2026-03-26T17:45:00+01:00",
+      "description": "\ud83d\udcf9 <a href=\"https://app.fyxer.com/call-recordings/63c2c98e-2343-4e03-bf71-6ce7f319f879:5215am0kmkgonds934cfbsh33i_20260326T163000Z\">View Fyxer Call Recording</a><br/><br/>",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260327T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-27T17:30:00+01:00",
+      "end": "2026-03-27T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260330T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-30T17:30:00+01:00",
+      "end": "2026-03-30T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "plhei8r9kgnpat1isenlmsbd5s",
+      "summary": "Debugging Call with Henry (if auth error persists)",
+      "start": "2026-03-31T14:00:00+00:00",
+      "end": "2026-03-31T14:30:00+00:00",
+      "description": "[source: gmail]\nAgreed during the Mar 30 Daily checkin: Triumphant will try to sign up for the Scheduled product again today and, if the authentication error (403 insufficient permissions / Google Calendar API scope error) persists, hop on a debugging call with Henry Dowling to resolve it. Time is a placeholder \u2014 confirm with Henry if needed. Google Meet for regular calls: https://meet.google.com/ahm-oqpu-vdy. Source: \"Notes: Daily checkin Mar 30, 2026\" (Gemini meeting notes).",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260331T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-03-31T17:30:00+01:00",
+      "end": "2026-03-31T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260401T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-01T17:30:00+01:00",
+      "end": "2026-04-01T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260402T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-02T17:30:00+01:00",
+      "end": "2026-04-02T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260403T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-03T17:30:00+01:00",
+      "end": "2026-04-03T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260406T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-06T17:30:00+01:00",
+      "end": "2026-04-06T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260407T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-07T17:30:00+01:00",
+      "end": "2026-04-07T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260408T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-08T17:30:00+01:00",
+      "end": "2026-04-08T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260409T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-09T17:30:00+01:00",
+      "end": "2026-04-09T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260410T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-10T17:30:00+01:00",
+      "end": "2026-04-10T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260413T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-13T17:30:00+01:00",
+      "end": "2026-04-13T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260414T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-14T17:30:00+01:00",
+      "end": "2026-04-14T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260415T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-15T17:30:00+01:00",
+      "end": "2026-04-15T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260416T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-16T17:30:00+01:00",
+      "end": "2026-04-16T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260417T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-17T17:30:00+01:00",
+      "end": "2026-04-17T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260420T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-20T17:30:00+01:00",
+      "end": "2026-04-20T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260421T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-21T17:30:00+01:00",
+      "end": "2026-04-21T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260422T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-22T17:30:00+01:00",
+      "end": "2026-04-22T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260423T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-23T17:30:00+01:00",
+      "end": "2026-04-23T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260424T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-24T17:30:00+01:00",
+      "end": "2026-04-24T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260427T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-27T17:30:00+01:00",
+      "end": "2026-04-27T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260428T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-28T17:30:00+01:00",
+      "end": "2026-04-28T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260429T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-29T17:30:00+01:00",
+      "end": "2026-04-29T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260430T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-04-30T17:30:00+01:00",
+      "end": "2026-04-30T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    },
+    {
+      "id": "5215am0kmkgonds934cfbsh33i_20260501T163000Z",
+      "summary": "Daily checkin",
+      "start": "2026-05-01T17:30:00+01:00",
+      "end": "2026-05-01T17:45:00+01:00",
+      "description": "",
+      "source": ""
+    }
+  ],
+  "timezone": "Africa/Lagos",
+  "updater_diffs": [
+    {
+      "raw_body": "Hi Alex,\n\nThanks for reaching out. I'd be happy to connect for a quick sync.\n\nWould Thursday at 3 PM WAT work for you? I'm free for 30 minutes then.\n\nLet me know!\n\nBest,\nTriumphant",
+      "sent_body": "Hey Alex,\n\nThanks for reaching out — happy to connect.\n\nWould Friday at 10 AM WAT work instead? Afternoons are a bit packed for me right now.\n\nLet me know!\n\nThanks,\nTriumphant",
+      "edit_distance_ratio": 0.72,
+      "chars_added": 42,
+      "chars_removed": 38,
+      "sent_at": "2026-03-24T10:15:00+00:00",
+      "composed_at": "2026-03-24T10:10:00+00:00",
+      "thread_context": [
+        {"sender": "Alex Chen <alex@examplecorp.com>", "body": "Hi Triumphant, hope you're well! I'd love to sync up about the API integration we discussed. Are you free Thursday afternoon?"}
+      ]
+    },
+    {
+      "raw_body": "Hi Jordan,\n\nGreat to hear from you! Happy to find time to chat.\n\nHow does Monday at 4 PM WAT sound? I have a free slot then.\n\nLooking forward to it.\n\nBest,\nTriumphant",
+      "sent_body": "Hey Jordan,\n\nGreat to hear from you! Happy to find time.\n\nHow does Tuesday at 9 AM WAT sound? Mornings tend to work better for me.\n\nLooking forward to it.\n\nThanks,\nTriumphant",
+      "edit_distance_ratio": 0.78,
+      "chars_added": 36,
+      "chars_removed": 31,
+      "sent_at": "2026-03-25T08:45:00+00:00",
+      "composed_at": "2026-03-25T08:40:00+00:00",
+      "thread_context": [
+        {"sender": "Jordan Lee <jordan@partnerco.io>", "body": "Hi! Following up on our intro call — would love to schedule a proper 30-min sync. Do you have any Monday openings?"}
+      ]
+    },
+    {
+      "raw_body": "Hi Priya,\n\nAbsolutely, happy to do a quick catchup.\n\nWednesday at 2 PM WAT works for me — does that suit you?\n\nThanks so much.\n\nBest,\nTriumphant",
+      "sent_body": "Hey Priya,\n\nAbsolutely, happy to catch up.\n\nThursday at 11 AM WAT works better for me — does that suit you?\n\nThanks so much.\n\nThanks,\nTriumphant",
+      "edit_distance_ratio": 0.81,
+      "chars_added": 29,
+      "chars_removed": 27,
+      "sent_at": "2026-03-26T09:00:00+00:00",
+      "composed_at": "2026-03-26T08:55:00+00:00",
+      "thread_context": [
+        {"sender": "Priya Shah <priya@designstudio.co>", "body": "Hey Triumphant! Could we grab 20 mins to discuss the onboarding flow? Wednesday afternoon maybe?"}
+      ]
+    },
+    {
+      "raw_body": "Hi Marcus,\n\nThanks for the heads-up. Happy to loop you in on progress.\n\nFriday at 3 PM WAT could work — let me know if that's good.\n\nSpeak soon.\n\nBest,\nTriumphant",
+      "sent_body": "Hey Marcus,\n\nThanks for the heads-up. Happy to loop you in.\n\nMonday at 10 AM WAT would actually work better — let me know if that's good.\n\nSpeak soon.\n\nThanks,\nTriumphant",
+      "edit_distance_ratio": 0.74,
+      "chars_added": 33,
+      "chars_removed": 36,
+      "sent_at": "2026-03-27T11:20:00+00:00",
+      "composed_at": "2026-03-27T11:15:00+00:00",
+      "thread_context": [
+        {"sender": "Marcus Wright <marcus@investorfirm.vc>", "body": "Triumphant — we'd love to get a quick progress update before our board meeting. Could you do a 15-min call Friday or early next week?"}
+      ]
+    },
+    {
+      "raw_body": "Hi Sarah,\n\nOf course, happy to connect and answer any questions you have.\n\nHow about Thursday at 4 PM WAT? I should be available then.\n\nBest regards.\n\nBest,\nTriumphant",
+      "sent_body": "Hey Sarah,\n\nOf course, happy to connect and answer any questions.\n\nHow about Friday at 9 AM WAT? Mornings generally work best for me.\n\nBest regards.\n\nThanks,\nTriumphant",
+      "edit_distance_ratio": 0.76,
+      "chars_added": 38,
+      "chars_removed": 34,
+      "sent_at": "2026-03-28T09:30:00+00:00",
+      "composed_at": "2026-03-28T09:25:00+00:00",
+      "thread_context": [
+        {"sender": "Sarah Kim <sarah@clientco.com>", "body": "Hello! A colleague recommended I reach out to you about your scheduling tool. Would you be open to a brief demo call this week, maybe Thursday or Friday afternoon?"}
+      ]
+    }
+  ],
+  "guides": {
+    "scheduling_preferences": "# Scheduling Preferences Guide\n*For use by an AI scheduling agent \u2014 based on calendar events and emails from 2026-01-30 to 2026-03-31*\n\n---\n\n## \u26a0\ufe0f Important Context: Limited Data Window\n\nThis account's email and calendar history begins around **mid-March 2026** (the Gmail workspace welcome email arrived March 11, 2026, and the Slack workspace invitation arrived the same day). This means meaningful scheduling data covers only **~3 weeks**, not the full 60-day window. All patterns below are drawn from this shorter period. Confidence levels are noted accordingly. As more data accumulates, this guide should be updated.\n\n---\n\n## 1. Timezone & Location\n\n- **Primary timezone**: **West Africa Time (WAT) \u2014 Lagos, Nigeria (UTC+1)**\n- The user's calendar and all meeting notes reflect WAT. Calendar invitations explicitly reference \"West Africa Time - Lagos.\"\n- The user's primary counterparties appear to be operating in **US Pacific Time (PDT, UTC-7)**, roughly an 8-hour gap.\n- **No in-person meetings or location-specific meetings** were observed in this window. All meetings are fully remote.\n- **Confidence: Strong** \u2014 timezone and remote-only setup are clearly established.\n\n---\n\n## 2. Recurring Commitments\n\n### Daily Work Check-in (Mon\u2013Fri)\n- **Frequency**: Every weekday\n- **Time**: ~**5:30 PM WAT** (occasionally adjusted to 5:00 PM WAT)\n- **Duration**: **15 minutes** (scheduled slot; actual meetings sometimes run 15\u201345 minutes based on Gemini note timestamps)\n- **Format**: Video call via **Google Meet**\n- **Participants**: The user + [manager] (organizer) + one [optional teammate]\n- **Purpose**: Technical/engineering standup \u2014 progress updates, code review, unblocking issues, and project direction\n- **Notes**: Auto-generated by Gemini after each session; recordings also stored via Fyxer for some sessions\n- **Confidence: Strong** \u2014 14+ instances observed across the window\n\nThis is the **only recurring meeting type** observed. There are no other recurring blocks (no weekly team meetings, no 1:1 reviews, etc.) visible in this window, though this may reflect the newness of the account.\n\n---\n\n## 3. Preferred Meeting Times\n\n- **Evening (WAT)**: All observed meetings fall in the **5:00\u20136:00 PM WAT** range. The standard slot is **5:30 PM WAT**.\n- This corresponds to **9:30 AM Pacific Time** \u2014 a typical morning slot for the counterparty. The schedule appears to be set to accommodate the manager's morning rather than the user's preference per se.\n- **Morning hours (WAT)** appear to be the user's primary deep-work window \u2014 no meetings are scheduled before ~5 PM WAT. This is likely a strong implicit preference for **protected mornings**.\n- **One ad-hoc meeting** was observed at **9:00 AM UTC (10:00 AM WAT)** \u2014 a product demo/tour with [manager], scheduled as a one-off during the morning. This may indicate morning slots are acceptable for special sessions.\n- **Confidence: Moderate** \u2014 limited variety of meeting types observed; the end-of-day pattern is likely driven by the cross-timezone scheduling constraint rather than purely personal preference.\n\n---\n\n## 4. Meeting Durations by Type\n\n| Meeting Type | Scheduled Duration | Observed Actual Duration |\n|---|---|---|\n| Daily work check-in (1:1) | 15 min | 15\u201345 min (often runs over) |\n| Ad-hoc demo / product tour | 60 min | 60 min (one instance) |\n\n- The daily check-ins **frequently run over** their 15-minute slot. Gemini notes often timestamp meeting completion 30\u201345 minutes after start, suggesting the user is comfortable with open-ended conversations that extend as needed.\n- **Confidence: Weak** \u2014 only two meeting types observed; more data needed for generalisation.\n\n---\n\n## 5. Meeting Format & Tools\n\n- **Video conferencing**: **Google Meet exclusively** \u2014 all observed meetings use a persistent team Google Meet link. No Zoom, Teams, or other platforms were observed.\n- **Meeting notes**: Gemini auto-notes are active for all Google Meet calls. Some sessions also use Fyxer call recordings.\n- **No in-person meetings** observed in the window.\n- **Communication between meetings**: Slack is the primary async channel for the team (the user joined the team Slack workspace on March 11, 2026).\n- **Confidence: Strong for Google Meet** \u2014 consistent across all sessions. Weak for \"no other platforms\" due to limited data.\n\n---\n\n## 6. Scheduling Initiation & Patterns\n\n- **The user is primarily a meeting recipient**, not an organizer. All calendar invitations in the window were sent by [manager]. The user has not been observed to initiate meeting invites.\n- **No sent scheduling emails** were found in the analysis window, consistent with the user being a more junior/contractor party who receives rather than sets meetings.\n- **Lead time**: Invitations are typically sent **same-day or 1 day in advance**, reflecting an informal, fast-moving small-team dynamic rather than a formal booking-ahead culture.\n- **Confidence: Moderate** \u2014 pattern is consistent but the window is short and the team is very small (2\u20133 people).\n\n---\n\n## 7. Rescheduling & Conflict Handling\n\nOne rescheduling event was directly observed:\n\n> On **March 18, 2026**, the user joined the daily check-in but was caught in traffic while driving home. The meeting was briefly attempted (audio/device troubleshooting occurred), then formally **postponed** to later that evening. The user messaged [manager] when ready, and the meeting was held at approximately **8:30\u20139:30 PM WAT** \u2014 roughly 3 hours after the normal time.\n\n**Key inferences:**\n- The user **prefers to reschedule rather than skip** important recurring meetings. Even with a significant disruption (commute + traffic), the meeting was held the same day.\n- The daily check-in appears to be treated as a **firm, non-skippable commitment** \u2014 it was rescheduled to an unusually late hour (late evening) rather than dropped.\n- The user proactively communicated the delay rather than waiting passively.\n- **Confidence: Weak** \u2014 based on a single observed event. However, the behaviour is consistent with a contractor/employee accountability dynamic.\n\n---\n\n## 8. Protected Blocks & Implicit Boundaries\n\nBased on the absence of meetings in certain windows:\n\n| Time Block (WAT) | Observed Status | Inference |\n|---|---|---|\n| 12:00 AM \u2013 5:00 PM | Always free | Likely deep work / personal time \u2014 **protect this block** |\n| 5:00\u20136:00 PM | Recurring meeting zone | The \"meeting window\" |\n| 6:00\u20138:00 PM | Generally free | Transition / evening |\n| 8:30\u201310:00 PM | Occasionally used for rescheduled calls | Available in urgent/exceptional cases |\n\n- **Mornings through mid-afternoon (WAT) appear protected** \u2014 no meetings have been scheduled here (except one 10 AM one-off). When proposing new meetings, **default to the 5\u20136 PM WAT window** unless the counterparty is in a timezone that makes this unreasonable.\n- **Late evenings (after 9 PM WAT)** should be treated as a last resort and only used when explicitly agreed.\n- **Confidence: Moderate** \u2014 pattern is consistent but may simply reflect the single counterparty's timezone rather than deliberate preference.\n\n---\n\n## 9. Flexibility Hierarchy (Firmness of Blocks)\n\nFrom most firm to most negotiable, based on observed behaviour:\n\n1. **Daily work check-in** \u2014 Very firm. Rescheduled same-day rather than skipped when disrupted. Treat as near-immovable; if a conflict arises, find a same-day alternative time rather than cancelling.\n2. **Ad-hoc project demos / collaborative sessions** \u2014 Moderately firm once agreed. Scheduled on relatively short notice by [manager]; likely to be honoured as-is.\n3. **Open calendar time** \u2014 Flexible; available for new scheduling.\n\n- **Confidence: Weak** \u2014 limited variety of events to establish a true hierarchy.\n\n---\n\n## 10. Urgency Signals & Response Patterns\n\n- The user's email activity in this window is primarily **inbound** (Gemini notes, calendar notifications, product newsletters). No outbound scheduling emails were found.\n- Communication for scheduling appears to happen via **Slack rather than email** \u2014 the team uses Slack for real-time coordination (e.g., \"send me a Slack message when you're ready\").\n- When a meeting needs to shift, the user **communicates the reason and gives a new ETA** (e.g., \"stuck in traffic, will message when ready\") \u2014 a proactive, communicative style.\n- **Confidence: Weak** \u2014 very few scheduling interactions captured.\n\n---\n\n## 11. What Is NOT Yet Known (Data Gaps)\n\nThe following dimensions **cannot be assessed** from current data due to the short history and single meeting type:\n\n- \u2753 Preferences for coffee, lunch, or dinner meetings (no social/external meetings observed)\n- \u2753 Preferred in-person locations or neighbourhoods in Lagos\n- \u2753 Buffer preferences between back-to-back meetings\n- \u2753 Preferences for group meetings vs. 1:1s\n- \u2753 How the user handles external (non-team) scheduling requests\n- \u2753 How far in advance they prefer meetings to be booked for different types\n- \u2753 Preferences for meeting on Monday/Friday vs. mid-week\n- \u2753 Weekend availability\n\n---\n\n## 12. Summary: Scheduling Rules of Thumb\n\nFor a future AI agent acting on this user's behalf:\n\n1. **Timezone is WAT (Lagos, UTC+1).** Always convert proposed times to WAT when presenting options.\n2. **Default meeting window: 5:00\u20136:00 PM WAT on weekdays.** This is the established working window for team collaboration.\n3. **Protect the morning (before 5 PM WAT)** unless the user explicitly opens it for a session.\n4. **Use Google Meet** for all video calls \u2014 use the persistent team link or create a new Meet link.\n5. **The daily check-in is sacred.** Do not propose anything that conflicts with it without flagging the conflict explicitly. If it must move, find a same-day window.\n6. **Async communication via Slack** is preferred for quick scheduling coordination. Email is for formal invitations.\n7. **Lead time is short** in this team \u2014 1-day notice for ad-hoc meetings is normal.\n8. **If the user is delayed**, the preferred response is to reschedule the same day and communicate proactively, not to cancel.\n\n---\n\n*Guide generated: 2026-03-31 | Analysis window: 2026-01-30 \u2013 2026-03-31 | Effective data start: ~2026-03-11*\n*This guide should be updated as more scheduling history accumulates, particularly to fill the data gaps noted in Section 11.*\n",
+    "email_style": "# Scheduling Email Style Guide\n### For: Triumphant Babalola (triumphant@ferganalabs.com)\n### Generated: 2026-03-31\n### Status: \u26a0\ufe0f BASELINE \u2014 No sent email data available (see Section 0)\n\n---\n\n## Section 0 \u2014 Data Availability Notice\n\n> **This guide could not be built from observed sent emails.**\n\nAfter running 20+ search queries (`from:me`, `from:triumphant@ferganalabs.com`, `in:sent`, and every scheduling keyword variant) and reading every accessible thread, **zero outbound emails from the user were found**. The Gmail integration currently appears to have read access to the inbox only, not the Sent folder.\n\n**What this means for you as the composing agent:**\n- All style recommendations below are **inferred defaults**, not empirically confirmed.\n- Treat every confidence rating seriously \u2014 do not over-weight low-confidence items.\n- **Priority action**: As soon as sent-email access is enabled, re-run this analysis and update every section. The biggest unknowns are greeting style, sign-off, and time-proposal format.\n\n---\n\n## Section 1 \u2014 What We Know About the User (High Confidence)\n\nFrom meeting notes (Gemini AI summaries of daily stand-ups), the following is confirmed:\n\n| Fact | Source |\n|---|---|\n| **Name**: Triumphant Babalola | All meeting notes |\n| **Email**: triumphant@ferganalabs.com | Email headers |\n| **Company**: Fergana Labs (small startup, ~4 people) | Slack digest |\n| **Role**: Software engineer | Meeting notes |\n| **Primary contact**: Henry Dowling (manager/co-founder) | All meeting notes |\n| **Location/timezone**: WAT (West Africa Time, UTC+1) | Meeting note timestamps |\n| **Work rhythm**: Daily 4:30 PM WAT check-ins with Henry | Thread dates |\n| **Product context**: Building a scheduling email agent | Meeting notes |\n\n**Implication for scheduling emails**: The user operates in a small, informal startup environment with a single primary collaborator (Henry). Most scheduling interactions are likely low-ceremony, direct, and internal rather than formal external correspondence.\n\n---\n\n## Section 2 \u2014 Tone & Formality\n\n**Confidence: LOW** \u2014 No sent emails observed. The following is inferred.\n\n### Inferred default: Casual-professional\n\nGiven:\n- Startup of ~4 people\n- Daily informal video check-ins (not formal scheduled meetings)\n- Engineering role (typically lower email formality than sales/BD roles)\n\n**Recommendation**: Default to **friendly and direct**. Not overly formal, not too breezy. Think \"startup colleague\" register \u2014 warm but efficient.\n\n**Do:**\n- Write like a person, not a corporate template\n- Keep things short (2\u20135 sentences for a scheduling reply)\n- Sound helpful and accommodating\n\n**Don't:**\n- Use stiff language (\"I would like to propose\u2026\", \"Please advise on your availability\")\n- Over-apologize or pad with filler\n- Use formal salutations like \"Dear [Name],\"\n\n---\n\n## Section 3 \u2014 Greeting Style\n\n**Confidence: LOW** \u2014 Not observed. Defaults below.\n\n| Scenario | Recommended Greeting |\n|---|---|\n| Familiar contact (Henry, team members) | `Hi [First name],` |\n| Less familiar external contact | `Hi [First name],` |\n| Unknown/cold contact | `Hi [First name],` or `Hello [First name],` |\n| Group/team email | `Hi all,` or `Hey team,` |\n\n**Notes:**\n- Avoid \"Hey\" for first-contact external emails until observed otherwise.\n- Avoid \"Dear\" \u2014 inconsistent with startup context.\n- Do NOT omit the greeting entirely unless the thread is very rapid back-and-forth (chat-like).\n- Use **first name only** (not full name) based on the informal team context.\n\n---\n\n## Section 4 \u2014 Sign-Off Style\n\n**Confidence: LOW** \u2014 Not observed. Defaults below.\n\n| Scenario | Recommended Sign-Off |\n|---|---|\n| Internal / familiar | `Thanks,` or `Cheers,` |\n| External / semi-formal | `Best,` or `Thanks,` |\n| Quick reply | `Thanks,` or no sign-off if very short |\n\n**Notes:**\n- Avoid \"Sincerely,\" \u2014 too formal for this context.\n- Henry (the manager) uses `Best,` in his own emails \u2014 mirroring this for external contacts is reasonable.\n- For one-liner confirmations (\"Sounds good, see you then\"), a sign-off may be omitted.\n\n---\n\n## Section 5 \u2014 How to Propose Meeting Times\n\n**Confidence: LOW** \u2014 Not observed. Recommended best-practice defaults below.\n\n### Format: Offer 2\u20133 specific options inline (not a bullet list, unless 3+ options)\n\n**For 1\u20132 options (short reply):**\n> \"I'm free Thursday between 2\u20134 PM WAT, or Friday morning. Does either work?\"\n\n**For 3+ options (slightly longer reply):**\n> \"A few times that work for me:\n> - Tuesday, Apr 2 \u2014 10 AM or 2 PM WAT\n> - Thursday, Apr 4 \u2014 any time after noon WAT\n>\n> Happy to adjust if none of those work.\"\n\n**General rules:**\n- Always include timezone (**WAT** or convert for the recipient if they're in a different zone).\n- Be specific \u2014 give day + time, not just \"sometime next week.\"\n- Offer flexibility: end with \"or let me know what works for you\" / \"happy to find another time.\"\n- Don't offer more than 3\u20134 slots \u2014 it creates decision fatigue.\n\n---\n\n## Section 6 \u2014 Accepting a Meeting Request\n\n**Confidence: LOW** \u2014 Not observed. Defaults below.\n\nKeep it short and warm. Example:\n\n> \"Hi [Name], that works for me \u2014 see you [day] at [time] WAT. I'll accept the calendar invite.\"\n\nOr for less formal:\n> \"[Day/time] works great, talk then!\"\n\n**Do:**\n- Confirm the specific time back (avoids miscommunication)\n- Mention calendar invite if relevant\n- Keep it to 1\u20133 sentences\n\n---\n\n## Section 7 \u2014 Declining or Rescheduling\n\n**Confidence: LOW** \u2014 Not observed. Defaults below.\n\nBe direct but warm. Offer an alternative immediately \u2014 don't just say no.\n\n> \"Hi [Name], unfortunately [proposed time] doesn't work for me. Could we do [alternative day/time] instead? Happy to find something that works.\"\n\n**Do:**\n- Always offer an alternative (don't just decline flat)\n- Keep the tone apologetic but not over-the-top\n- Be specific about what does work\n\n**Don't:**\n- Give elaborate explanations for why you're unavailable\n- Use passive-aggressive hedging (\"I might potentially be available\u2026\")\n\n---\n\n## Section 8 \u2014 Email Length\n\n**Confidence: LOW** \u2014 Not observed.\n\n**Default target: 2\u20135 sentences** for a standard scheduling reply.\n\n- Simple acceptance: 1\u20132 sentences\n- Proposing times: 2\u20134 sentences (or a short bullet list)\n- Rescheduling/declining: 3\u20135 sentences\n- No scheduling email should exceed ~150 words unless there's a complex multi-party coordination need\n\n---\n\n## Section 9 \u2014 Punctuation & Formatting Habits\n\n**Confidence: VERY LOW** \u2014 Entirely unobserved.\n\n**Safe defaults:**\n- Use standard sentence punctuation (periods, commas)\n- Avoid excessive exclamation marks (max 1 per email, only if the context is genuinely enthusiastic)\n- No ellipses (\"...\") unless mirroring the recipient's style\n- No ALL CAPS for emphasis\n- Light use of bold is fine for calling out a specific time/date, but don't over-format a short email\n- Emoji: **avoid by default** unless the recipient uses them first\n\n---\n\n## Section 10 \u2014 Common Scheduling Phrases (Suggested Defaults)\n\nThe following are reasonable neutral defaults to use until actual phrases are observed:\n\n| Situation | Suggested Phrase |\n|---|---|\n| Proposing time | \"Does [day/time] WAT work for you?\" |\n| Offering options | \"I'm free [option 1] or [option 2] \u2014 either work?\" |\n| Accepting | \"That works for me, see you then.\" |\n| Acknowledging flexibility | \"Happy to find a time that works for you.\" |\n| Following up | \"Just circling back on finding a time to connect.\" |\n| Rescheduling | \"Would it be possible to shift to [alternative]?\" |\n\n---\n\n## Section 11 \u2014 Context-Specific Notes\n\n### Internal emails (Henry, Fergana Labs team)\n- Maximum informality within the casual-professional band\n- Can skip pleasantries entirely for quick confirmations\n- Henry already uses \"Best,\" as a sign-off \u2014 matching this is safe\n\n### External emails (new contacts, partners, candidates)\n- Step up one notch in formality\n- Always include a greeting and sign-off\n- Include timezone explicitly (WAT / UTC+1)\n\n### Calendar invites\n- If sending a Google Calendar invite alongside an email, mention it: \"I'll send over a calendar invite.\"\n- Do not rely solely on the invite without an email \u2014 always send a brief human message too\n\n---\n\n## Section 12 \u2014 What to Update Once Sent Emails Are Accessible\n\nWhen sent-mail access is available, re-analyze with priority on:\n\n1. **Actual greeting** \u2014 Does the user say \"Hi\", \"Hey\", \"Hello\", or skip it?\n2. **Sign-off** \u2014 \"Thanks\", \"Best\", \"Cheers\", or none?\n3. **Time format** \u2014 \"2pm\", \"2 PM\", \"14:00\"? With or without timezone?\n4. **Sentence length & rhythm** \u2014 Short punchy sentences vs. longer flowing ones?\n5. **Exclamation marks** \u2014 Does the user use them? How often?\n6. **Emoji** \u2014 Ever used in professional email?\n7. **Contractions** \u2014 \"I'm / I'll / won't\" vs. \"I am / I will / will not\"?\n8. **Any recurring phrases** \u2014 Verbal tics or go-to expressions?\n9. **How they handle back-and-forth** \u2014 Do they quote the previous email? Trim it?\n10. **Response speed patterns** \u2014 Same-day? Next day? Does this affect tone?\n\n---\n\n*This guide was generated by an AI analyst agent on 2026-03-31. It is a baseline placeholder and should be treated as low-confidence until updated with observed sent email data.*\n"
+  }
+}
