@@ -49,28 +49,80 @@ MAX_LENGTH_GROWTH = 1.20
 # Shared helpers
 # ---------------------------------------------------------------------------
 
+def _normalize_action(action: str | None) -> str:
+    """Normalise agent-supplied action strings to the canonical set.
+
+    The LLM sometimes outputs 'UPDATE', 'replace', 'update', etc. Map all
+    of those to the three canonical values: 'modify', 'add', 'remove'.
+    """
+    if not action:
+        return ""
+    canonical = action.strip().lower()
+    # Common aliases the model produces for a replace/edit operation
+    if canonical in ("update", "replace", "edit", "change", "modify"):
+        return "modify"
+    if canonical in ("add", "insert", "append"):
+        return "add"
+    if canonical in ("remove", "delete", "drop"):
+        return "remove"
+    return canonical
+
+
+def _normalize_ws(text: str) -> str:
+    """Collapse runs of whitespace so minor indentation/newline differences
+    don't prevent a match between the agent's current_text and the live guide.
+    """
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def _apply_change_to_guide(current: str, change: dict) -> str | None:
     """Apply a single atomic change to guide markdown. Returns new content or
     None if the change cannot be applied safely (e.g. section not found).
 
-    Supports actions: 'modify', 'add', 'remove'.
+    Canonical actions: 'modify' (replace current_text with proposed_text),
+    'add' (insert proposed_text after a named section), 'remove' (delete
+    current_text). Common aliases like 'UPDATE', 'replace', 'insert' are
+    accepted and normalised automatically.
     """
-    action = change.get("action")
+    action = _normalize_action(change.get("action"))
     section = change.get("section", "")
     proposed_text = change.get("proposed_text", "")
     current_text = change.get("current_text", "")
 
     if action == "modify":
-        if current_text and current_text in current:
-            return current.replace(current_text, proposed_text, 1)
-        # Fuzzy: find the section header and append the change after it
+        if current_text:
+            # 1. Exact match (fastest, most accurate)
+            if current_text in current:
+                return current.replace(current_text, proposed_text, 1)
+            # 2. Whitespace-normalised match — handles minor indentation /
+            #    line-ending differences between the agent's quoted text and
+            #    the stored guide.
+            norm_current = _normalize_ws(current)
+            norm_target = _normalize_ws(current_text)
+            if norm_target and norm_target in norm_current:
+                # Re-apply on the original (preserve formatting) by finding
+                # the best approximate location via the section header.
+                pass  # fall through to section-header fallback below
+        # 3. Section-header fallback: find the section and replace its body.
+        if section:
+            # Strip trailing decorators like " — Greeting Style" from section names
+            section_key = re.split(r"\s*[—–-]\s*", section)[0].strip()
+            pattern = rf"(#+\s+{re.escape(section_key)}[^\n]*\n)"
+            match = re.search(pattern, current, re.IGNORECASE)
+            if match and proposed_text:
+                # Find the next section header (or end of string) as the boundary
+                next_section = re.search(r"\n#+\s+", current[match.end():])
+                if next_section:
+                    end = match.end() + next_section.start()
+                    return current[: match.end()] + proposed_text + "\n" + current[end:]
+                return current[: match.end()] + proposed_text + "\n"
         return None
 
     if action == "add":
-        # Append to end of guide (or after a named section if section given)
+        # Insert after a named section header if given, otherwise append.
         if section:
-            # Try to insert after the last line of the named section header
-            pattern = rf"(#+\s+{re.escape(section)}[^\n]*\n)"
+            section_key = re.split(r"\s*[—–-]\s*", section)[0].strip()
+            pattern = rf"(#+\s+{re.escape(section_key)}[^\n]*\n)"
             match = re.search(pattern, current, re.IGNORECASE)
             if match:
                 insert_at = match.end()
@@ -123,6 +175,16 @@ the observed edits.
 - Do NOT invent patterns or extrapolate beyond the evidence.
 - Each proposed change must have a concrete justification citing the diffs.
 - Err on the side of no change over a speculative change.
+
+## propose_change field rules
+- `action` MUST be exactly one of: "modify", "add", "remove"
+  - "modify" — replace current_text with proposed_text in the named section
+  - "add"    — insert proposed_text after the named section header
+  - "remove" — delete current_text from the named section
+- `current_text` MUST be an exact verbatim copy of the text you want to
+  replace or remove, copied character-for-character from the guide above.
+- `section` should be the section heading as it appears in the guide
+  (e.g. "Section 3 — Greeting Style").
 """
 
 
@@ -246,6 +308,16 @@ updates based on observed edits to proposed times, durations, and logistics.
   probably ephemeral even if the same time was avoided multiple times.
 - Never propose a full rewrite — only targeted section changes.
 - Err on the side of no change over a speculative change.
+
+## propose_change field rules
+- `action` MUST be exactly one of: "modify", "add", "remove"
+  - "modify" — replace current_text with proposed_text in the named section
+  - "add"    — insert proposed_text after the named section header
+  - "remove" — delete current_text from the named section
+- `current_text` MUST be an exact verbatim copy of the text you want to
+  replace or remove, copied character-for-character from the guide above.
+- `section` should be the section heading as it appears in the guide
+  (e.g. "Section 8 — Protected Blocks & Implicit Boundaries").
 """
 
 
