@@ -42,10 +42,9 @@ export async function api<T = unknown>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const { headers: _dropHeaders, ...restOptions } = options;
   const res = await fetch(`${BASE_URL}${path}`, {
     credentials: 'include',
-    ...restOptions,
+    ...options,
     headers,
   });
 

@@ -94,16 +94,11 @@ export default function OnboardingClient({ needsGoogle, checkoutStatus, modePara
     }
 
     if (needsGoogle) {
-      // Fresh from Auth0 — check if they already have a subscription (returning user who paid but didn't connect Google)
+      // Fresh from Auth0 — check if they already paid (returning user who didn't connect Google)
       api<{ subscription_status: string }>('/web/api/v1/billing/status')
         .then((billing) => {
-          const hasSubscription = billing.subscription_status === 'trialing' || billing.subscription_status === 'active';
-          if (hasSubscription) {
-            // Already paid — skip straight to Google connect
-            setStep('google');
-          } else {
-            setStep('welcome');
-          }
+          const paid = billing.subscription_status === 'trialing' || billing.subscription_status === 'active';
+          setStep(paid ? 'google' : 'welcome');
         })
         .catch(() => setStep('welcome'));
     } else {
@@ -112,19 +107,12 @@ export default function OnboardingClient({ needsGoogle, checkoutStatus, modePara
         api<{ subscription_status: string }>('/web/api/v1/billing/status'),
       ])
         .then(([status, billing]) => {
-          const hasSubscription = billing.subscription_status === 'trialing' || billing.subscription_status === 'active';
-          if (status.ready && hasSubscription) {
-            router.push('/settings');
-          } else if (status.ready && !hasSubscription) {
-            setStep('paywall');
-          } else if (status.connected) {
-            setStep('calendars');
-          } else if (hasSubscription) {
-            // Has subscription but no Google — go to Google connect
-            setStep('google');
-          } else {
-            setStep('welcome');
-          }
+          const paid = billing.subscription_status === 'trialing' || billing.subscription_status === 'active';
+          if (status.ready && paid) return router.push('/settings');
+          if (status.ready) return setStep('paywall');
+          if (status.connected) return setStep('calendars');
+          if (paid) return setStep('google');
+          setStep('welcome');
         })
         .catch(() => setStep('processing'));
     }
@@ -172,24 +160,22 @@ export default function OnboardingClient({ needsGoogle, checkoutStatus, modePara
 
   // Submit profile to backend
   const submitProfile = useCallback(async (selectedMode: 'bot' | 'draft') => {
-    const tools = schedulingContext.pastTools
-      .map(t => t === '__other__' ? schedulingContext.pastToolsOther || 'Other' : t)
-      .filter(Boolean);
+    const tools = schedulingContext.pastTools.map(
+      t => t === '__other__' ? schedulingContext.pastToolsOther || 'Other' : t
+    );
 
-    const contextParts = [
-      schedulingContext.calendarGoal && `Calendar goal: ${schedulingContext.calendarGoal}`,
-      schedulingContext.schedulingWith && `Scheduling with: ${schedulingContext.schedulingWith}`,
-      tools.length > 0 && `Past tools: ${tools.join(', ')}`,
-      preferences.length > 0 && `Preferences: ${preferences.join(', ')}`,
-    ].filter(Boolean);
+    const contextLines: string[] = [];
+    if (schedulingContext.calendarGoal) contextLines.push(`Calendar goal: ${schedulingContext.calendarGoal}`);
+    if (schedulingContext.schedulingWith) contextLines.push(`Scheduling with: ${schedulingContext.schedulingWith}`);
+    if (tools.length > 0) contextLines.push(`Past tools: ${tools.join(', ')}`);
+    if (preferences.length > 0) contextLines.push(`Preferences: ${preferences.join(', ')}`);
 
     try {
       await api('/web/api/v1/onboarding/profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           job_title: jobTitle || null,
-          scheduling_context: contextParts.join('\n') || null,
+          scheduling_context: contextLines.join('\n') || null,
           scheduling_mode: selectedMode,
         }),
       });

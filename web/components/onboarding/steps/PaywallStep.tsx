@@ -19,7 +19,6 @@ export default function PaywallStep({ email }: PaywallStepProps) {
     try {
       const res = await api<{ checkout_url: string }>('/web/api/v1/billing/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan }),
       });
       window.location.href = res.checkout_url;

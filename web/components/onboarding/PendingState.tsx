@@ -15,10 +15,10 @@ const BOT_AGENT_LABELS: Record<string, string> = {
 
 interface PendingStateProps {
   agents: Record<string, string> | null;
-  mode?: 'bot' | 'draft';
+  mode: 'bot' | 'draft';
 }
 
-export default function PendingState({ agents, mode = 'draft' }: PendingStateProps) {
+export default function PendingState({ agents, mode }: PendingStateProps) {
   const isBotMode = mode === 'bot';
   const agentLabels = isBotMode ? BOT_AGENT_LABELS : DRAFT_AGENT_LABELS;
 

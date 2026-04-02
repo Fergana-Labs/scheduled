@@ -7,8 +7,8 @@ import { track } from '@/lib/analytics';
 
 interface ModeSwitcherProps {
   initialMode: string;
-  initialGuides?: { name: string }[];
-  onModeChange?: (mode: string) => void;
+  initialGuides: { name: string }[];
+  onModeChange: (mode: string) => void;
 }
 
 export default function ModeSwitcher({ initialMode, initialGuides, onModeChange }: ModeSwitcherProps) {
@@ -20,7 +20,7 @@ export default function ModeSwitcher({ initialMode, initialGuides, onModeChange 
 
   // On mount, check if we're in draft mode but missing email_style guide (post-OAuth switch)
   useEffect(() => {
-    if (initialMode !== 'draft' || !initialGuides) return;
+    if (initialMode !== 'draft') return;
     const guideNames = new Set(initialGuides.map((g) => g.name));
     if (!guideNames.has('email_style')) {
       setProcessing(true);
@@ -65,7 +65,7 @@ export default function ModeSwitcher({ initialMode, initialGuides, onModeChange 
         return;
       }
       setMode(res.scheduling_mode);
-      onModeChange?.(res.scheduling_mode);
+      onModeChange(res.scheduling_mode);
       track('setting_changed', { setting: 'scheduling_mode', new_value: res.scheduling_mode });
       if (res.generating_guides) {
         setProcessing(true);

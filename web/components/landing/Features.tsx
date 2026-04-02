@@ -1,26 +1,23 @@
 'use client';
 
-import { Brain, Mail, Calendar, Shield } from 'lucide-react';
+import { Brain, Mail, Calendar } from 'lucide-react';
 
 const features = [
   {
     name: 'Knows Your Calendar',
-    description:
-      'Scheduled reads your availability in real-time across all your calendars. Primary calendar, shared team calendars, and even a dedicated calendar for commitments. No double-bookings, ever.',
+    description: 'Scheduled reads your availability in real-time across all your calendars. Primary calendar, shared team calendars, and even a dedicated calendar for commitments. No double-bookings, ever.',
     icon: Calendar,
     visualType: 'calendar' as const,
   },
   {
     name: 'Learns Your Preferences',
-    description:
-      'Scheduled analyzes how you schedule — when you like to meet, how long your meetings run, and how you communicate. Every interaction sounds like you, not a robot.',
+    description: 'Scheduled analyzes how you schedule — when you like to meet, how long your meetings run, and how you communicate. Every interaction sounds like you, not a robot.',
     icon: Brain,
     visualType: 'style' as const,
   },
   {
     name: 'Handles the Back-and-Forth',
-    description:
-      'Not every email is a scheduling request. Scheduled uses AI to detect scheduling intent, proposes times that work, and handles the entire conversation — so you never have to.',
+    description: 'Not every email is a scheduling request. Scheduled uses AI to detect scheduling intent, proposes times that work, and handles the entire conversation — so you never have to.',
     icon: Mail,
     visualType: 'intent' as const,
   },
@@ -154,19 +151,17 @@ export default function Features() {
         <div className="space-y-24 sm:space-y-32">
           {features.map((feature, index) => {
             const Icon = feature.icon;
-            const isEven = index % 2 === 0;
+            const flipped = index % 2 !== 0;
 
             return (
               <div
                 key={feature.name}
                 className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20"
               >
-                {/* Content */}
-                <div className={!isEven ? 'lg:order-2' : ''}>
+                <div className={flipped ? 'lg:order-2' : ''}>
                   <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-900">
                     <Icon className="h-7 w-7 text-white" />
                   </div>
-
                   <h3 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
                     {feature.name}
                   </h3>
@@ -175,8 +170,7 @@ export default function Features() {
                   </p>
                 </div>
 
-                {/* Visual */}
-                <div className={!isEven ? 'lg:order-1' : ''}>
+                <div className={flipped ? 'lg:order-1' : ''}>
                   <div className="relative rounded-2xl border border-gray-200 bg-[#FAFAFA] p-10 sm:p-12">
                     {feature.visualType === 'style' && <StyleVisual />}
                     {feature.visualType === 'intent' && <IntentVisual />}

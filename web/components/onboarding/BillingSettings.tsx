@@ -18,6 +18,15 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   none: { label: 'No Plan', color: 'bg-gray-100 text-gray-600' },
 };
 
+function formatDate(iso: string | null) {
+  if (!iso) return null;
+  return new Date(iso).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 export default function BillingSettings() {
   const [status, setStatus] = useState<BillingStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,15 +63,6 @@ export default function BillingSettings() {
   }
 
   const statusInfo = STATUS_LABELS[status.subscription_status] || STATUS_LABELS.none;
-
-  function formatDate(iso: string | null) {
-    if (!iso) return null;
-    return new Date(iso).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  }
 
   return (
     <div className="rounded-xl border border-gray-200 p-4">

@@ -597,24 +597,6 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
-# Auto-restart after 50K requests to reclaim leaked per-request memory from
-# uvicorn/h11/FastAPI/starlette.  Equivalent to uvicorn --limit-max-requests
-# but works without changing the Render start command.
-_MAX_REQUESTS = 10_000
-_request_count = 0
-
-
-@app.middleware("http")
-async def _limit_max_requests(request: Request, call_next):
-    global _request_count
-    _request_count += 1
-    response = await call_next(request)
-    if _request_count >= _MAX_REQUESTS:
-        logger.info("limit_max_requests: reached %d requests, exiting for restart", _request_count)
-        # Defer exit so the response can be sent first
-        asyncio.get_event_loop().call_later(1.0, os._exit, 0)
-    return response
-
 
 # --- Self-hosted setup + settings (only active in self-hosted mode) ---
 
@@ -3666,9 +3648,6 @@ def web_billing_checkout(req: WebBillingCheckoutRequest, user: dict = Depends(ge
         update_stripe_customer(str(db_user.id), customer_id)
 
     price_id = config.stripe_annual_price_id if req.plan == "annual" else config.stripe_price_id
-
-    # Include a fresh session token in the success URL so auth persists after Stripe redirect.
-    # Redirect back to /onboarding so the user proceeds to Google connect.
     session_token = _sign_session(user["user_id"], db_user.email)
 
     session = create_checkout_session(
@@ -3684,7 +3663,7 @@ def web_billing_checkout(req: WebBillingCheckoutRequest, user: dict = Depends(ge
 def web_billing_status(user: dict = Depends(get_authenticated_user)):
     import stripe as stripe_mod
     from scheduler.db import get_user_by_id, update_subscription_status
-    from scheduler.billing import _ensure_stripe
+    from scheduler.billing import _init_stripe
 
     db_user = get_user_by_id(user["user_id"])
     if not db_user:
@@ -3694,7 +3673,7 @@ def web_billing_status(user: dict = Depends(get_authenticated_user)):
     # to catch missed webhooks.
     if db_user.subscription_status == "none" and db_user.stripe_customer_id:
         try:
-            _ensure_stripe()
+            _init_stripe()
             subs = stripe_mod.Subscription.list(customer=db_user.stripe_customer_id, limit=1)
             if subs.data:
                 sub = subs.data[0]
@@ -3742,7 +3721,7 @@ def web_billing_portal(user: dict = Depends(get_authenticated_user)):
 @app.post("/webhooks/stripe")
 async def stripe_webhook(request: Request):
     import stripe as stripe_mod
-    from scheduler.billing import construct_webhook_event, _ensure_stripe
+    from scheduler.billing import construct_webhook_event, _init_stripe
     from scheduler.db import update_subscription_status
 
     payload = await request.body()
@@ -3762,7 +3741,7 @@ async def stripe_webhook(request: Request):
         subscription_id = data.get("subscription")
         if customer_id and subscription_id:
             try:
-                _ensure_stripe()
+                _init_stripe()
                 sub = stripe_mod.Subscription.retrieve(subscription_id)
                 trial_end = datetime.fromtimestamp(sub.trial_end, tz=timezone.utc) if sub.trial_end else None
                 period_end = datetime.fromtimestamp(sub.current_period_end, tz=timezone.utc) if sub.current_period_end else None
@@ -3893,17 +3872,17 @@ def web_settings_scheduling_mode(req: WebUpdateSchedulingModeRequest, user: dict
 
     # Switching bot → draft requires Gmail scopes. Check if user already has them.
     if req.mode == "draft" and db_user.scheduling_mode == "bot":
-        needs_reauth = True
+        has_gmail = False
         if db_user.google_refresh_token:
             try:
                 creds = load_credentials(user["user_id"])
                 service = build("gmail", "v1", credentials=creds, cache_discovery=False)
                 service.users().getProfile(userId="me").execute()
-                needs_reauth = False
+                has_gmail = True
             except Exception:
-                needs_reauth = True
+                pass
 
-        if needs_reauth:
+        if not has_gmail:
             update_scheduling_mode(user["user_id"], req.mode)
             return {"scheduling_mode": req.mode, "needs_reauth": True}
 
