@@ -83,35 +83,59 @@ If `E2B_TEMPLATE_ID` is unset, the code falls back to runtime provisioning insid
 
 ## Cron Jobs
 
-Two recurring jobs keep the system healthy. Run them from the `scheduled/` directory:
+Two recurring jobs keep the system healthy:
+
+| Job | Endpoint | Schedule |
+|---|---|---|
+| Renew Gmail watches | `POST /api/v1/gmail/watch/renew` | Daily, 2 AM |
+| Run guide updater | `POST /api/v1/guides/update-all` | Weekly, Monday 6 AM |
+
+Both endpoints return immediately — all processing runs in background tasks on the server.
+
+### Production auth
+
+Set `CRON_SECRET` to a long random string in your environment. The server rejects any request to these endpoints that doesn't include the matching `X-Cron-Secret` header. The check is skipped when `CRON_SECRET` is unset (safe for local dev).
 
 ```bash
-# Daily — renew Gmail push notification watches (prevents missed emails)
-python scripts/cron_jobs.py --job daily
-
-# Weekly — run the guide updater for all active users (continual learning)
-python scripts/cron_jobs.py --job weekly
-```
-
-Both jobs POST to internal server endpoints and exit `0` on success / non-zero on failure, so standard cron alerting works out of the box.
-
-**System crontab** (add with `crontab -e`):
-
-```cron
-# Renew Gmail watches every day at 2 AM
-0 2 * * * cd /path/to/scheduled && /path/to/venv/bin/python scripts/cron_jobs.py --job daily >> /var/log/scheduled-cron.log 2>&1
-
-# Run guide updater every Monday at 6 AM
-0 6 * * 1 cd /path/to/scheduled && /path/to/venv/bin/python scripts/cron_jobs.py --job weekly >> /var/log/scheduled-cron.log 2>&1
-```
-
-**Production auth:** set `CRON_SECRET` in your environment. The script sends it as `X-Cron-Secret` and the server rejects requests without it. Generate a secret with:
-
-```bash
+# Generate a secret
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-**Render Cron / GCP Cloud Scheduler:** point them at `POST /api/v1/gmail/watch/renew` (daily) and `POST /api/v1/guides/update-all` (weekly) with `X-Cron-Secret: <your-secret>` in the headers.
+### Deploying on Render (recommended)
+
+Create two **Cron Job** services in the Render dashboard (New → Cron Job). No Python environment needed — the commands are plain `curl`:
+
+**Daily — Gmail watch renewal**
+```
+Schedule: 0 2 * * *
+Command:  curl -sf -X POST -H "X-Cron-Secret: $CRON_SECRET" $CONTROL_PLANE_URL/api/v1/gmail/watch/renew
+```
+
+**Weekly — Guide updater**
+```
+Schedule: 0 6 * * 1
+Command:  curl -sf -X POST -H "X-Cron-Secret: $CRON_SECRET" $CONTROL_PLANE_URL/api/v1/guides/update-all
+```
+
+Set `CRON_SECRET` and `CONTROL_PLANE_URL` as environment variables on each cron service (or via a Render environment group shared with the web service). The `-sf` flags cause `curl` to exit non-zero on HTTP errors so Render marks failed runs correctly.
+
+> **Note:** if your web service is on Render's free tier it spins down between requests. Add a pre-warm step to avoid timeouts: prepend `curl -sf $CONTROL_PLANE_URL/health && ` before the actual cron command.
+
+### Local dev / self-hosted
+
+Use the helper script, which wraps the same HTTP calls:
+
+```bash
+python scripts/cron_jobs.py --job daily
+python scripts/cron_jobs.py --job weekly
+```
+
+Or add to your system crontab (`crontab -e`):
+
+```cron
+0 2 * * *   cd /path/to/scheduled && /path/to/venv/bin/python scripts/cron_jobs.py --job daily  >> /var/log/scheduled-cron.log 2>&1
+0 6 * * 1   cd /path/to/scheduled && /path/to/venv/bin/python scripts/cron_jobs.py --job weekly >> /var/log/scheduled-cron.log 2>&1
+```
 
 ### What the guide updater does
 
