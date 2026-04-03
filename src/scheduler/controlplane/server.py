@@ -3353,11 +3353,11 @@ def demo_book(req: DemoBookRequest, request: Request):
 
 
 @app.post("/api/v1/gmail/watch/renew")
-def gmail_watch_renew():
+def gmail_watch_renew(_: None = Depends(_require_cron_secret)):
     """Renew Gmail push notification watches for all users.
 
-    Intended to be called by a daily cron job. No auth required since
-    it only re-registers existing watches (idempotent and safe).
+    Intended to be called by a daily cron job. Requires X-Cron-Secret
+    header when CRON_SECRET env var is set.
     """
     from scheduler.gmail.watch import renew_all_watches
 
@@ -3372,6 +3372,21 @@ def gmail_watch_renew():
 # ---------------------------------------------------------------------------
 # Guide updater — production-scale async orchestration
 # ---------------------------------------------------------------------------
+
+# Shared secret for internal cron endpoints.
+# Set CRON_SECRET in .env / environment. If unset, the endpoints are open
+# (acceptable for local dev; required in production).
+_CRON_SECRET: str | None = os.environ.get("CRON_SECRET")
+
+
+def _require_cron_secret(x_cron_secret: str | None = Header(default=None)) -> None:
+    """Dependency that enforces CRON_SECRET when the env var is set.
+
+    Cron scripts must pass the header:  X-Cron-Secret: <secret>
+    In local dev (CRON_SECRET not set) the check is skipped entirely.
+    """
+    if _CRON_SECRET and x_cron_secret != _CRON_SECRET:
+        raise HTTPException(status_code=401, detail="Invalid or missing X-Cron-Secret")
 
 # Max users processed in parallel. Each user makes 2 multi-turn LLM calls;
 # keeping this at 5 comfortably fits within Anthropic's default RPM limits.
@@ -3533,11 +3548,14 @@ async def _run_guide_updater_batch(user_ids: list[str]) -> None:
 
 
 @app.post("/api/v1/guides/update-all")
-async def guides_update_all(background_tasks: BackgroundTasks):
+async def guides_update_all(
+    background_tasks: BackgroundTasks,
+    _: None = Depends(_require_cron_secret),
+):
     """Run the weekly guide updater for all active users.
 
-    Intended to be called by a weekly cron job. No auth required —
-    the operation is read-then-write on internal DB data only.
+    Intended to be called by a weekly cron job. Requires X-Cron-Secret
+    header when CRON_SECRET env var is set.
 
     Returns immediately; all processing happens in background tasks.
     Progress is visible in real time via GET /web/api/v1/admin/guide-updates

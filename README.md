@@ -81,6 +81,44 @@ export E2B_TEMPLATE_ID=scheduler-agents
 
 If `E2B_TEMPLATE_ID` is unset, the code falls back to runtime provisioning inside a fresh sandbox.
 
+## Cron Jobs
+
+Two recurring jobs keep the system healthy. Run them from the `scheduled/` directory:
+
+```bash
+# Daily — renew Gmail push notification watches (prevents missed emails)
+python scripts/cron_jobs.py --job daily
+
+# Weekly — run the guide updater for all active users (continual learning)
+python scripts/cron_jobs.py --job weekly
+```
+
+Both jobs POST to internal server endpoints and exit `0` on success / non-zero on failure, so standard cron alerting works out of the box.
+
+**System crontab** (add with `crontab -e`):
+
+```cron
+# Renew Gmail watches every day at 2 AM
+0 2 * * * cd /path/to/scheduled && /path/to/venv/bin/python scripts/cron_jobs.py --job daily >> /var/log/scheduled-cron.log 2>&1
+
+# Run guide updater every Monday at 6 AM
+0 6 * * 1 cd /path/to/scheduled && /path/to/venv/bin/python scripts/cron_jobs.py --job weekly >> /var/log/scheduled-cron.log 2>&1
+```
+
+**Production auth:** set `CRON_SECRET` in your environment. The script sends it as `X-Cron-Secret` and the server rejects requests without it. Generate a secret with:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+**Render Cron / GCP Cloud Scheduler:** point them at `POST /api/v1/gmail/watch/renew` (daily) and `POST /api/v1/guides/update-all` (weekly) with `X-Cron-Secret: <your-secret>` in the headers.
+
+### What the guide updater does
+
+Once a week the updater agent reads the last 7 days of edited drafts — emails the assistant composed that the user changed before sending — and proposes surgical updates to the `email_style` and `scheduling_preferences` guides. Changes only apply when a pattern has been observed at least 3× (style) or 5× (preferences), preventing one-off edits from polluting the guides.
+
+Every run is logged in `guide_update_runs` and visible in the **Guide Updates** tab at `/admin`.
+
 ## Evals
 
 Eval fixtures and golden data live in a separate private repo because they contain real confidential data from Henry's personal email:
@@ -104,6 +142,9 @@ python -m scheduler.eval draft --fixture eval/fixtures/baseline.json
 
 # Run guide-writer evals
 python -m scheduler.eval guides --fixture eval/fixtures/baseline.json
+
+# Run guide updater evals (uses updater_diffs key in fixture.json)
+python -m scheduler.eval updater
 ```
 
 ## License

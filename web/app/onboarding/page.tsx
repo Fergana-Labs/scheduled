@@ -1,13 +1,14 @@
 import OnboardingClient from './onboarding-client';
 
 interface OnboardingPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     needs_google?: string | string[];
-  };
+  }>;
 }
 
-export default function OnboardingPage({ searchParams }: OnboardingPageProps) {
-  const rawNeedsGoogle = searchParams?.needs_google;
+export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
+  const params = await searchParams;
+  const rawNeedsGoogle = params?.needs_google;
   const needsGoogle = Array.isArray(rawNeedsGoogle)
     ? rawNeedsGoogle.includes('1')
     : rawNeedsGoogle === '1';

@@ -382,7 +382,7 @@ def update_google_tokens(
 
 
 def get_all_user_ids() -> list[str]:
-    rows = _get_db().execute("SELECT id FROM users").fetchall()
+    rows = _get_db().execute("SELECT id FROM users ORDER BY created_at DESC").fetchall()
     return [row["id"] for row in rows]
 
 

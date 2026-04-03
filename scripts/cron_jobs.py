@@ -35,10 +35,16 @@ def _server_url() -> str:
 
 
 def _post(path: str) -> dict:
-    """POST to the server and return the parsed JSON response."""
+    """POST to the server and return the parsed JSON response.
+
+    Sends X-Cron-Secret header when CRON_SECRET env var is set.
+    """
     url = _server_url() + path
     req = urllib.request.Request(url, method="POST", data=b"")
     req.add_header("Content-Type", "application/json")
+    secret = os.environ.get("CRON_SECRET")
+    if secret:
+        req.add_header("X-Cron-Secret", secret)
     try:
         with urllib.request.urlopen(req, timeout=300) as resp:
             body = resp.read().decode()

@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useState, useCallback } from 'react';
-import { Loader2, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Loader2, Search, ChevronDown, ChevronRight, CheckCircle, XCircle, Clock, SkipForward } from 'lucide-react';
 import { api, captureSessionFromURL, clearSession } from '@/lib/api';
 import {
   BarChart,
@@ -84,7 +84,29 @@ interface DraftRow {
   sent_similarity: number | null;
 }
 
-type Tab = 'funnel' | 'cohorts' | 'drafts' | 'definitions';
+interface ProposedChange {
+  action: string;
+  current_text?: string;
+  new_text?: string;
+  reason?: string;
+  observed_n_times?: number;
+}
+
+interface GuideUpdateRun {
+  id: string;
+  user_email: string;
+  guide_name: string;
+  ran_at: string;
+  status: 'running' | 'done' | 'skipped' | 'failed';
+  drafts_analyzed: number;
+  changes_made: boolean;
+  proposed_changes: ProposedChange[];
+  applied_changes: ProposedChange[];
+  skipped_reason: string | null;
+  agent_log: string | null;
+}
+
+type Tab = 'funnel' | 'cohorts' | 'drafts' | 'guide-updates' | 'definitions';
 
 // --- Helpers ---
 
@@ -813,6 +835,330 @@ function DraftBrowser() {
   );
 }
 
+// --- Guide Updates ---
+
+const STATUS_CONFIG = {
+  done:    { label: 'Done',    icon: CheckCircle,  cls: 'bg-green-100 text-green-800' },
+  skipped: { label: 'Skipped', icon: SkipForward,  cls: 'bg-gray-100 text-gray-600' },
+  running: { label: 'Running', icon: Clock,         cls: 'bg-blue-100 text-blue-800' },
+  failed:  { label: 'Failed',  icon: XCircle,       cls: 'bg-red-100 text-red-800' },
+} as const;
+
+function StatusBadge({ status }: { status: GuideUpdateRun['status'] }) {
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.skipped;
+  const Icon = cfg.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ${cfg.cls}`}>
+      <Icon className="h-3 w-3" />
+      {cfg.label}
+    </span>
+  );
+}
+
+function ChangeCard({
+  change,
+  applied,
+  runId,
+  index,
+  onApply,
+}: {
+  change: ProposedChange;
+  applied: boolean;
+  runId: string;
+  index: number;
+  onApply: (runId: string, index: number) => void;
+}) {
+  return (
+    <div className={`rounded border p-3 text-xs ${applied ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'}`}>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="font-medium text-gray-700 capitalize">{change.action}</span>
+        {applied ? (
+          <span className="text-green-700 font-medium">Applied</span>
+        ) : (
+          <button
+            onClick={() => onApply(runId, index)}
+            className="rounded border border-gray-300 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100"
+          >
+            Apply manually
+          </button>
+        )}
+      </div>
+      {change.reason && (
+        <p className="mb-2 text-gray-500 italic">{change.reason}</p>
+      )}
+      {change.observed_n_times !== undefined && (
+        <p className="mb-2 text-gray-400">Observed {change.observed_n_times}×</p>
+      )}
+      {change.current_text && (
+        <div className="mb-1">
+          <div className="mb-0.5 text-gray-400 uppercase tracking-wide" style={{ fontSize: '10px' }}>Before</div>
+          <pre className="max-h-24 overflow-auto whitespace-pre-wrap rounded bg-red-50 p-2 text-red-800">{change.current_text}</pre>
+        </div>
+      )}
+      {change.new_text && (
+        <div>
+          <div className="mb-0.5 text-gray-400 uppercase tracking-wide" style={{ fontSize: '10px' }}>After</div>
+          <pre className="max-h-24 overflow-auto whitespace-pre-wrap rounded bg-green-50 p-2 text-green-800">{change.new_text}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GuideUpdatesBrowser() {
+  const [runs, setRuns] = useState<GuideUpdateRun[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [emailSearch, setEmailSearch] = useState('');
+  const [guideFilter, setGuideFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showLog, setShowLog] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState<string | null>(null);
+  const perPage = 20;
+
+  const fetchRuns = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(page), per_page: String(perPage) });
+      if (emailSearch) params.set('email', emailSearch);
+      if (guideFilter) params.set('guide_name', guideFilter);
+      const res = await api<{ runs: GuideUpdateRun[]; total: number }>(
+        `/web/api/v1/admin/guide-updates?${params.toString()}`
+      );
+      let filtered = res.runs;
+      if (statusFilter) filtered = filtered.filter((r) => r.status === statusFilter);
+      setRuns(filtered);
+      setTotal(res.total);
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
+  }, [page, emailSearch, guideFilter, statusFilter]);
+
+  useEffect(() => { fetchRuns(); }, [fetchRuns]);
+
+  const handleApply = async (runId: string, index: number) => {
+    setApplying(`${runId}:${index}`);
+    try {
+      await api(`/web/api/v1/admin/guide-updates/${runId}/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ change_index: index }),
+      });
+      await fetchRuns();
+    } catch {
+      alert('Failed to apply change — check the console or server logs.');
+    } finally {
+      setApplying(null);
+    }
+  };
+
+  const totalPages = Math.ceil(total / perPage);
+
+  const appliedSet = (run: GuideUpdateRun): Set<string> => {
+    const set = new Set<string>();
+    (run.applied_changes ?? []).forEach((c) => {
+      set.add(JSON.stringify({ action: c.action, new_text: c.new_text }));
+    });
+    return set;
+  };
+
+  return (
+    <div>
+      {/* Filters */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by email..."
+            value={emailSearch}
+            onChange={(e) => { setEmailSearch(e.target.value); setPage(1); }}
+            className="rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-[#43614a] focus:outline-none"
+          />
+        </div>
+        <select
+          value={guideFilter}
+          onChange={(e) => { setGuideFilter(e.target.value); setPage(1); }}
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#43614a] focus:outline-none"
+        >
+          <option value="">All guides</option>
+          <option value="email_style">email_style</option>
+          <option value="scheduling_preferences">scheduling_preferences</option>
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#43614a] focus:outline-none"
+        >
+          <option value="">All statuses</option>
+          <option value="done">Done</option>
+          <option value="skipped">Skipped</option>
+          <option value="running">Running</option>
+          <option value="failed">Failed</option>
+        </select>
+        <span className="text-sm text-gray-400">{total} runs</span>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        </div>
+      ) : runs.length === 0 ? (
+        <p className="py-8 text-center text-sm text-gray-500">No guide update runs yet.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="w-8 px-2 py-2" />
+                <th className="px-3 py-2 text-left font-medium text-gray-600">User</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Guide</th>
+                <th className="px-3 py-2 text-center font-medium text-gray-600">Status</th>
+                <th className="px-3 py-2 text-center font-medium text-gray-600">Analyzed</th>
+                <th className="px-3 py-2 text-center font-medium text-gray-600">Proposed</th>
+                <th className="px-3 py-2 text-center font-medium text-gray-600">Applied</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Ran At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {runs.map((run) => {
+                const isExpanded = expandedId === run.id;
+                const applied = appliedSet(run);
+                return (
+                  <Fragment key={run.id}>
+                    <tr
+                      className="cursor-pointer border-b border-gray-100 hover:bg-gray-50"
+                      onClick={() => setExpandedId(isExpanded ? null : run.id)}
+                    >
+                      <td className="px-2 py-2">
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 text-gray-400" />
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-gray-700">{run.user_email}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-gray-600">{run.guide_name}</td>
+                      <td className="px-3 py-2 text-center">
+                        <StatusBadge status={run.status} />
+                      </td>
+                      <td className="px-3 py-2 text-center text-gray-600">{run.drafts_analyzed}</td>
+                      <td className="px-3 py-2 text-center text-gray-600">
+                        {run.proposed_changes?.length ?? 0}
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        {run.changes_made ? (
+                          <span className="font-medium text-green-700">{run.applied_changes?.length ?? 0}</span>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-xs text-gray-500">
+                        {new Date(run.ran_at).toLocaleString('en-US', {
+                          month: 'short', day: 'numeric',
+                          hour: 'numeric', minute: '2-digit',
+                        })}
+                      </td>
+                    </tr>
+
+                    {isExpanded && (
+                      <tr className="border-b border-gray-100 bg-gray-50">
+                        <td colSpan={8} className="px-6 py-4">
+                          {/* Skipped reason */}
+                          {run.skipped_reason && (
+                            <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                              <span className="font-medium">Skipped: </span>{run.skipped_reason}
+                            </div>
+                          )}
+
+                          {/* Proposed changes */}
+                          {run.proposed_changes && run.proposed_changes.length > 0 ? (
+                            <div className="mb-4">
+                              <div className="mb-2 text-xs font-medium uppercase text-gray-500">
+                                Proposed Changes ({run.proposed_changes.length})
+                              </div>
+                              <div className="grid gap-3 md:grid-cols-2">
+                                {run.proposed_changes.map((change, i) => {
+                                  const key = JSON.stringify({ action: change.action, new_text: change.new_text });
+                                  const isApplied = applied.has(key);
+                                  const isApplying = applying === `${run.id}:${i}`;
+                                  return (
+                                    <div key={i} className="relative">
+                                      {isApplying && (
+                                        <div className="absolute inset-0 z-10 flex items-center justify-center rounded bg-white/70">
+                                          <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                                        </div>
+                                      )}
+                                      <ChangeCard
+                                        change={change}
+                                        applied={isApplied}
+                                        runId={run.id}
+                                        index={i}
+                                        onApply={handleApply}
+                                      />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ) : run.status !== 'skipped' && (
+                            <p className="mb-4 text-xs text-gray-400">No changes proposed.</p>
+                          )}
+
+                          {/* Agent log toggle */}
+                          {run.agent_log && (
+                            <div>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setShowLog(showLog === run.id ? null : run.id); }}
+                                className="mb-2 text-xs text-gray-400 underline hover:text-gray-600"
+                              >
+                                {showLog === run.id ? 'Hide' : 'Show'} agent log
+                              </button>
+                              {showLog === run.id && (
+                                <pre className="max-h-60 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">
+                                  {run.agent_log}
+                                </pre>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-500">Page {page} of {totalPages}</span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Definitions() {
   return (
     <div className="space-y-8 text-sm text-gray-700 leading-relaxed">
@@ -950,6 +1296,7 @@ export default function AdminDashboard() {
     { key: 'funnel', label: 'Funnel' },
     { key: 'cohorts', label: 'Cohorts' },
     { key: 'drafts', label: 'Drafts' },
+    { key: 'guide-updates', label: 'Guide Updates' },
     { key: 'definitions', label: 'Definitions' },
   ];
 
@@ -975,6 +1322,7 @@ export default function AdminDashboard() {
         {tab === 'funnel' && <FunnelSection />}
         {tab === 'cohorts' && <CohortSection />}
         {tab === 'drafts' && <DraftBrowser />}
+        {tab === 'guide-updates' && <GuideUpdatesBrowser />}
         {tab === 'definitions' && <Definitions />}
       </div>
     </div>
