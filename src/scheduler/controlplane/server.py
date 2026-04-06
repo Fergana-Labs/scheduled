@@ -3352,19 +3352,6 @@ def demo_book(req: DemoBookRequest, request: Request):
     return {"status": "booked", "event_id": event_id}
 
 
-@app.post("/api/v1/gmail/watch/renew")
-def gmail_watch_renew(_: None = Depends(_require_cron_secret)):
-    """Renew Gmail push notification watches for all users.
-
-    Intended to be called by a daily cron job. Requires X-Cron-Secret
-    header when CRON_SECRET env var is set.
-    """
-    from scheduler.gmail.watch import renew_all_watches
-
-    result = renew_all_watches()
-    return result
-
-
 # ---------------------------------------------------------------------------
 # Guide update system — weekly continual learning
 # ---------------------------------------------------------------------------
@@ -3387,6 +3374,19 @@ def _require_cron_secret(x_cron_secret: str | None = Header(default=None)) -> No
     """
     if _CRON_SECRET and x_cron_secret != _CRON_SECRET:
         raise HTTPException(status_code=401, detail="Invalid or missing X-Cron-Secret")
+
+
+@app.post("/api/v1/gmail/watch/renew")
+def gmail_watch_renew(_: None = Depends(_require_cron_secret)):
+    """Renew Gmail push notification watches for all users.
+
+    Intended to be called by a daily cron job. Requires X-Cron-Secret
+    header when CRON_SECRET env var is set.
+    """
+    from scheduler.gmail.watch import renew_all_watches
+
+    result = renew_all_watches()
+    return result
 
 # Max users processed in parallel. Each user makes 2 multi-turn LLM calls;
 # keeping this at 5 comfortably fits within Anthropic's default RPM limits.
